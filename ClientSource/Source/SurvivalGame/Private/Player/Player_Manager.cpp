@@ -22,6 +22,8 @@ void APlayer_Manager::BeginPlay()
 
 	SetActorTickInterval(0.033f);
 
+	
+
 	/*if (PlayerId > 0)
 	{
 		for (int i = 0; i < MAX_USER; ++i)
@@ -90,9 +92,46 @@ void APlayer_Manager::Tick(float DeltaTime)
 SpawnInfo.Instigator = Instigator;
 APawn* ResultPawn = GetWorld()->SpawnActor<APawn>(GetWorld()->GetFirstPlayerController()->GetPawn()->StaticClass(), location, rotation, SpawnInfo);*/
 
-		test = true;
+		//test = true;
 	}
 
+
+	if (!test)
+	{
+		UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/Player/PlayerPawn")));
+
+		UBlueprint* GenerateBp = Cast<UBlueprint>(SpawnActor);
+
+		if (!SpawnActor)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CAN'T FIND OBJECT TO SPAWN")));
+		}
+
+		UClass* SpawnClass = SpawnActor->StaticClass();
+		if (SpawnClass == NULL)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("CLASS == NULL")));
+		}
+
+		UWorld* World = GetWorld();
+		FActorSpawnParameters Spawnparams;
+		Spawnparams.Owner = this;
+		Spawnparams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		FVector loc;
+		FRotator rot;
+		loc.X = -4692.9672852;
+		loc.Y = 4420.972168;
+		loc.Z = 1132.0373535;
+
+		ASCharacter* NewCharacter = World->SpawnActor<ASCharacter>(GenerateBp->GeneratedClass, loc, FRotator::ZeroRotator, Spawnparams);
+
+		APlayerController* Mycontroller = World->GetFirstPlayerController();
+
+		Mycontroller->Possess(NewCharacter);
+
+		test = true;
+	}
 }
 
 ASCharacter* APlayer_Manager::actorspawn(FVector Loc, FRotator Rot)
