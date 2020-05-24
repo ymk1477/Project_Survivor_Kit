@@ -13,13 +13,27 @@ S_Obj sendInform;
 Player Player_Info;
 
 bool IsStarted = false;
+bool recving[MAX_USER] = { false };
+
+void err_display(DWORD msg)
+{
+	LPVOID MsgBuf;
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, WSAGetLastError(),
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR)&MsgBuf, 0, NULL);
+	cout << "[" << msg << "] " << (char*)MsgBuf << endl;
+	LocalFree(MsgBuf);
+}
 
 void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overlapped, DWORD lnFlags)
 {
 	int clientId = reinterpret_cast<int>(overlapped->hEvent);
-
+	
 	// 클라이언트가 closesocket을 했을 경우
-	if (dataBytes == 0) {
+	if (Error != 0 || dataBytes == 0) {
+		if (Error != 0) err_display(Error);
 		printf("Error - LastError(error_code : %d)\n", WSAGetLastError());
 		closesocket(g_clients[clientId].socket);
 		cout << clientId + 1 << "번 플레이어 나감 (recv_callback)" << endl;
@@ -44,11 +58,13 @@ void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 void CALLBACK send_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overlapped, DWORD lnFlags)
 {
 	DWORD flags = 0;
+	int retval;
 
 	int clientId = reinterpret_cast<int>(overlapped->hEvent);
 
 	// 클라이언트가 closesocket을 했을 경우
 	if (dataBytes == 0) {
+		printf("Error - LastError(error_code : %d)\n", WSAGetLastError());
 		closesocket(g_clients[clientId].socket);
 		cout << clientId + 1 << "번 플레이어 나감 (send_callback)" << endl;
 		g_clients[clientId].isUsed = false;
@@ -63,15 +79,21 @@ void CALLBACK send_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 	memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
 	g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
 
+	//if (!recving[clientId]) {
 
-	if (WSARecv(g_clients[clientId].socket, &g_clients[clientId].over.dataBuffer, 1, 0, &flags,
-		&(g_clients[clientId].over.overlapped), recv_callback) == SOCKET_ERROR)
-	{
-		if (WSAGetLastError() != WSA_IO_PENDING)
+		//recving[clientId] = true;
+		retval = WSARecv(g_clients[clientId].socket, &g_clients[clientId].over.dataBuffer, 1, 0, &flags,
+			&(g_clients[clientId].over.overlapped), recv_callback);
+		
+		if (retval == SOCKET_ERROR)
 		{
-			printf("Error - Fail WSARecv(error_code : %d)\n", WSAGetLastError());
+			if (WSAGetLastError() != WSA_IO_PENDING)
+			{
+				printf("Error - Fail WSARecv(error_code : %d)\n", WSAGetLastError());
+			}
 		}
-	}
+
+	//}
 	//WSARecv(g_clients[clientId].socket, &g_clients[clientId].over.dataBuffer, 1, 0, &flags,
 	//	&(g_clients[clientId].over.overlapped), recv_callback);
 
@@ -138,6 +160,7 @@ int main()
 		}
 
 		g_clients[id].over.overlapped.hEvent = (HANDLE)id;
+		
 
 		// 1은 버퍼의 개수! 우리는 하나 쓸 것이다. 무턱대고 MAX쓰면 안 돼.
 		// Recv 처리는 'recv_callback' 에서 한다.
@@ -153,6 +176,7 @@ int main()
 void Recv_Packet(int clientId, char* buf) {
 
 	R_Test* Test = reinterpret_cast<R_Test*>(buf);
+	int retval;
 
 	if (Test->packet_type == PACKET_CS_LOGIN) {
 		cout << clientId + 1 << "번 플레이어 Login! " << endl;
@@ -177,11 +201,19 @@ void Recv_Packet(int clientId, char* buf) {
 
 				g_clients[i].over.dataBuffer.buf = reinterpret_cast<char*>(&packet);
 
-				WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,	 // 수정
+				retval = WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,	 // 수정
 					&(g_clients[i].over.overlapped), send_callback);
+				if (retval == SOCKET_ERROR)
+				{
+					if (WSAGetLastError() != WSA_IO_PENDING)
+					{
+						printf("Error - %d CLINET Fail WSASend(error_code : %d)\n", i, WSAGetLastError());
+					}
+				}
 				cout << i + 1 << "번 플레이어에게 로그인정보 전달!" << endl;
 			}
 		}
+		
 	}
 	else {
 		S_Players tmp;
@@ -203,11 +235,19 @@ void Recv_Packet(int clientId, char* buf) {
 
 					g_clients[i].over.dataBuffer.buf = reinterpret_cast<char*>(&packet);
 
-					WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,	 // 수정
+					retval = WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,	 // 수정
 						&(g_clients[i].over.overlapped), send_callback);
+					if (retval == SOCKET_ERROR)
+					{
+						if (WSAGetLastError() != WSA_IO_PENDING)
+						{
+							printf("Error - %d CLINET Fail WSASend(error_code : %d)\n", i, WSAGetLastError());
+						}
+					}
 					cout << i + 1 << "번 플레이어에게 게임시작 전달!" << endl;
 				}
 			}
+
 		}
 		break;
 		case PACKET_CS_LOCATION:
@@ -292,16 +332,24 @@ void Recv_Packet(int clientId, char* buf) {
 
 			for (int i = 0; i < MAX_USER; ++i) {
 				if (Player_Info.IsUsed[i]) {
-					WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,
+					retval = WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,	 // 수정
 						&(g_clients[i].over.overlapped), send_callback);
+					if (retval == SOCKET_ERROR)
+					{
+						if (WSAGetLastError() != WSA_IO_PENDING)
+						{
+							printf("Error - %d CLINET Fail WSASend(error_code : %d)\n", i, WSAGetLastError());
+						}
+					}
 				}
 			}
-
+			
 		}
 		break;
 		}
 		
 	}
+	//recving[clientId] = false;
 }
 
 void Send_Packet(char* buf) {
