@@ -104,7 +104,7 @@ void MySocket::RecvPacket() {
 	bool Success = inst->Recv(RECV_BUF, (int32)MAX_BUFFER, zero);
 
 	if (!Success) {
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fail to Recv!! ")));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fail to Recv!! ")));
 	}
 	else {
 
@@ -153,8 +153,16 @@ void MySocket::RecvPacket() {
 			{
 				Player_info.Host = packet->Host;
 				Player_info.IsUsed[i] = packet->IsUsed[i];
-				Player_info.Loc[i] = packet->Loc[i];
-				Player_info.IsJump[i] = packet->IsJump[i];
+				if (i != PlayerId)
+				{
+					Player_info.Loc[i] = packet->Loc[i];
+					Player_info.IsJump[i] = packet->IsJump[i];
+				}
+				if (Player_info.IsUsed[i])
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("X : %f, Y : %f, Z: %f "),
+						Player_info.Loc[i].x, Player_info.Loc[i].y, Player_info.Loc[i].z));
+				}
 			}
 
 		/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("X : %f, Y : %f, Z: %f "),

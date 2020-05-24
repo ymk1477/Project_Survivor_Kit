@@ -70,6 +70,12 @@ void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	FVector test = GetActorLocation();
+
+	Player_info.Loc[PlayerId].x = test.X;
+	Player_info.Loc[PlayerId].y = test.Y;
+	Player_info.Loc[PlayerId].z = test.Z;
+
 	if (Role == ROLE_Authority)
 	{
 		// Set a timer to increment hunger every interval
@@ -191,6 +197,7 @@ void ASCharacter::MoveForward(float Val)
 		const FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
 
 		AddMovementInput(Direction, Val);
+
 	}
 }
 

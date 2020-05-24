@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#define MAX_BUFFER 1024
+#define MAX_BUFFER 2048
 #define SERVER_PORT 9000
 #define MAX_USER 4
 

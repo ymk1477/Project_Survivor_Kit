@@ -21,8 +21,10 @@ class SURVIVALGAME_API APlayer_Manager : public AActor
 {
 	GENERATED_BODY()
 
-		ASCharacter* Array_Player[MAX_USER] = { NULL };
+		//ASCharacter* Array_Player[MAX_USER] = { NULL };
 
+	TArray<ASCharacter*> players;
+	TArray<FVector> StartLocation;
 	bool test = false;
 
 public:
@@ -37,18 +39,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	ASCharacter** Get_Player_Array();
-
-	template<class T>
-	T* SpawnActor(UClass* Class, FVector const& Location, FRotator const& Rotation)
-	{
-		AActor* Owner = NULL;
-		APawn* Instigator = NULL;
-		bool bNoCollisionFail = false;
-		return (Class != NULL) ? Cast<T>(GetWorld()->SpawnActor(Class, &Location, &Rotation)) : NULL;
-	}
-
-	ASCharacter* actorspawn(FVector Loc, FRotator Rot);
-	void CheckNewPlayer();
+	void MakeStartLocation();
+	void SpawnPlayers();
+	//void CheckNewPlayer();
 };
 

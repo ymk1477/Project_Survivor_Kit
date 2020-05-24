@@ -20,6 +20,7 @@ void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 
 	// 클라이언트가 closesocket을 했을 경우
 	if (dataBytes == 0) {
+		printf("Error - LastError(error_code : %d)\n", WSAGetLastError());
 		closesocket(g_clients[clientId].socket);
 		cout << clientId + 1 << "번 플레이어 나감 (recv_callback)" << endl;
 		g_clients[clientId].isUsed = false;
@@ -63,8 +64,16 @@ void CALLBACK send_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 	g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
 
 
-	WSARecv(g_clients[clientId].socket, &g_clients[clientId].over.dataBuffer, 1, 0, &flags,
-		&(g_clients[clientId].over.overlapped), recv_callback);
+	if (WSARecv(g_clients[clientId].socket, &g_clients[clientId].over.dataBuffer, 1, 0, &flags,
+		&(g_clients[clientId].over.overlapped), recv_callback) == SOCKET_ERROR)
+	{
+		if (WSAGetLastError() != WSA_IO_PENDING)
+		{
+			printf("Error - Fail WSARecv(error_code : %d)\n", WSAGetLastError());
+		}
+	}
+	//WSARecv(g_clients[clientId].socket, &g_clients[clientId].over.dataBuffer, 1, 0, &flags,
+	//	&(g_clients[clientId].over.overlapped), recv_callback);
 
 }
 
