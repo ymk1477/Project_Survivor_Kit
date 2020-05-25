@@ -8,12 +8,13 @@ using namespace std;
 int id = 0;
 
 SockInf g_clients[MAX_USER];
-R_Obj recvInform;
-S_Obj sendInform;
 Player Player_Info;
+R_Players recvplayer;
+S_Players sendplayer;
 
 bool IsStarted = false;
 bool recving[MAX_USER] = { false };
+bool LevelChange[MAX_USER] = { false };
 
 void err_display(DWORD msg)
 {
@@ -30,7 +31,7 @@ void err_display(DWORD msg)
 void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overlapped, DWORD lnFlags)
 {
 	int clientId = reinterpret_cast<int>(overlapped->hEvent);
-	
+
 	// 클라이언트가 closesocket을 했을 경우
 	if (Error != 0 || dataBytes == 0) {
 		if (Error != 0) err_display(Error);
@@ -38,7 +39,6 @@ void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 		closesocket(g_clients[clientId].socket);
 		cout << clientId + 1 << "번 플레이어 나감 (recv_callback)" << endl;
 		g_clients[clientId].isUsed = false;
-		recvInform.isUsed[clientId] = false;
 		Player_Info.IsUsed[clientId] = false;
 		return;
 	}
@@ -46,13 +46,6 @@ void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 	Recv_Packet(clientId, g_clients[clientId].over.dataBuffer.buf);
 
 	// &dataBytes -> 이거 리턴받는건데 비우는게 더 좋다고 말씀하셨음.
-
-	/*for (int i = 0; i < MAX_USER; ++i) {
-		if (Player_Info.IsUsed[i]) {*/
-		/*	WSASend(g_clients[clientId].socket, &(g_clients[clientId].over.dataBuffer), 1, NULL, 0,
-				&(g_clients[clientId].over.overlapped), send_callback);*/
-				/*	}
-				}*/
 }
 
 void CALLBACK send_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overlapped, DWORD lnFlags)
@@ -68,32 +61,27 @@ void CALLBACK send_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 		closesocket(g_clients[clientId].socket);
 		cout << clientId + 1 << "번 플레이어 나감 (send_callback)" << endl;
 		g_clients[clientId].isUsed = false;
-		sendInform.isUsed[clientId] = false;
 		Player_Info.IsUsed[clientId] = false;
 		return;
 	}
 
 	g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
-	g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvInform);
+	g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
 
 	memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
 	g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
 
-	//if (!recving[clientId]) {
+	retval = WSARecv(g_clients[clientId].socket, &g_clients[clientId].over.dataBuffer, 1, 0, &flags,
+		&(g_clients[clientId].over.overlapped), recv_callback);
 
-		//recving[clientId] = true;
-		retval = WSARecv(g_clients[clientId].socket, &g_clients[clientId].over.dataBuffer, 1, 0, &flags,
-			&(g_clients[clientId].over.overlapped), recv_callback);
-		
-		if (retval == SOCKET_ERROR)
+	if (retval == SOCKET_ERROR)
+	{
+		if (WSAGetLastError() != WSA_IO_PENDING)
 		{
-			if (WSAGetLastError() != WSA_IO_PENDING)
-			{
-				printf("Error - Fail WSARecv(error_code : %d)\n", WSAGetLastError());
-			}
+			printf("Error - Fail WSARecv(error_code : %d)\n", WSAGetLastError());
 		}
+	}
 
-	//}
 	//WSARecv(g_clients[clientId].socket, &g_clients[clientId].over.dataBuffer, 1, 0, &flags,
 	//	&(g_clients[clientId].over.overlapped), recv_callback);
 
@@ -144,23 +132,21 @@ int main()
 
 		memset(&g_clients[id], 0x00, sizeof(SockInf));
 		g_clients[id].socket = clientSocket;
-		g_clients[id].over.dataBuffer.len = sizeof(recvInform);
-		g_clients[id].over.dataBuffer.buf = reinterpret_cast<char*>(&recvInform);
+		g_clients[id].over.dataBuffer.len = sizeof(recvplayer);
+		g_clients[id].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
 		ZeroMemory(&(g_clients[id].over.overlapped), sizeof(WSAOVERLAPPED));
 		g_clients[id].clientId = id;
 		g_clients[id].isUsed = true;
 		flags = 0;
 
-		recvInform.clientId = id;
 		for (int i = 0; i < MAX_USER; ++i) {
 			if (true == g_clients[i].isUsed) {
-				recvInform.isUsed[i] = g_clients[i].isUsed;
 				Player_Info.IsUsed[i] = g_clients[i].isUsed;
 			}
 		}
 
 		g_clients[id].over.overlapped.hEvent = (HANDLE)id;
-		
+
 
 		// 1은 버퍼의 개수! 우리는 하나 쓸 것이다. 무턱대고 MAX쓰면 안 돼.
 		// Recv 처리는 'recv_callback' 에서 한다.
@@ -213,7 +199,7 @@ void Recv_Packet(int clientId, char* buf) {
 				cout << i + 1 << "번 플레이어에게 로그인정보 전달!" << endl;
 			}
 		}
-		
+
 	}
 	else {
 		S_Players tmp;
@@ -291,14 +277,14 @@ void Recv_Packet(int clientId, char* buf) {
 				tmp.IsUsed[i] = Player_Info.IsJump[i];
 			}
 
-			g_clients[clientId].over.dataBuffer.len = sizeof(tmp);
-			memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
-			g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
-
-			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&tmp);
 
 			for (int i = 0; i < MAX_USER; ++i) {
 				if (Player_Info.IsUsed[i]) {
+					g_clients[i].over.dataBuffer.len = sizeof(tmp);
+					memset(&(g_clients[i].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
+					g_clients[i].over.overlapped.hEvent = (HANDLE)i;
+
+					g_clients[i].over.dataBuffer.buf = reinterpret_cast<char*>(&tmp);
 					WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,
 						&(g_clients[i].over.overlapped), send_callback);
 				}
@@ -311,26 +297,76 @@ void Recv_Packet(int clientId, char* buf) {
 			cout << clientId + 1 << "번 플레이어 정보 RECV !!!" << endl;
 
 			Player_Info.Loc[clientId] = packet->Loc;
+			Player_Info.Rot[clientId] = packet->Rot;
 			Player_Info.IsJump[clientId] = packet->IsJump;
 
-			cout << "x : " << Player_Info.Loc[clientId].x << " y : " << Player_Info.Loc[clientId].y << " z : " << Player_Info.Loc[clientId].z;
-			cout << " Jump : " << (int)Player_Info.IsJump[clientId] << endl;
+			/*cout << "x : " << Player_Info.Loc[clientId].x << " y : " << Player_Info.Loc[clientId].y << " z : " << Player_Info.Loc[clientId].z;*/
+			/*cout << " Jump : " << (int)Player_Info.IsJump[clientId] << endl;*/
+			cout << "Pitch : " << Player_Info.Rot[clientId].pitch << " Yaw : " << Player_Info.Rot[clientId].yaw 
+				<< " Roll : " << Player_Info.Rot[clientId].roll << endl;
 
 			S_Players s_packet;
 			for (int i = 0; i < MAX_USER; ++i) {
 				s_packet.Host = Player_Info.Host;
 				s_packet.IsUsed[i] = Player_Info.IsUsed[i];
 				s_packet.Loc[i] = Player_Info.Loc[i];
+				s_packet.Rot[i] = Player_Info.Rot[i];
 				s_packet.IsJump[i] = Player_Info.IsJump[i];
 			}
 
-			g_clients[clientId].over.dataBuffer.len = sizeof(s_packet);
-			memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
-			g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
+			for (int i = 0; i < MAX_USER; ++i) {
+				if (Player_Info.IsUsed[i]) {
+					g_clients[i].over.dataBuffer.len = sizeof(s_packet);
+					memset(&(g_clients[i].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
+					g_clients[i].over.overlapped.hEvent = (HANDLE)i;
 
-			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&s_packet);
+					g_clients[i].over.dataBuffer.buf = reinterpret_cast<char*>(&s_packet);
+					retval = WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,	 // 수정
+						&(g_clients[i].over.overlapped), send_callback);
+					if (retval == SOCKET_ERROR)
+					{
+						if (WSAGetLastError() != WSA_IO_PENDING)
+						{
+							printf("Error - %d CLINET Fail WSASend(error_code : %d)\n", i, WSAGetLastError());
+						}
+					}
+				}
+			}
+
+		}
+		break;
+		case PACKET_CS_LEVEL_CHANGE:
+		{
+			R_LevelChange* packet = reinterpret_cast<R_LevelChange*>(buf);
+			cout << clientId + 1 << "번 플레이어 레벨 변경!" << endl;
+
+			LevelChange[clientId] = packet->changed;
+
+			S_LevelChange s_packet;
+			int num = 0;
+			int ischange = 0;
+			for (int i = 0; i < MAX_USER; ++i)
+			{
+				if (g_clients[i].isUsed)
+					++num;
+			}
+			for (int i = 0; i < MAX_USER; ++i)
+			{
+				if (LevelChange[i])
+					++ischange;
+			}
+			if (num == ischange)
+				s_packet.changed = true;
+			else
+				s_packet.changed = false;
+
 
 			for (int i = 0; i < MAX_USER; ++i) {
+				g_clients[i].over.dataBuffer.len = sizeof(s_packet);
+				memset(&(g_clients[i].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
+				g_clients[i].over.overlapped.hEvent = (HANDLE)i;
+
+				g_clients[i].over.dataBuffer.buf = reinterpret_cast<char*>(&s_packet);
 				if (Player_Info.IsUsed[i]) {
 					retval = WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,	 // 수정
 						&(g_clients[i].over.overlapped), send_callback);
@@ -343,13 +379,11 @@ void Recv_Packet(int clientId, char* buf) {
 					}
 				}
 			}
-			
 		}
 		break;
 		}
-		
 	}
-	//recving[clientId] = false;
+
 }
 
 void Send_Packet(char* buf) {

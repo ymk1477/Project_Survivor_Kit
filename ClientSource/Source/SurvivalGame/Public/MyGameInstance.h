@@ -18,6 +18,8 @@
 
 #define PACKET_CS_GAME_START 300
 #define PACKET_SC_GAME_START 301
+#define PACKET_CS_LEVEL_CHANGE 302
+#define PACKET_SC_LEVEL_CHANGE 303
 
 #define PACKET_SC_LOGIN 100
 #define PACKET_SC_LOCATION 101
@@ -35,10 +37,17 @@ typedef struct LOCATION {
 	float z;
 }Location;
 
+typedef struct Rotation {
+	float yaw;
+	float pitch;
+	float roll;
+}Rotation;
+
 typedef struct Info_Player {
 	bool IsUsed[MAX_USER] = { false };
 	int Host = -1;
 	Location Loc[MAX_USER];
+	Rotation Rot[MAX_USER];
 	bool IsJump[MAX_USER] = { false };
 }Player;
 
@@ -98,6 +107,7 @@ typedef struct Recv_Packet_GAME_START {
 typedef struct Send_Packet_Players {
 	int packet_type = PACKET_CS_PLAYERS;
 	Location Loc;
+	Rotation Rot;
 	bool IsJump;
 }S_Players;
 
@@ -106,9 +116,19 @@ typedef struct Recv_Packet_Players {
 	int Host;
 	bool IsUsed[MAX_USER];
 	Location Loc[MAX_USER];
+	Rotation Rot[MAX_USER];
 	bool IsJump[MAX_USER];
 }R_Players;
 
+typedef struct Send_Packet_Level_Change {
+	int packet_type = PACKET_CS_LEVEL_CHANGE;
+	bool changed;
+}S_LevelChange;
+
+typedef struct Recv_Packet_Level_Change {
+	int packet_type = PACKET_SC_LEVEL_CHANGE;
+	bool changed;
+}R_LevelChange;
 
 
 class MySocket {
@@ -132,7 +152,7 @@ static bool Connected;
 static int HostPlayer;
 static bool GameStart;
 static bool PlayerLogin;
-
+static bool All_level_Changed;
 
 /**
  *

@@ -6,12 +6,14 @@
 
 using namespace std;
 
-#define MAX_BUFFER 1024
+#define MAX_BUFFER 2048
 #define SERVER_PORT 9000
 #define MAX_USER 4
 
 #define PACKET_CS_GAME_START 300
 #define PACKET_SC_GAME_START 301
+#define PACKET_CS_LEVEL_CHANGE 302
+#define PACKET_SC_LEVEL_CHANGE 303
 
 #define PACKET_SC_LOGIN 100
 #define PACKET_SC_LOCATION 101
@@ -29,6 +31,12 @@ typedef struct LOCATION {
 	float z;
 }Location;
 
+typedef struct Rotation {
+	float yaw;
+	float pitch;
+	float roll;
+}Rotation;
+
 struct OVER_EX {
 	WSAOVERLAPPED overlapped;
 	WSABUF dataBuffer;
@@ -41,23 +49,11 @@ typedef struct SOCKETINFORM {
 	bool isUsed = false;
 }SockInf;
 
-typedef struct RECVOBJECT {
-	int clientId;
-	bool isUsed[MAX_USER] = { false };
-	//bool keyBuffer[MAX_BUFFER];
-	Location clientLoc;
-}R_Obj;
-
-typedef struct SENDOBJECT {
-	int clientId;
-	bool isUsed[MAX_USER] = { false };
-	Location clientLoc[MAX_USER];
-}S_Obj;
-
 typedef struct Info_Player {
 	int Host = -1;
 	bool IsUsed[MAX_USER] = { false };
 	Location Loc[MAX_USER];
+	Rotation Rot[MAX_USER];
 	bool IsJump[MAX_USER] = { false };
 }Player;
 
@@ -86,7 +82,6 @@ typedef struct Send_Packet_Login {
 	int clientId;
 	bool Player[MAX_USER] = { false };
 	int Host;
-	//Location Loc[MAX_USER];
 }S_Login;
 
 typedef struct Send_Packet_GAME_START {
@@ -103,14 +98,26 @@ typedef struct Send_Packet_Players {
 	int Host;
 	bool IsUsed[MAX_USER];
 	Location Loc[MAX_USER];
+	Rotation Rot[MAX_USER];
 	bool IsJump[MAX_USER];
 }S_Players;
 
 typedef struct Recv_Packet_Players {
 	int packet_type = PACKET_CS_PLAYERS;
 	Location Loc;
+	Rotation Rot;
 	bool IsJump;
 }R_Players;
+
+typedef struct Recv_Packet_Level_Change {
+	int packet_type = PACKET_CS_LEVEL_CHANGE;
+	bool changed;
+}R_LevelChange;
+
+typedef struct Send_Packet_Level_Change {
+	int packet_type = PACKET_SC_LEVEL_CHANGE;
+	bool changed;
+}S_LevelChange;
 
 void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overlapped, DWORD lnFlags);
 void CALLBACK send_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overlapped, DWORD lnFlags);

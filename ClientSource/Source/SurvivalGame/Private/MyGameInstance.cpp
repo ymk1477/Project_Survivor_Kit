@@ -88,7 +88,16 @@ void MySocket::sendBuffer(int PacketType, void* BUF) {
 	{
 		S_Players* packet = reinterpret_cast<S_Players*>(BUF);
 		Success = inst->Send((uint8*)packet, (int32)sizeof(*packet), zero);
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player_Info Send !!")));
+		if(Success)
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Complete to Send Player_Info !!")));
+		else
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fail to Send Player_Info !!")));
+	}
+	break;
+	case PACKET_CS_LEVEL_CHANGE:
+	{
+		S_LevelChange* packet = reinterpret_cast<S_LevelChange*>(BUF);
+		Success = inst->Send((uint8*)packet, (int32)sizeof(*packet), zero);
 	}
 	break;
 	}
@@ -153,20 +162,30 @@ void MySocket::RecvPacket() {
 			{
 				Player_info.Host = packet->Host;
 				Player_info.IsUsed[i] = packet->IsUsed[i];
-				if (i != PlayerId)
+				if ( (i != PlayerId) && Player_info.IsUsed[i])
 				{
 					Player_info.Loc[i] = packet->Loc[i];
+					Player_info.Rot[i] = packet->Rot[i];
 					Player_info.IsJump[i] = packet->IsJump[i];
 				}
 				if (Player_info.IsUsed[i])
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("X : %f, Y : %f, Z: %f "),
-						Player_info.Loc[i].x, Player_info.Loc[i].y, Player_info.Loc[i].z));
+					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player -> X : %f, Y : %f, Z: %f "),
+						i + 1, Player_info.Loc[i].x, Player_info.Loc[i].y, Player_info.Loc[i].z));*/
+				/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player -> Pitch : %f, Yaw : %f, Roll : %f"),
+						Player_info.Rot[PlayerId].pitch, Player_info.Rot[PlayerId].yaw, Player_info.Rot[PlayerId].roll));*/
 				}
+				
 			}
 
 		/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("X : %f, Y : %f, Z: %f "),
 				Player_info.Loc[PlayerId].x, Player_info.Loc[PlayerId].y, Player_info.Loc[PlayerId].z));*/
+		}
+		break;
+		case PACKET_SC_LEVEL_CHANGE:
+		{
+			R_LevelChange* packet = reinterpret_cast<R_LevelChange*>(RECV_BUF);
+			All_level_Changed = packet->changed;
 		}
 		break;
 		}
@@ -183,6 +202,7 @@ UMyGameInstance::UMyGameInstance()
 	Connected = false;
 	GameStart = false;
 	PlayerLogin = false;
+	All_level_Changed = false;
 }
 
 //Player UMyGameInstance::Get_Player_info()

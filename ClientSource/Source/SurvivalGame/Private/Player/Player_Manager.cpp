@@ -20,12 +20,15 @@ void APlayer_Manager::BeginPlay()
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player_Manager Begin Play!! ")));
 
-	SetActorTickInterval(0.1f);
-	
+	SetActorTickInterval(0.016f);
+
 
 	MakeStartLocation();
 	SpawnPlayers();
-	
+
+	/*S_LevelChange s_packet;
+	s_packet.changed = true;
+	MySocket::sendBuffer(PACKET_CS_LEVEL_CHANGE, &s_packet);*/
 }
 
 // Called every frame
@@ -38,15 +41,17 @@ void APlayer_Manager::Tick(float DeltaTime)
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Connected : %d "),Connected));
 	if (Connected)
 	{
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PlayerId : %d "), PlayerId));
 		S_Players S_Packet;
 		S_Packet.Loc = Player_info.Loc[PlayerId];
+		S_Packet.Rot = Player_info.Rot[PlayerId];
 		S_Packet.IsJump = Player_info.IsJump[PlayerId];
 		MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Packet);
 		MySocket::RecvPacket();
-		
+
 		for (int i = 0; i < MAX_USER; ++i)
 		{
-			if (i != PlayerId) 
+			if (i != PlayerId)
 			{
 				if (Player_info.IsUsed[i])
 				{
@@ -54,18 +59,20 @@ void APlayer_Manager::Tick(float DeltaTime)
 					NewLocation.X = Player_info.Loc[i].x;
 					NewLocation.Y = Player_info.Loc[i].y;
 					NewLocation.Z = Player_info.Loc[i].z;
-					players[i]->SetActorLocation(NewLocation);
+					FRotator NewRotation;
+					NewRotation.Pitch = Player_info.Rot[i].pitch;
+					NewRotation.Yaw = Player_info.Rot[i].yaw;
+					NewRotation.Roll = Player_info.Rot[i].roll;
+					players[i]->SetActorLocationAndRotation(NewLocation, NewRotation);
 				}
 			}
 		}
+			
+
+		//MySocket::RecvPacket();
+
 	}
 
-
-	if (!test)
-	{
-		
-		test = true;
-	}
 }
 
 
@@ -109,7 +116,7 @@ void APlayer_Manager::SpawnPlayers()
 		FActorSpawnParameters Spawnparams;
 		Spawnparams.Owner = this;
 		Spawnparams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		
+
 		APlayerController* Mycontroller = World->GetFirstPlayerController();
 		for (int i = 1; i < Playing; ++i) {
 			ASCharacter* NewCharacter = World->SpawnActor<ASCharacter>(GenerateBp->GeneratedClass, StartLocation[i], FRotator::ZeroRotator, Spawnparams);

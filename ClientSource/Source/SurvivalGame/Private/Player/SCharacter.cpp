@@ -70,11 +70,15 @@ void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FVector test = GetActorLocation();
+	FVector loc = GetActorLocation();
+	Player_info.Loc[PlayerId].x = loc.X;
+	Player_info.Loc[PlayerId].y = loc.Y;
+	Player_info.Loc[PlayerId].z = loc.Z;
 
-	Player_info.Loc[PlayerId].x = test.X;
-	Player_info.Loc[PlayerId].y = test.Y;
-	Player_info.Loc[PlayerId].z = test.Z;
+	FRotator rot = GetActorRotation();
+	Player_info.Rot[PlayerId].yaw = rot.Yaw;
+	Player_info.Rot[PlayerId].pitch = rot.Pitch;
+	Player_info.Rot[PlayerId].roll = rot.Roll;
 
 	if (Role == ROLE_Authority)
 	{
@@ -93,14 +97,19 @@ void ASCharacter::Tick(float DeltaTime)
 
 	if (Connected)
 	{
-		FVector test = GetActorLocation();
+		FVector loc = GetActorLocation();
+		Player_info.Loc[PlayerId].x = loc.X;
+		Player_info.Loc[PlayerId].y = loc.Y;
+		Player_info.Loc[PlayerId].z = loc.Z;
 
-		Player_info.Loc[PlayerId].x = test.X;
-		Player_info.Loc[PlayerId].y = test.Y;
-		Player_info.Loc[PlayerId].z = test.Z;
-
+		FRotator rot = GetActorRotation();
+		Player_info.Rot[PlayerId].yaw = rot.Yaw;
+		Player_info.Rot[PlayerId].pitch = rot.Pitch;
+		Player_info.Rot[PlayerId].roll = rot.Roll;
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player X : %f, Y : %f, Z : %f"),
 			Player_info.Loc[PlayerId].x, Player_info.Loc[PlayerId].y, Player_info.Loc[PlayerId].z));*/
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player Pitch : %f, Yaw : %f, Roll : %f"),
+			Player_info.Rot[PlayerId].pitch, Player_info.Rot[PlayerId].yaw, Player_info.Rot[PlayerId].roll));*/
 	}
 
 	if (bWantsToRun && !IsSprinting())
