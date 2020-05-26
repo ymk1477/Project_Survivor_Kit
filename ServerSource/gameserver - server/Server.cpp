@@ -302,6 +302,7 @@ void Recv_Packet(int clientId, char* buf) {
 			Player_Info.Rot[clientId] = packet->Rot;
 			Player_Info.Vel[clientId] = packet->Vel;
 			Player_Info.IsJump[clientId] = packet->IsJump;
+			Player_Info.isTargeting[clientId] = packet->isTargeting;
 
 			/*cout << "x : " << Player_Info.Loc[clientId].x << " y : " << Player_Info.Loc[clientId].y << " z : " << Player_Info.Loc[clientId].z;*/
 			/*cout << " Jump : " << (int)Player_Info.IsJump[clientId] << endl;*/
@@ -317,6 +318,7 @@ void Recv_Packet(int clientId, char* buf) {
 				s_packet.Rot[i] = Player_Info.Rot[i];
 				s_packet.Vel[i] = Player_Info.Vel[i];
 				s_packet.IsJump[i] = Player_Info.IsJump[i];
+				s_packet.isTargeting[i] = Player_Info.isTargeting[i];
 			}
 
 			for (int i = 0; i < MAX_USER; ++i) {

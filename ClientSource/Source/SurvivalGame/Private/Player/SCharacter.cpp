@@ -301,14 +301,20 @@ void ASCharacter::OnStartTargeting()
 	}
 
 	SetTargeting(true);
+	Player_info.IsTargeting[PlayerId] = true;
 }
 
 
 void ASCharacter::OnEndTargeting()
 {
 	SetTargeting(false);
+	Player_info.IsTargeting[PlayerId] = true;
 }
 
+void ASCharacter::SetIsTargeting(bool Targeting)
+{
+	SetTargeting(Targeting);
+}
 
 void ASCharacter::OnJump()
 {

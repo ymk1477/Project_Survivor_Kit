@@ -78,7 +78,7 @@ public:
 
 	/* Client mapped to Input */
 	void OnStartSprinting();
-
+	
 	/* Client mapped to Input */
 	void OnStopSprinting();
 
@@ -137,6 +137,8 @@ public:
 	void OnStartTargeting();
 
 	void OnEndTargeting();
+
+	void SetIsTargeting(bool Targeting);
 
 	/************************************************************************/
 	/* Hunger                                                               */

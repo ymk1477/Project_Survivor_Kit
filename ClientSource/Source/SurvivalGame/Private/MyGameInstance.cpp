@@ -168,6 +168,7 @@ void MySocket::RecvPacket() {
 					Player_info.Rot[i] = packet->Rot[i];
 					Player_info.Vel[i] = packet->Vel[i];
 					Player_info.IsJump[i] = packet->IsJump[i];
+					Player_info.IsTargeting[i] = packet->IsTargeting[i];
 				}
 				if (Player_info.IsUsed[i])
 				{
@@ -175,6 +176,8 @@ void MySocket::RecvPacket() {
 						i + 1, Player_info.Loc[i].x, Player_info.Loc[i].y, Player_info.Loc[i].z));*/
 				/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player -> Pitch : %f, Yaw : %f, Roll : %f"),
 						Player_info.Rot[PlayerId].pitch, Player_info.Rot[PlayerId].yaw, Player_info.Rot[PlayerId].roll));*/
+				/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player VELOCITY -> x : %f, y : %f, z : %f"),
+						i + 1, Player_info.Vel[i].x, Player_info.Vel[i].y, Player_info.Vel[i].z));*/
 				}
 				
 			}

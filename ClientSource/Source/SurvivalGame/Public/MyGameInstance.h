@@ -56,6 +56,7 @@ typedef struct Info_Player {
 	Rotation Rot[MAX_USER];
 	Velocity Vel[MAX_USER];
 	bool IsJump[MAX_USER] = { false };
+	bool IsTargeting[MAX_USER] = { false };
 }Player;
 
 typedef struct RECVOBJECT {
@@ -117,6 +118,7 @@ typedef struct Send_Packet_Players {
 	Rotation Rot;
 	Velocity Vel;
 	bool IsJump;
+	bool IsTargeting;
 }S_Players;
 
 typedef struct Recv_Packet_Players {
@@ -127,6 +129,7 @@ typedef struct Recv_Packet_Players {
 	Rotation Rot[MAX_USER];
 	Velocity Vel[MAX_USER];
 	bool IsJump[MAX_USER];
+	bool IsTargeting[MAX_USER];
 
 }R_Players;
 
