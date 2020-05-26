@@ -45,6 +45,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 		S_Players S_Packet;
 		S_Packet.Loc = Player_info.Loc[PlayerId];
 		S_Packet.Rot = Player_info.Rot[PlayerId];
+		S_Packet.Vel = Player_info.Vel[PlayerId];
 		S_Packet.IsJump = Player_info.IsJump[PlayerId];
 		MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Packet);
 		MySocket::RecvPacket();
@@ -63,7 +64,12 @@ void APlayer_Manager::Tick(float DeltaTime)
 					NewRotation.Pitch = Player_info.Rot[i].pitch;
 					NewRotation.Yaw = Player_info.Rot[i].yaw;
 					NewRotation.Roll = Player_info.Rot[i].roll;
+					FVector NewVelocity;
+					NewVelocity.X = Player_info.Vel[i].x;
+					NewVelocity.Y = Player_info.Vel[i].y;
+					NewVelocity.Z = Player_info.Vel[i].z;
 					players[i]->SetActorLocationAndRotation(NewLocation, NewRotation);
+					players[i]->GetRootComponent()->ComponentVelocity = NewVelocity;
 				}
 			}
 		}
@@ -84,11 +90,11 @@ void APlayer_Manager::MakeStartLocation()
 
 	FVector PlayerStart = MyCharacter->GetActorLocation();		// 플레이어별 시작지점 지정
 	StartLocation.Emplace(PlayerStart);							// Player1
-	PlayerStart.Y += 200;
+	PlayerStart.Y += 250;
 	StartLocation.Emplace(PlayerStart);							// Player2
-	PlayerStart.X -= 200;
+	PlayerStart.X -= 250;
 	StartLocation.Emplace(PlayerStart);							// Player3
-	PlayerStart.Y -= 200;
+	PlayerStart.Y -= 250;
 	StartLocation.Emplace(PlayerStart);							// Player4
 }
 
@@ -126,4 +132,6 @@ void APlayer_Manager::SpawnPlayers()
 		if (PlayerId != 0)
 			Mycontroller->Possess(players[PlayerId]);
 	}
+
+	
 }

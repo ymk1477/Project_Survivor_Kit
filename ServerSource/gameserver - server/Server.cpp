@@ -71,6 +71,8 @@ void CALLBACK send_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 	memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
 	g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
 
+
+	recving[clientId] = true;
 	retval = WSARecv(g_clients[clientId].socket, &g_clients[clientId].over.dataBuffer, 1, 0, &flags,
 		&(g_clients[clientId].over.overlapped), recv_callback);
 
@@ -298,12 +300,14 @@ void Recv_Packet(int clientId, char* buf) {
 
 			Player_Info.Loc[clientId] = packet->Loc;
 			Player_Info.Rot[clientId] = packet->Rot;
+			Player_Info.Vel[clientId] = packet->Vel;
 			Player_Info.IsJump[clientId] = packet->IsJump;
 
 			/*cout << "x : " << Player_Info.Loc[clientId].x << " y : " << Player_Info.Loc[clientId].y << " z : " << Player_Info.Loc[clientId].z;*/
 			/*cout << " Jump : " << (int)Player_Info.IsJump[clientId] << endl;*/
-			cout << "Pitch : " << Player_Info.Rot[clientId].pitch << " Yaw : " << Player_Info.Rot[clientId].yaw 
-				<< " Roll : " << Player_Info.Rot[clientId].roll << endl;
+			/*cout << "Pitch : " << Player_Info.Rot[clientId].pitch << " Yaw : " << Player_Info.Rot[clientId].yaw 
+				<< " Roll : " << Player_Info.Rot[clientId].roll << endl;*/
+			cout << "VELOCITY - x : " << Player_Info.Vel[clientId].x << " y : " << Player_Info.Vel[clientId].y << " z : " << Player_Info.Vel[clientId].z << endl;
 
 			S_Players s_packet;
 			for (int i = 0; i < MAX_USER; ++i) {
@@ -311,6 +315,7 @@ void Recv_Packet(int clientId, char* buf) {
 				s_packet.IsUsed[i] = Player_Info.IsUsed[i];
 				s_packet.Loc[i] = Player_Info.Loc[i];
 				s_packet.Rot[i] = Player_Info.Rot[i];
+				s_packet.Vel[i] = Player_Info.Vel[i];
 				s_packet.IsJump[i] = Player_Info.IsJump[i];
 			}
 
@@ -319,7 +324,6 @@ void Recv_Packet(int clientId, char* buf) {
 					g_clients[i].over.dataBuffer.len = sizeof(s_packet);
 					memset(&(g_clients[i].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
 					g_clients[i].over.overlapped.hEvent = (HANDLE)i;
-
 					g_clients[i].over.dataBuffer.buf = reinterpret_cast<char*>(&s_packet);
 					retval = WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,	 // ¼öÁ¤
 						&(g_clients[i].over.overlapped), send_callback);

@@ -166,6 +166,7 @@ void MySocket::RecvPacket() {
 				{
 					Player_info.Loc[i] = packet->Loc[i];
 					Player_info.Rot[i] = packet->Rot[i];
+					Player_info.Vel[i] = packet->Vel[i];
 					Player_info.IsJump[i] = packet->IsJump[i];
 				}
 				if (Player_info.IsUsed[i])

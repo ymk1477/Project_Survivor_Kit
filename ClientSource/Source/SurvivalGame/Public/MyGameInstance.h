@@ -14,7 +14,7 @@
 
 #define MAX_USER 4
 #define SERVERPORT 9000
-#define MAX_BUFFER 1024
+#define MAX_BUFFER 2048
 
 #define PACKET_CS_GAME_START 300
 #define PACKET_SC_GAME_START 301
@@ -43,11 +43,18 @@ typedef struct Rotation {
 	float roll;
 }Rotation;
 
+typedef struct Velocity {
+	float x;
+	float y;
+	float z;
+}Velocity;
+
 typedef struct Info_Player {
 	bool IsUsed[MAX_USER] = { false };
 	int Host = -1;
 	Location Loc[MAX_USER];
 	Rotation Rot[MAX_USER];
+	Velocity Vel[MAX_USER];
 	bool IsJump[MAX_USER] = { false };
 }Player;
 
@@ -108,6 +115,7 @@ typedef struct Send_Packet_Players {
 	int packet_type = PACKET_CS_PLAYERS;
 	Location Loc;
 	Rotation Rot;
+	Velocity Vel;
 	bool IsJump;
 }S_Players;
 
@@ -117,7 +125,9 @@ typedef struct Recv_Packet_Players {
 	bool IsUsed[MAX_USER];
 	Location Loc[MAX_USER];
 	Rotation Rot[MAX_USER];
+	Velocity Vel[MAX_USER];
 	bool IsJump[MAX_USER];
+
 }R_Players;
 
 typedef struct Send_Packet_Level_Change {
