@@ -308,7 +308,7 @@ void ASCharacter::OnStartTargeting()
 void ASCharacter::OnEndTargeting()
 {
 	SetTargeting(false);
-	Player_info.IsTargeting[PlayerId] = true;
+	Player_info.IsTargeting[PlayerId] = false;
 }
 
 void ASCharacter::SetIsTargeting(bool Targeting)

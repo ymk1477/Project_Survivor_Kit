@@ -71,10 +71,9 @@ void APlayer_Manager::Tick(float DeltaTime)
 					NewVelocity.Z = Player_info.Vel[i].z;
 
 					players[i]->SetActorLocationAndRotation(NewLocation, NewRotation);
-					players[i]->GetRootComponent()->ComponentVelocity = NewVelocity;
 					players[i]->SetIsJumping(Player_info.IsJump[i]);
 					players[i]->SetIsTargeting(Player_info.IsTargeting);
-					
+					players[i]->GetMovementComponent()->Velocity = NewVelocity;
 					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Com VELOCITY -> x : %f, y : %f, z : %f"),
 						i + 1, players[i]->GetRootComponent()->ComponentVelocity.X, players[i]->GetRootComponent()->ComponentVelocity.Y, players[i]->GetRootComponent()->ComponentVelocity.Z));
 					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Get VELOCITY -> x : %f, y : %f, z : %f"),
@@ -100,11 +99,11 @@ void APlayer_Manager::MakeStartLocation()
 
 	FVector PlayerStart = MyCharacter->GetActorLocation();		// 플레이어별 시작지점 지정
 	StartLocation.Emplace(PlayerStart);							// Player1
-	PlayerStart.Y += 250;
+	PlayerStart.Y += 300;
 	StartLocation.Emplace(PlayerStart);							// Player2
-	PlayerStart.X -= 250;
+	PlayerStart.X -= 300;
 	StartLocation.Emplace(PlayerStart);							// Player3
-	PlayerStart.Y -= 250;
+	PlayerStart.Y -= 300;
 	StartLocation.Emplace(PlayerStart);							// Player4
 }
 
