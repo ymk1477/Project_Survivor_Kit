@@ -4,6 +4,7 @@
 
 #include "GameFramework/Character.h"
 #include "STypes.h"
+
 #include "SBaseCharacter.generated.h"
 
 UCLASS(ABSTRACT)

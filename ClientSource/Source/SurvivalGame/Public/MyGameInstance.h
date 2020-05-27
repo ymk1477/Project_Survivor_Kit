@@ -49,33 +49,24 @@ typedef struct Velocity {
 	float z;
 }Velocity;
 
+typedef struct AimOffset {
+	float yaw;
+	float pitch;
+	float roll;
+}AimOffset;
+
 typedef struct Info_Player {
 	bool IsUsed[MAX_USER] = { false };
 	int Host = -1;
 	Location Loc[MAX_USER];
 	Rotation Rot[MAX_USER];
 	Velocity Vel[MAX_USER];
+	AimOffset Aim[MAX_USER];
 	bool IsJump[MAX_USER] = { false };
 	bool IsTargeting[MAX_USER] = { false };
+	bool IsSprinting[MAX_USER] = { false };
+	bool onCrouchToggle[MAX_USER] = { false };
 }Player;
-
-typedef struct RECVOBJECT {
-	int clientId;
-	bool isUsed[MAX_USER] = { false };
-	Location clientLoc[MAX_USER];
-}R_Obj;
-
-typedef struct SENDOBJECT {
-	int clientId;
-	bool isUsed[MAX_USER] = { false };
-	Location clientLoc;
-	//bool keyBuffer[MAX_BUFFER];
-}S_Obj;
-
-typedef struct Send_Packet {
-	int packet_type;
-	void* Buffer;
-}S_packet;
 
 typedef struct Test_Packet {
 	int packet_type;
@@ -119,6 +110,8 @@ typedef struct Send_Packet_Players {
 	Velocity Vel;
 	bool IsJump;
 	bool IsTargeting;
+	bool IsSprinting;
+	bool onCrouchToggle;
 }S_Players;
 
 typedef struct Recv_Packet_Players {
@@ -128,8 +121,11 @@ typedef struct Recv_Packet_Players {
 	Location Loc[MAX_USER];
 	Rotation Rot[MAX_USER];
 	Velocity Vel[MAX_USER];
+	
 	bool IsJump[MAX_USER];
 	bool IsTargeting[MAX_USER];
+	bool IsSprinting[MAX_USER];
+	bool onCrouchToggle[MAX_USER];
 
 }R_Players;
 

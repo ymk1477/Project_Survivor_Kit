@@ -65,24 +65,28 @@ void CALLBACK send_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 		return;
 	}
 
-	g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
+	/*g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
 	g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
 
 	memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
 	g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
+*/
 
-
-	recving[clientId] = true;
-	retval = WSARecv(g_clients[clientId].socket, &g_clients[clientId].over.dataBuffer, 1, 0, &flags,
-		&(g_clients[clientId].over.overlapped), recv_callback);
-
-	if (retval == SOCKET_ERROR)
+	if (!recving[clientId])
 	{
-		if (WSAGetLastError() != WSA_IO_PENDING)
+		recving[clientId] = true;
+		retval = WSARecv(g_clients[clientId].socket, &g_clients[clientId].over.dataBuffer, 1, 0, &flags,
+			&(g_clients[clientId].over.overlapped), recv_callback);
+
+		if (retval == SOCKET_ERROR)
 		{
-			printf("Error - Fail WSARecv(error_code : %d)\n", WSAGetLastError());
+			if (WSAGetLastError() != WSA_IO_PENDING)
+			{
+				printf("Error - Fail WSARecv(error_code : %d)\n", WSAGetLastError());
+			}
 		}
 	}
+
 
 	//WSARecv(g_clients[clientId].socket, &g_clients[clientId].over.dataBuffer, 1, 0, &flags,
 	//	&(g_clients[clientId].over.overlapped), recv_callback);
@@ -172,6 +176,12 @@ void Recv_Packet(int clientId, char* buf) {
 		if (Player_Info.Host == -1)
 			Player_Info.Host = clientId;
 
+		g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
+		g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
+
+		memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
+		g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
+
 		S_Login packet;
 		packet.clientId = clientId;
 		for (int i = 0; i < MAX_USER; ++i) {
@@ -183,19 +193,26 @@ void Recv_Packet(int clientId, char* buf) {
 
 		for (int i = 0; i < MAX_USER; ++i) {
 			if (Player_Info.IsUsed[i]) {
-				g_clients[i].over.dataBuffer.len = sizeof(packet);
-				memset(&(g_clients[i].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
-				g_clients[i].over.overlapped.hEvent = (HANDLE)i;
 
-				g_clients[i].over.dataBuffer.buf = reinterpret_cast<char*>(&packet);
+				OVER_EX* SendingOverlapped = new OVER_EX;
 
-				retval = WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,	 // 수정
-					&(g_clients[i].over.overlapped), send_callback);
+				SendingOverlapped->dataBuffer.len = sizeof(packet);
+				memset(&(SendingOverlapped->overlapped), 0x00, sizeof(WSAOVERLAPPED));
+				SendingOverlapped->overlapped.hEvent = (HANDLE)i;
+
+				SendingOverlapped->dataBuffer.buf = reinterpret_cast<char*>(&packet);
+
+				retval = WSASend(g_clients[i].socket, &(SendingOverlapped->dataBuffer), 1, NULL, 0,	 // 수정
+					&(SendingOverlapped->overlapped), send_callback);
 				if (retval == SOCKET_ERROR)
 				{
 					if (WSAGetLastError() != WSA_IO_PENDING)
 					{
 						printf("Error - %d CLINET Fail WSASend(error_code : %d)\n", i, WSAGetLastError());
+					}
+					else
+					{
+						delete SendingOverlapped;
 					}
 				}
 				cout << i + 1 << "번 플레이어에게 로그인정보 전달!" << endl;
@@ -215,21 +232,34 @@ void Recv_Packet(int clientId, char* buf) {
 			packet.Started = IsStarted;
 			cout << "호스트가 게임 시작함" << endl;
 
+			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
+			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
+
+			memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
+			g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
+
 			for (int i = 0; i < MAX_USER; ++i) {
 				if (Player_Info.IsUsed[i]) {
-					g_clients[i].over.dataBuffer.len = sizeof(packet);
-					memset(&(g_clients[i].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
-					g_clients[i].over.overlapped.hEvent = (HANDLE)i;
 
-					g_clients[i].over.dataBuffer.buf = reinterpret_cast<char*>(&packet);
+					OVER_EX* SendingOverlapped = new OVER_EX;
 
-					retval = WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,	 // 수정
-						&(g_clients[i].over.overlapped), send_callback);
+					SendingOverlapped->dataBuffer.len = sizeof(packet);
+					memset(&(SendingOverlapped->overlapped), 0x00, sizeof(WSAOVERLAPPED));
+					SendingOverlapped->overlapped.hEvent = (HANDLE)i;
+
+					SendingOverlapped->dataBuffer.buf = reinterpret_cast<char*>(&packet);
+
+					retval = WSASend(g_clients[i].socket, &(SendingOverlapped->dataBuffer), 1, NULL, 0,	 // 수정
+						&(SendingOverlapped->overlapped), send_callback);
 					if (retval == SOCKET_ERROR)
 					{
 						if (WSAGetLastError() != WSA_IO_PENDING)
 						{
 							printf("Error - %d CLINET Fail WSASend(error_code : %d)\n", i, WSAGetLastError());
+						}
+						else
+						{
+							delete SendingOverlapped;
 						}
 					}
 					cout << i + 1 << "번 플레이어에게 게임시작 전달!" << endl;
@@ -303,12 +333,20 @@ void Recv_Packet(int clientId, char* buf) {
 			Player_Info.Vel[clientId] = packet->Vel;
 			Player_Info.IsJump[clientId] = packet->IsJump;
 			Player_Info.isTargeting[clientId] = packet->isTargeting;
+			Player_Info.IsSprinting[clientId] = packet->IsSprinting;
+			Player_Info.onCrouchToggle[clientId] = packet->onCrouchToggle;
+
+			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
+			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
+
+			memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
+			g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
 
 			/*cout << "x : " << Player_Info.Loc[clientId].x << " y : " << Player_Info.Loc[clientId].y << " z : " << Player_Info.Loc[clientId].z;*/
 			/*cout << " Jump : " << (int)Player_Info.IsJump[clientId] << endl;*/
-			/*cout << "Pitch : " << Player_Info.Rot[clientId].pitch << " Yaw : " << Player_Info.Rot[clientId].yaw 
+			/*cout << "Pitch : " << Player_Info.Rot[clientId].pitch << " Yaw : " << Player_Info.Rot[clientId].yaw
 				<< " Roll : " << Player_Info.Rot[clientId].roll << endl;*/
-			cout << "VELOCITY - x : " << Player_Info.Vel[clientId].x << " y : " << Player_Info.Vel[clientId].y << " z : " << Player_Info.Vel[clientId].z << endl;
+				//cout << "VELOCITY - x : " << Player_Info.Vel[clientId].x << " y : " << Player_Info.Vel[clientId].y << " z : " << Player_Info.Vel[clientId].z << endl;
 
 			S_Players s_packet;
 			for (int i = 0; i < MAX_USER; ++i) {
@@ -319,21 +357,33 @@ void Recv_Packet(int clientId, char* buf) {
 				s_packet.Vel[i] = Player_Info.Vel[i];
 				s_packet.IsJump[i] = Player_Info.IsJump[i];
 				s_packet.isTargeting[i] = Player_Info.isTargeting[i];
+				s_packet.IsSprinting[i] = Player_Info.IsSprinting[i];
+				s_packet.onCrouchToggle[i] = Player_Info.onCrouchToggle[i];
 			}
 
 			for (int i = 0; i < MAX_USER; ++i) {
 				if (Player_Info.IsUsed[i]) {
-					g_clients[i].over.dataBuffer.len = sizeof(s_packet);
-					memset(&(g_clients[i].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
-					g_clients[i].over.overlapped.hEvent = (HANDLE)i;
-					g_clients[i].over.dataBuffer.buf = reinterpret_cast<char*>(&s_packet);
-					retval = WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,	 // 수정
-						&(g_clients[i].over.overlapped), send_callback);
+
+					OVER_EX* SendingOverlapped = new OVER_EX;
+
+					SendingOverlapped->dataBuffer.len = sizeof(s_packet);
+					memset(&(SendingOverlapped->overlapped), 0x00, sizeof(WSAOVERLAPPED));
+					SendingOverlapped->overlapped.hEvent = (HANDLE)i;
+
+					SendingOverlapped->dataBuffer.buf = reinterpret_cast<char*>(&s_packet);
+
+					retval = WSASend(g_clients[i].socket, &(SendingOverlapped->dataBuffer), 1, NULL, 0,	 // 수정
+						&(SendingOverlapped->overlapped), send_callback);
+
 					if (retval == SOCKET_ERROR)
 					{
 						if (WSAGetLastError() != WSA_IO_PENDING)
 						{
 							printf("Error - %d CLINET Fail WSASend(error_code : %d)\n", i, WSAGetLastError());
+						}
+						else
+						{
+							delete SendingOverlapped;
 						}
 					}
 				}
@@ -389,7 +439,7 @@ void Recv_Packet(int clientId, char* buf) {
 		break;
 		}
 	}
-
+	recving[clientId] = false;
 }
 
 void Send_Packet(char* buf) {

@@ -48,7 +48,10 @@ void APlayer_Manager::Tick(float DeltaTime)
 		S_Packet.Vel = Player_info.Vel[PlayerId];
 		S_Packet.IsJump = Player_info.IsJump[PlayerId];
 		S_Packet.IsTargeting = Player_info.IsTargeting[PlayerId];
+		S_Packet.IsSprinting = Player_info.IsSprinting[PlayerId];
+		S_Packet.onCrouchToggle = Player_info.onCrouchToggle[PlayerId];
 		MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Packet);
+		Player_info.onCrouchToggle[PlayerId] = false;
 		MySocket::RecvPacket();
 
 		for (int i = 0; i < MAX_USER; ++i)
@@ -69,11 +72,17 @@ void APlayer_Manager::Tick(float DeltaTime)
 					NewVelocity.X = Player_info.Vel[i].x;
 					NewVelocity.Y = Player_info.Vel[i].y;
 					NewVelocity.Z = Player_info.Vel[i].z;
-
-					players[i]->SetActorLocationAndRotation(NewLocation, NewRotation);
-					players[i]->SetIsJumping(Player_info.IsJump[i]);
-					players[i]->SetIsTargeting(Player_info.IsTargeting);
+					
+					players[i]->SetActorLocationAndRotation(NewLocation, NewRotation, false, 0, ETeleportType::None);
 					players[i]->GetMovementComponent()->Velocity = NewVelocity;
+					players[i]->SetIsJumping(Player_info.IsJump[i]);
+					players[i]->SetIsTargeting(Player_info.IsTargeting[i]);
+					players[i]->SetSprinting(Player_info.IsSprinting[i]);
+					if (Player_info.onCrouchToggle[i])
+						players[i]->OnCrouchToggle();
+
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Sprinting -> %d"),
+						i + 1, players[i]->IsSprinting()));
 					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Com VELOCITY -> x : %f, y : %f, z : %f"),
 						i + 1, players[i]->GetRootComponent()->ComponentVelocity.X, players[i]->GetRootComponent()->ComponentVelocity.Y, players[i]->GetRootComponent()->ComponentVelocity.Z));
 					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Get VELOCITY -> x : %f, y : %f, z : %f"),

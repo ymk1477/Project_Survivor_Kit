@@ -114,6 +114,27 @@ void MySocket::RecvPacket() {
 
 	if (!Success) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fail to Recv!! ")));
+		auto SocketState = MySocket::getInstance().GetConnectionState();
+		switch (SocketState)
+		{
+		case SCS_NotConnected:
+		{
+			Connected = false;
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("SCS_NotConnected ")));
+			MySocket::initializeServer();
+		}
+		break;
+		case SCS_Connected:
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("SCS_Connected")));
+		}
+		break;
+		case SCS_ConnectionError:
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("SCS_ConnectionError")));
+		}
+		break;
+		}
 	}
 	else {
 
@@ -169,7 +190,9 @@ void MySocket::RecvPacket() {
 					Player_info.Vel[i] = packet->Vel[i];
 					Player_info.IsJump[i] = packet->IsJump[i];
 					Player_info.IsTargeting[i] = packet->IsTargeting[i];
-				}
+					Player_info.IsSprinting[i] = packet->IsSprinting[i];
+					Player_info.onCrouchToggle[i] = packet->onCrouchToggle[i];
+				}	
 				if (Player_info.IsUsed[i])
 				{
 					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player -> X : %f, Y : %f, Z: %f "),
@@ -178,6 +201,7 @@ void MySocket::RecvPacket() {
 						Player_info.Rot[PlayerId].pitch, Player_info.Rot[PlayerId].yaw, Player_info.Rot[PlayerId].roll));*/
 				/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player VELOCITY -> x : %f, y : %f, z : %f"),
 						i + 1, Player_info.Vel[i].x, Player_info.Vel[i].y, Player_info.Vel[i].z));*/
+				
 				}
 				
 			}

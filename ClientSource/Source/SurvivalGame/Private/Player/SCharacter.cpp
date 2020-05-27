@@ -70,7 +70,7 @@ void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FVector loc = GetActorLocation();
+	/*FVector loc = GetActorLocation();
 	Player_info.Loc[PlayerId].x = loc.X;
 	Player_info.Loc[PlayerId].y = loc.Y;
 	Player_info.Loc[PlayerId].z = loc.Z;
@@ -83,7 +83,7 @@ void ASCharacter::BeginPlay()
 	FVector vel = GetVelocity();
 	Player_info.Vel[PlayerId].x = vel.X;
 	Player_info.Vel[PlayerId].y = vel.Y;
-	Player_info.Vel[PlayerId].z = vel.Z;
+	Player_info.Vel[PlayerId].z = vel.Z;*/
 
 	if (Role == ROLE_Authority)
 	{
@@ -102,20 +102,26 @@ void ASCharacter::Tick(float DeltaTime)
 
 	if (Connected)
 	{
-		FVector loc = GetActorLocation();
-		Player_info.Loc[PlayerId].x = loc.X;
-		Player_info.Loc[PlayerId].y = loc.Y;
-		Player_info.Loc[PlayerId].z = loc.Z;
+		/*if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)*/
+		if(this->IsPlayerControlled())
+		{
+			FVector loc = GetActorLocation();
+			Player_info.Loc[PlayerId].x = loc.X;
+			Player_info.Loc[PlayerId].y = loc.Y;
+			Player_info.Loc[PlayerId].z = loc.Z;
 
-		FRotator rot = GetActorRotation();
-		Player_info.Rot[PlayerId].yaw = rot.Yaw;
-		Player_info.Rot[PlayerId].pitch = rot.Pitch;
-		Player_info.Rot[PlayerId].roll = rot.Roll;
+			FRotator rot = GetActorRotation();
+			Player_info.Rot[PlayerId].yaw = rot.Yaw;
+			Player_info.Rot[PlayerId].pitch = rot.Pitch;
+			Player_info.Rot[PlayerId].roll = rot.Roll;
 
-		FVector vel = GetVelocity();
-		Player_info.Vel[PlayerId].x = vel.X;
-		Player_info.Vel[PlayerId].y = vel.Y;
-		Player_info.Vel[PlayerId].z = vel.Z;
+			FVector vel = GetVelocity();
+			Player_info.Vel[PlayerId].x = vel.X;
+			Player_info.Vel[PlayerId].y = vel.Y;
+			Player_info.Vel[PlayerId].z = vel.Z;
+
+		}
+		
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player X : %f, Y : %f, Z : %f"),
 			Player_info.Loc[PlayerId].x, Player_info.Loc[PlayerId].y, Player_info.Loc[PlayerId].z));*/
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player Pitch : %f, Yaw : %f, Roll : %f"),
@@ -301,25 +307,28 @@ void ASCharacter::OnStartTargeting()
 	}
 
 	SetTargeting(true);
-	Player_info.IsTargeting[PlayerId] = true;
+	if (this->IsPlayerControlled())
+		Player_info.IsTargeting[PlayerId] = true;
 }
 
 
 void ASCharacter::OnEndTargeting()
 {
 	SetTargeting(false);
-	Player_info.IsTargeting[PlayerId] = false;
+	if (this->IsPlayerControlled())
+		Player_info.IsTargeting[PlayerId] = false;
 }
 
 void ASCharacter::SetIsTargeting(bool Targeting)
 {
-	SetTargeting(Targeting);
+	SetTargeting(Targeting);	
 }
 
 void ASCharacter::OnJump()
 {
 	SetIsJumping(true);
-	Player_info.IsJump[PlayerId] = true;
+	if (this->IsPlayerControlled())
+		Player_info.IsJump[PlayerId] = true;
 	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player Jump : %d"),
 		Player_info.IsJump[PlayerId]));*/
 }
@@ -365,7 +374,8 @@ void ASCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 Pr
 		GetCharacterMovement()->MovementMode != EMovementMode::MOVE_Falling)
 	{
 		SetIsJumping(false);
-		Player_info.IsJump[PlayerId] = false;
+		if (this->IsPlayerControlled())
+			Player_info.IsJump[PlayerId] = false;
 	/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player Jump : %d"),
 			Player_info.IsJump[PlayerId]));*/
 	}
@@ -393,12 +403,14 @@ void ASCharacter::OnStartSprinting()
 	}
 
 	SetSprinting(true);
+	
 }
 
 
 void ASCharacter::OnStopSprinting()
 {
 	SetSprinting(false);
+	
 }
 
 
@@ -426,7 +438,18 @@ void ASCharacter::OnCrouchToggle()
 	{
 		SetSprinting(false);
 	}
+	if (this->IsControlled())
+	{
+		Player_info.onCrouchToggle[PlayerId] = true;
+	}
+	else
+	{
+		if (this->bIsCrouched)
+			this->bIsCrouched = false;
+		else
+			this->bIsCrouched = true;
 
+	}
 	// If we are crouching then CanCrouch will return false. If we cannot crouch then calling Crouch() wont do anything
 	if (CanCrouch())
 	{
@@ -436,6 +459,9 @@ void ASCharacter::OnCrouchToggle()
 	{
 		UnCrouch();
 	}
+	
+	
+	
 }
 
 
@@ -1015,4 +1041,6 @@ void ASCharacter::SetSprinting(bool NewSprinting)
 	}
 
 	Super::SetSprinting(NewSprinting);
+	if (this->IsPlayerControlled())
+		Player_info.IsSprinting[PlayerId] = NewSprinting;
 }
