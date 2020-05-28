@@ -70,21 +70,6 @@ void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*FVector loc = GetActorLocation();
-	Player_info.Loc[PlayerId].x = loc.X;
-	Player_info.Loc[PlayerId].y = loc.Y;
-	Player_info.Loc[PlayerId].z = loc.Z;
-
-	FRotator rot = GetActorRotation();
-	Player_info.Rot[PlayerId].yaw = rot.Yaw;
-	Player_info.Rot[PlayerId].pitch = rot.Pitch;
-	Player_info.Rot[PlayerId].roll = rot.Roll;
-
-	FVector vel = GetVelocity();
-	Player_info.Vel[PlayerId].x = vel.X;
-	Player_info.Vel[PlayerId].y = vel.Y;
-	Player_info.Vel[PlayerId].z = vel.Z;*/
-
 	if (Role == ROLE_Authority)
 	{
 		// Set a timer to increment hunger every interval
@@ -103,8 +88,9 @@ void ASCharacter::Tick(float DeltaTime)
 	if (Connected)
 	{
 		/*if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)*/
-		if(this->IsPlayerControlled())
+		/*if(this->IsPlayerControlled())
 		{
+			
 			FVector loc = GetActorLocation();
 			Player_info.Loc[PlayerId].x = loc.X;
 			Player_info.Loc[PlayerId].y = loc.Y;
@@ -125,13 +111,14 @@ void ASCharacter::Tick(float DeltaTime)
 			Player_info.Aim[PlayerId].pitch = Aim.Pitch;
 			Player_info.Aim[PlayerId].roll = Aim.Roll;
 
-		}
+		}*/
 		
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player X : %f, Y : %f, Z : %f"),
 			Player_info.Loc[PlayerId].x, Player_info.Loc[PlayerId].y, Player_info.Loc[PlayerId].z));*/
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player Pitch : %f, Yaw : %f, Roll : %f"),
 			Player_info.Rot[PlayerId].pitch, Player_info.Rot[PlayerId].yaw, Player_info.Rot[PlayerId].roll));*/
 	}
+
 
 	if (bWantsToRun && !IsSprinting())
 	{
@@ -166,6 +153,7 @@ void ASCharacter::Tick(float DeltaTime)
 			}
 		}
 	}
+
 }
 
 void ASCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -312,7 +300,7 @@ void ASCharacter::OnStartTargeting()
 	}
 
 	SetTargeting(true);
-	if (this->IsPlayerControlled())
+	if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)
 		Player_info.IsTargeting[PlayerId] = true;
 }
 
@@ -320,7 +308,7 @@ void ASCharacter::OnStartTargeting()
 void ASCharacter::OnEndTargeting()
 {
 	SetTargeting(false);
-	if (this->IsPlayerControlled())
+	if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)
 		Player_info.IsTargeting[PlayerId] = false;
 }
 
@@ -342,7 +330,7 @@ FRotator ASCharacter::GetAimOffsetsOther() const
 void ASCharacter::OnJump()
 {
 	SetIsJumping(true);
-	if (this->IsPlayerControlled())
+	if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)
 		Player_info.IsJump[PlayerId] = true;
 	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player Jump : %d"),
 		Player_info.IsJump[PlayerId]));*/
@@ -389,7 +377,7 @@ void ASCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 Pr
 		GetCharacterMovement()->MovementMode != EMovementMode::MOVE_Falling)
 	{
 		SetIsJumping(false);
-		if (this->IsPlayerControlled())
+		if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)
 			Player_info.IsJump[PlayerId] = false;
 	/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player Jump : %d"),
 			Player_info.IsJump[PlayerId]));*/
@@ -453,7 +441,7 @@ void ASCharacter::OnCrouchToggle()
 	{
 		SetSprinting(false);
 	}
-	if (this->IsControlled())
+	if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)
 	{
 		Player_info.onCrouchToggle[PlayerId] = true;
 	}
@@ -1056,6 +1044,6 @@ void ASCharacter::SetSprinting(bool NewSprinting)
 	}
 
 	Super::SetSprinting(NewSprinting);
-	if (this->IsPlayerControlled())
+	if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)
 		Player_info.IsSprinting[PlayerId] = NewSprinting;
 }

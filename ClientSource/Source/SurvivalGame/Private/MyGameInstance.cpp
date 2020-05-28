@@ -88,10 +88,10 @@ void MySocket::sendBuffer(int PacketType, void* BUF) {
 	{
 		S_Players* packet = reinterpret_cast<S_Players*>(BUF);
 		Success = inst->Send((uint8*)packet, (int32)sizeof(*packet), zero);
-		if(Success)
+		/*if(Success)
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Complete to Send Player_Info !!")));
 		else
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fail to Send Player_Info !!")));
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fail to Send Player_Info !!")));*/
 	}
 	break;
 	case PACKET_CS_LEVEL_CHANGE:
@@ -193,7 +193,7 @@ void MySocket::RecvPacket() {
 					Player_info.IsTargeting[i] = packet->IsTargeting[i];
 					Player_info.IsSprinting[i] = packet->IsSprinting[i];
 					Player_info.onCrouchToggle[i] = packet->onCrouchToggle[i];
-				}	
+				}	 
 				if (Player_info.IsUsed[i])
 				{
 					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player -> X : %f, Y : %f, Z: %f "),
