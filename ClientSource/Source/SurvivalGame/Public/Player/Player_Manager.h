@@ -8,11 +8,11 @@
 #include "GameFramework/Actor.h"
 #include "SCoopGameMode.h"
 #include "MyGameInstance.h"
-#include "SCharacter.h"
 #include "SPlayerController.h"
 #include "SPlayerCameraManager.h"
 #include "SLocalPlayer.h"
 #include "MyGameInstance.h"
+#include "SCharacter.h"
 #include "Player_Manager.generated.h"
 
 

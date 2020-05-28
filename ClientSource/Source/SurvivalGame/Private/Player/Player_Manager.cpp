@@ -46,6 +46,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 		S_Packet.Loc = Player_info.Loc[PlayerId];
 		S_Packet.Rot = Player_info.Rot[PlayerId];
 		S_Packet.Vel = Player_info.Vel[PlayerId];
+		S_Packet.Aim = Player_info.Aim[PlayerId];
 		S_Packet.IsJump = Player_info.IsJump[PlayerId];
 		S_Packet.IsTargeting = Player_info.IsTargeting[PlayerId];
 		S_Packet.IsSprinting = Player_info.IsSprinting[PlayerId];
@@ -72,14 +73,20 @@ void APlayer_Manager::Tick(float DeltaTime)
 					NewVelocity.X = Player_info.Vel[i].x;
 					NewVelocity.Y = Player_info.Vel[i].y;
 					NewVelocity.Z = Player_info.Vel[i].z;
-					
+					FRotator NewAim;
+					NewAim.Pitch = Player_info.Aim[i].pitch;
+					NewAim.Yaw = Player_info.Aim[i].yaw;
+					NewAim.Roll = Player_info.Aim[i].roll;
+
 					players[i]->SetActorLocationAndRotation(NewLocation, NewRotation, false, 0, ETeleportType::None);
 					players[i]->GetMovementComponent()->Velocity = NewVelocity;
+					players[i]->SetAimOffset(NewAim);
 					players[i]->SetIsJumping(Player_info.IsJump[i]);
 					players[i]->SetIsTargeting(Player_info.IsTargeting[i]);
 					players[i]->SetSprinting(Player_info.IsSprinting[i]);
 					if (Player_info.onCrouchToggle[i])
 						players[i]->OnCrouchToggle();
+					
 
 					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Sprinting -> %d"),
 						i + 1, players[i]->IsSprinting()));

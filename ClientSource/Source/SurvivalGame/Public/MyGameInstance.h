@@ -66,6 +66,7 @@ typedef struct Info_Player {
 	bool IsTargeting[MAX_USER] = { false };
 	bool IsSprinting[MAX_USER] = { false };
 	bool onCrouchToggle[MAX_USER] = { false };
+	bool IsFiring[MAX_USER] = { false };
 }Player;
 
 typedef struct Test_Packet {
@@ -108,10 +109,12 @@ typedef struct Send_Packet_Players {
 	Location Loc;
 	Rotation Rot;
 	Velocity Vel;
+	AimOffset Aim;
 	bool IsJump;
 	bool IsTargeting;
 	bool IsSprinting;
 	bool onCrouchToggle;
+	bool IsFiring;
 }S_Players;
 
 typedef struct Recv_Packet_Players {
@@ -121,11 +124,12 @@ typedef struct Recv_Packet_Players {
 	Location Loc[MAX_USER];
 	Rotation Rot[MAX_USER];
 	Velocity Vel[MAX_USER];
-	
+	AimOffset Aim[MAX_USER];
 	bool IsJump[MAX_USER];
 	bool IsTargeting[MAX_USER];
 	bool IsSprinting[MAX_USER];
 	bool onCrouchToggle[MAX_USER];
+	bool IsFiring[MAX_USER];
 
 }R_Players;
 
@@ -179,23 +183,6 @@ public:
 	UMyGameInstance();
 
 	void SetPlayer_Loc(float x, float y, float z);
-
-	/*Player Get_Player_info();
-	void Set_Player_Used(int id, bool used);
-	void Set_Player_info(int id, FVector location);
-	void Set_Player_info(int id, bool jump);
-	int Get_PlayerId();
-	void Set_PlayerId(int id);
-	FString Get_Ip_Adress();
-	void Set_Ip_Adress(FString adress);
-	bool Get_Connected();
-	int Get_Host();
-	void Set_Host(int host);
-	bool Get_GameStart();
-	void Set_GameStart(bool start);
-	bool Get_PlayerLogin();
-	void Set_PlayerLogin(bool login);*/
-
 
 	UFUNCTION(BlueprintCallable, Category = "My_Server")
 		void SetIpAdress(FString Ip_Adress);

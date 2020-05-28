@@ -43,6 +43,12 @@ typedef struct Velocity {
 	float z;
 }Velocity;
 
+typedef struct AimOffset {
+	float yaw;
+	float pitch;
+	float roll;
+}AimOffset;
+
 struct OVER_EX {
 	WSAOVERLAPPED overlapped;
 	WSABUF dataBuffer;
@@ -61,6 +67,7 @@ typedef struct Info_Player {
 	Location Loc[MAX_USER];
 	Rotation Rot[MAX_USER];
 	Velocity Vel[MAX_USER];
+	AimOffset Aim[MAX_USER];
 	bool IsJump[MAX_USER] = { false };
 	bool isTargeting[MAX_USER] = { false };
 	bool IsSprinting[MAX_USER] = { false };
@@ -110,6 +117,7 @@ typedef struct Send_Packet_Players {
 	Location Loc[MAX_USER];
 	Rotation Rot[MAX_USER];
 	Velocity Vel[MAX_USER];
+	AimOffset Aim[MAX_USER];
 	bool IsJump[MAX_USER];
 	bool isTargeting[MAX_USER];
 	bool IsSprinting[MAX_USER];
@@ -121,6 +129,7 @@ typedef struct Recv_Packet_Players {
 	Location Loc;
 	Rotation Rot;
 	Velocity Vel;
+	AimOffset Aim;
 	bool IsJump;
 	bool isTargeting;
 	bool IsSprinting;

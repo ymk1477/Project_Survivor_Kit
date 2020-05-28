@@ -188,6 +188,7 @@ void MySocket::RecvPacket() {
 					Player_info.Loc[i] = packet->Loc[i];
 					Player_info.Rot[i] = packet->Rot[i];
 					Player_info.Vel[i] = packet->Vel[i];
+					Player_info.Aim[i] = packet->Aim[i];
 					Player_info.IsJump[i] = packet->IsJump[i];
 					Player_info.IsTargeting[i] = packet->IsTargeting[i];
 					Player_info.IsSprinting[i] = packet->IsSprinting[i];
@@ -233,70 +234,6 @@ UMyGameInstance::UMyGameInstance()
 	All_level_Changed = false;
 }
 
-//Player UMyGameInstance::Get_Player_info()
-//{
-//	return Player_info;
-//}
-//
-//void UMyGameInstance::Set_Player_Used(int id, bool used)
-//{
-//	Player_info.IsUsed[id] = used;
-//}
-//
-//void UMyGameInstance::Set_Player_info(int id, FVector location)
-//{
-//	Player_info.Loc[id].x = location.X;
-//	Player_info.Loc[id].y = location.Y;
-//	Player_info.Loc[id].z = location.Z;
-//}
-//void UMyGameInstance::Set_Player_info(int id, bool jump)
-//{
-//	Player_info.IsJump[id] = jump;
-//}
-//int UMyGameInstance::Get_PlayerId()
-//{
-//	return PlayerId;
-//}
-//void UMyGameInstance::Set_PlayerId(int id)
-//{
-//	PlayerId = id;
-//}
-//FString UMyGameInstance::Get_Ip_Adress()
-//{
-//	return Adress;
-//}
-//void UMyGameInstance::Set_Ip_Adress(FString adress)
-//{
-//	Adress = adress;
-//}
-//bool UMyGameInstance::Get_Connected()
-//{
-//	return Connected;
-//}
-//int UMyGameInstance::Get_Host()
-//{
-//	return HostPlayer;
-//}
-//void UMyGameInstance::Set_Host(int host)
-//{
-//	HostPlayer = host;
-//}
-//bool UMyGameInstance::Get_GameStart()
-//{
-//	return GameStart;
-//}
-//void UMyGameInstance::Set_GameStart(bool start)
-//{
-//	GameStart = start;
-//}
-//bool UMyGameInstance::Get_PlayerLogin()
-//{
-//	return PlayerLogin;
-//}
-//void UMyGameInstance::Set_PlayerLogin(bool login)
-//{
-//	PlayerLogin = login;
-//}
 
 void UMyGameInstance::SetPlayer_Loc(float x, float y, float z)
 {

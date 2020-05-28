@@ -4,6 +4,7 @@
 
 #include "GameFramework/Character.h"
 #include "STypes.h"
+#include "MyGameInstance.h"
 
 #include "SBaseCharacter.generated.h"
 
@@ -82,6 +83,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
 	float TargetingSpeedModifier;
 
+	
+
 public:
 
 	/* Is player aiming down sights */
@@ -91,9 +94,11 @@ public:
 	float GetTargetingSpeedModifier() const;
 
 	/* Retrieve Pitch/Yaw from current camera */
+
+
 	UFUNCTION(BlueprintCallable, Category = "Targeting")
 	FRotator GetAimOffsets() const;
-
+		
 	/************************************************************************/
 	/* Damage & Death                                                       */
 	/************************************************************************/

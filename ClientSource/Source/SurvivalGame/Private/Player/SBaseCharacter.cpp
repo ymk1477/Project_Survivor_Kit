@@ -384,6 +384,7 @@ FRotator ASBaseCharacter::GetAimOffsets() const
 	
 }
 
+
 void ASBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

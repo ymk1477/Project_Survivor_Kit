@@ -120,6 +120,11 @@ void ASCharacter::Tick(float DeltaTime)
 			Player_info.Vel[PlayerId].y = vel.Y;
 			Player_info.Vel[PlayerId].z = vel.Z;
 
+			FRotator Aim = GetAimOffsets();
+			Player_info.Aim[PlayerId].yaw = Aim.Yaw;
+			Player_info.Aim[PlayerId].pitch = Aim.Pitch;
+			Player_info.Aim[PlayerId].roll = Aim.Roll;
+
 		}
 		
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player X : %f, Y : %f, Z : %f"),
@@ -322,6 +327,16 @@ void ASCharacter::OnEndTargeting()
 void ASCharacter::SetIsTargeting(bool Targeting)
 {
 	SetTargeting(Targeting);	
+}
+
+void ASCharacter::SetAimOffset(FRotator NewAim)
+{
+	AimOffset = NewAim;
+}
+
+FRotator ASCharacter::GetAimOffsetsOther() const
+{
+	return AimOffset;
 }
 
 void ASCharacter::OnJump()
