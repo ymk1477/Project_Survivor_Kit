@@ -43,7 +43,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PlayerId : %d "), PlayerId));
 		
-		for (int i = 0; i < MAX_USER; ++i)
+		/*for (int i = 0; i < MAX_USER; ++i)
 		{
 			if(Player_info.IsUsed[i])
 				if (players[i]->IsControlled())
@@ -54,32 +54,39 @@ void APlayer_Manager::Tick(float DeltaTime)
 				{
 					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player Controller: FALSE "), i));
 				}
-		}
+		}*/
 
 		ASPlayerController* Mycontroller = Cast<ASPlayerController>(GetWorld()->GetFirstPlayerController());
 		ASCharacter* MyPawn = Cast<ASCharacter>(Mycontroller->GetPawn());
 
-		FVector MyLocation = MyPawn->GetActorLocation();
-		Player_info.Loc[PlayerId].x = MyLocation.X;
-		Player_info.Loc[PlayerId].y = MyLocation.Y;
-		Player_info.Loc[PlayerId].z = MyLocation.Z;
+		if (MyPawn->GetHealth() > 0.0f)
+		{
+			Player_info.HP[PlayerId] = MyPawn->GetHealth();
 
-		FRotator MyRotation = MyPawn->GetActorRotation();
-		Player_info.Rot[PlayerId].yaw = MyRotation.Yaw;
-		Player_info.Rot[PlayerId].pitch = MyRotation.Pitch;
-		Player_info.Rot[PlayerId].roll = MyRotation.Roll;
+			FVector MyLocation = MyPawn->GetActorLocation();
+			Player_info.Loc[PlayerId].x = MyLocation.X;
+			Player_info.Loc[PlayerId].y = MyLocation.Y;
+			Player_info.Loc[PlayerId].z = MyLocation.Z;
 
-		FVector MyVelocity = MyPawn->GetVelocity();
-		Player_info.Vel[PlayerId].x = MyVelocity.X;
-		Player_info.Vel[PlayerId].y = MyVelocity.Y;
-		Player_info.Vel[PlayerId].z = MyVelocity.Z;
+			FRotator MyRotation = MyPawn->GetActorRotation();
+			Player_info.Rot[PlayerId].yaw = MyRotation.Yaw;
+			Player_info.Rot[PlayerId].pitch = MyRotation.Pitch;
+			Player_info.Rot[PlayerId].roll = MyRotation.Roll;
 
-		FRotator MyAim = MyPawn->GetAimOffsets();
-		Player_info.Aim[PlayerId].yaw = MyAim.Yaw;
-		Player_info.Aim[PlayerId].pitch = MyAim.Pitch;
-		Player_info.Aim[PlayerId].roll = MyAim.Roll;
+			FVector MyVelocity = MyPawn->GetVelocity();
+			Player_info.Vel[PlayerId].x = MyVelocity.X;
+			Player_info.Vel[PlayerId].y = MyVelocity.Y;
+			Player_info.Vel[PlayerId].z = MyVelocity.Z;
+
+			FRotator MyAim = MyPawn->GetAimOffsets();
+			Player_info.Aim[PlayerId].yaw = MyAim.Yaw;
+			Player_info.Aim[PlayerId].pitch = MyAim.Pitch;
+			Player_info.Aim[PlayerId].roll = MyAim.Roll;
+
+		}
 
 		S_Players S_Packet;
+		S_Packet.HP = Player_info.HP[PlayerId];
 		S_Packet.Loc = Player_info.Loc[PlayerId];
 		S_Packet.Rot = Player_info.Rot[PlayerId];
 		S_Packet.Vel = Player_info.Vel[PlayerId];
@@ -114,6 +121,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 				NewAim.Yaw = Player_info.Aim[i].yaw;
 				NewAim.Roll = Player_info.Aim[i].roll;
 
+				players[i]->SetOtherHealth(Player_info.HP[i]);
 				players[i]->SetActorLocationAndRotation(NewLocation, NewRotation, false, 0, ETeleportType::TeleportPhysics);
 				players[i]->GetMovementComponent()->Velocity = NewVelocity;
 				players[i]->SetAimOffset(NewAim);
@@ -123,7 +131,8 @@ void APlayer_Manager::Tick(float DeltaTime)
 				if (Player_info.onCrouchToggle[i])
 					players[i]->OnCrouchToggle();
 
-
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player HP -> %f"),
+					i + 1, players[i]->GetHealth()));
 				/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Sprinting -> %d"),
 					i + 1, players[i]->IsSprinting()));*/
 					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Com VELOCITY -> x : %f, y : %f, z : %f"),

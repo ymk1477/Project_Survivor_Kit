@@ -187,6 +187,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerCondition")
 	TSubclassOf<UDamageType> HungerDamageType;
 
+	void SetOtherHealth(float hp);
+
 	/************************************************************************/
 	/* Damage & Death                                                       */
 	/************************************************************************/

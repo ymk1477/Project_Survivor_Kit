@@ -64,6 +64,7 @@ typedef struct SOCKETINFORM {
 typedef struct Info_Player {
 	int Host = -1;
 	bool IsUsed[MAX_USER] = { false };
+	float HP[MAX_USER];
 	Location Loc[MAX_USER];
 	Rotation Rot[MAX_USER];
 	Velocity Vel[MAX_USER];
@@ -114,6 +115,7 @@ typedef struct Send_Packet_Players {
 	int packet_type = PACKET_SC_PLAYERS;
 	int Host;
 	bool IsUsed[MAX_USER];
+	float HP[MAX_USER];
 	Location Loc[MAX_USER];
 	Rotation Rot[MAX_USER];
 	Velocity Vel[MAX_USER];
@@ -126,6 +128,7 @@ typedef struct Send_Packet_Players {
 
 typedef struct Recv_Packet_Players {
 	int packet_type = PACKET_CS_PLAYERS;
+	float HP;
 	Location Loc;
 	Rotation Rot;
 	Velocity Vel;

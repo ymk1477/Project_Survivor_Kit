@@ -1047,3 +1047,8 @@ void ASCharacter::SetSprinting(bool NewSprinting)
 	if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)
 		Player_info.IsSprinting[PlayerId] = NewSprinting;
 }
+
+void ASCharacter::SetOtherHealth(float hp)
+{
+	Health = hp;
+}

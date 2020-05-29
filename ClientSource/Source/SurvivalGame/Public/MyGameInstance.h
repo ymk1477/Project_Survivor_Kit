@@ -58,6 +58,7 @@ typedef struct AimOffset {
 typedef struct Info_Player {
 	bool IsUsed[MAX_USER] = { false };
 	int Host = -1;
+	float HP[MAX_USER];
 	Location Loc[MAX_USER];
 	Rotation Rot[MAX_USER];
 	Velocity Vel[MAX_USER];
@@ -66,6 +67,7 @@ typedef struct Info_Player {
 	bool IsTargeting[MAX_USER] = { false };
 	bool IsSprinting[MAX_USER] = { false };
 	bool onCrouchToggle[MAX_USER] = { false };
+	bool UseWeapon[MAX_USER] = { false };
 	bool IsFiring[MAX_USER] = { false };
 }Player;
 
@@ -106,6 +108,7 @@ typedef struct Recv_Packet_GAME_START {
 
 typedef struct Send_Packet_Players {
 	int packet_type = PACKET_CS_PLAYERS;
+	float HP;
 	Location Loc;
 	Rotation Rot;
 	Velocity Vel;
@@ -114,6 +117,7 @@ typedef struct Send_Packet_Players {
 	bool IsTargeting;
 	bool IsSprinting;
 	bool onCrouchToggle;
+	bool UseWeapon;
 	bool IsFiring;
 }S_Players;
 
@@ -121,6 +125,7 @@ typedef struct Recv_Packet_Players {
 	int packet_type = PACKET_SC_PLAYERS;
 	int Host;
 	bool IsUsed[MAX_USER];
+	float HP[MAX_USER];
 	Location Loc[MAX_USER];
 	Rotation Rot[MAX_USER];
 	Velocity Vel[MAX_USER];
@@ -129,8 +134,8 @@ typedef struct Recv_Packet_Players {
 	bool IsTargeting[MAX_USER];
 	bool IsSprinting[MAX_USER];
 	bool onCrouchToggle[MAX_USER];
+	bool UseWeapon[MAX_USER];
 	bool IsFiring[MAX_USER];
-
 }R_Players;
 
 typedef struct Send_Packet_Level_Change {
