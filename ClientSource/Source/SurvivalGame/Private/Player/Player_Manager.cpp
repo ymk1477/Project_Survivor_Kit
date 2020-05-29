@@ -35,10 +35,7 @@ void APlayer_Manager::BeginPlay()
 void APlayer_Manager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Connected : %d"), PlayerId));
-	//bool s = ASCoopGameMode::IsStart();
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PlayerManager Tick()")));
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Connected : %d "),Connected));
+	
 	if (Connected)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PlayerId : %d "), PlayerId));
@@ -56,38 +53,28 @@ void APlayer_Manager::Tick(float DeltaTime)
 				}
 		}*/
 
-		ASPlayerController* Mycontroller = Cast<ASPlayerController>(GetWorld()->GetFirstPlayerController());
-		ASCharacter* MyPawn = Cast<ASCharacter>(Mycontroller->GetPawn());
+		
+		ASCharacter* MyPawn = players[PlayerId];
+		
+		Player_info.HP[PlayerId] = MyPawn->GetHealth();
 
-		if (MyPawn->GetHealth() > 0.0f)
-		{
-			Player_info.HP[PlayerId] = MyPawn->GetHealth();
+		FRotator MyRotation = MyPawn->GetActorRotation();
+		Player_info.Rot[PlayerId].yaw = MyRotation.Yaw;
+		Player_info.Rot[PlayerId].pitch = MyRotation.Pitch;
+		Player_info.Rot[PlayerId].roll = MyRotation.Roll;
 
-			FVector MyLocation = MyPawn->GetActorLocation();
-			Player_info.Loc[PlayerId].x = MyLocation.X;
-			Player_info.Loc[PlayerId].y = MyLocation.Y;
-			Player_info.Loc[PlayerId].z = MyLocation.Z;
+		FVector MyVelocity = MyPawn->GetVelocity();
+		Player_info.Vel[PlayerId].x = MyVelocity.X;
+		Player_info.Vel[PlayerId].y = MyVelocity.Y;
+		Player_info.Vel[PlayerId].z = MyVelocity.Z;
 
-			FRotator MyRotation = MyPawn->GetActorRotation();
-			Player_info.Rot[PlayerId].yaw = MyRotation.Yaw;
-			Player_info.Rot[PlayerId].pitch = MyRotation.Pitch;
-			Player_info.Rot[PlayerId].roll = MyRotation.Roll;
-
-			FVector MyVelocity = MyPawn->GetVelocity();
-			Player_info.Vel[PlayerId].x = MyVelocity.X;
-			Player_info.Vel[PlayerId].y = MyVelocity.Y;
-			Player_info.Vel[PlayerId].z = MyVelocity.Z;
-
-			FRotator MyAim = MyPawn->GetAimOffsets();
-			Player_info.Aim[PlayerId].yaw = MyAim.Yaw;
-			Player_info.Aim[PlayerId].pitch = MyAim.Pitch;
-			Player_info.Aim[PlayerId].roll = MyAim.Roll;
-
-		}
-
+		FRotator MyAim = MyPawn->GetAimOffsets();
+		Player_info.Aim[PlayerId].yaw = MyAim.Yaw;
+		Player_info.Aim[PlayerId].pitch = MyAim.Pitch;
+		Player_info.Aim[PlayerId].roll = MyAim.Roll;
+			   
 		S_Players S_Packet;
 		S_Packet.HP = Player_info.HP[PlayerId];
-		S_Packet.Loc = Player_info.Loc[PlayerId];
 		S_Packet.Rot = Player_info.Rot[PlayerId];
 		S_Packet.Vel = Player_info.Vel[PlayerId];
 		S_Packet.Aim = Player_info.Aim[PlayerId];
@@ -104,10 +91,6 @@ void APlayer_Manager::Tick(float DeltaTime)
 			if ( (i != PlayerId) && Player_info.IsUsed[i] )
 			{
 
-				FVector NewLocation;
-				NewLocation.X = Player_info.Loc[i].x;
-				NewLocation.Y = Player_info.Loc[i].y;
-				NewLocation.Z = Player_info.Loc[i].z;
 				FRotator NewRotation;
 				NewRotation.Pitch = Player_info.Rot[i].pitch;
 				NewRotation.Yaw = Player_info.Rot[i].yaw;
@@ -122,7 +105,8 @@ void APlayer_Manager::Tick(float DeltaTime)
 				NewAim.Roll = Player_info.Aim[i].roll;
 
 				players[i]->SetOtherHealth(Player_info.HP[i]);
-				players[i]->SetActorLocationAndRotation(NewLocation, NewRotation, false, 0, ETeleportType::TeleportPhysics);
+				players[i]->SetActorRotation(NewRotation);
+				players[i]->AddMovementInput(NewVelocity);
 				players[i]->GetMovementComponent()->Velocity = NewVelocity;
 				players[i]->SetAimOffset(NewAim);
 				players[i]->SetIsJumping(Player_info.IsJump[i]);
@@ -144,9 +128,6 @@ void APlayer_Manager::Tick(float DeltaTime)
 			}
 		}
 			
-
-		//MySocket::RecvPacket();
-
 	}
 
 }

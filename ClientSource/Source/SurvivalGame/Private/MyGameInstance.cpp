@@ -185,7 +185,6 @@ void MySocket::RecvPacket() {
 				Player_info.IsUsed[i] = packet->IsUsed[i];
 				if ( (i != PlayerId) && Player_info.IsUsed[i])
 				{
-					Player_info.Loc[i] = packet->Loc[i];
 					Player_info.Rot[i] = packet->Rot[i];
 					Player_info.Vel[i] = packet->Vel[i];
 					Player_info.Aim[i] = packet->Aim[i];
@@ -234,13 +233,6 @@ UMyGameInstance::UMyGameInstance()
 	All_level_Changed = false;
 }
 
-
-void UMyGameInstance::SetPlayer_Loc(float x, float y, float z)
-{
-	Player_info.Loc[PlayerId].x = x;
-	Player_info.Loc[PlayerId].y = y;
-	Player_info.Loc[PlayerId].z = z;
-}
 
 void UMyGameInstance::SetIpAdress(FString Ip_Adress)
 {

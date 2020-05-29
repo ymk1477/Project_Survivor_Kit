@@ -59,7 +59,6 @@ typedef struct Info_Player {
 	bool IsUsed[MAX_USER] = { false };
 	int Host = -1;
 	float HP[MAX_USER];
-	Location Loc[MAX_USER];
 	Rotation Rot[MAX_USER];
 	Velocity Vel[MAX_USER];
 	AimOffset Aim[MAX_USER];
@@ -109,7 +108,6 @@ typedef struct Recv_Packet_GAME_START {
 typedef struct Send_Packet_Players {
 	int packet_type = PACKET_CS_PLAYERS;
 	float HP;
-	Location Loc;
 	Rotation Rot;
 	Velocity Vel;
 	AimOffset Aim;
@@ -126,7 +124,6 @@ typedef struct Recv_Packet_Players {
 	int Host;
 	bool IsUsed[MAX_USER];
 	float HP[MAX_USER];
-	Location Loc[MAX_USER];
 	Rotation Rot[MAX_USER];
 	Velocity Vel[MAX_USER];
 	AimOffset Aim[MAX_USER];

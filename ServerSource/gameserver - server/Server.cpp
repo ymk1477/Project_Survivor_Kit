@@ -268,68 +268,12 @@ void Recv_Packet(int clientId, char* buf) {
 
 		}
 		break;
-		case PACKET_CS_LOCATION:
-		{
-			R_Loc* packet = reinterpret_cast<R_Loc*>(buf);
-			cout << clientId + 1 << "번 플레이어 Location ( ";
-			cout << "X : " << packet->clientLoc.x << ", Y : " << packet->clientLoc.y << ", Z : " << packet->clientLoc.z << ")" << endl;
-			cout << "//////////////////////////////////////////////////////////////////" << endl;
-			Player_Info.Loc[clientId] = packet->clientLoc;
-
-			for (int i = 0; i < MAX_USER; ++i) {
-				tmp.IsUsed[i] = Player_Info.IsUsed[i];
-				tmp.Loc[i] = Player_Info.Loc[i];
-				tmp.IsUsed[i] = Player_Info.IsJump[i];
-			}
-
-			g_clients[clientId].over.dataBuffer.len = sizeof(tmp);
-			memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
-			g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
-
-			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&tmp);
-
-			for (int i = 0; i < MAX_USER; ++i) {
-				if (Player_Info.IsUsed[i]) {
-					WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,
-						&(g_clients[i].over.overlapped), send_callback);
-				}
-			}
-		}
-		break;
-		case PACKET_CS_JUMP:
-		{
-			R_Jump* packet = reinterpret_cast<R_Jump*>(buf);
-			cout << clientId + 1 << "번 플레이어 Jump!" << endl;
-			cout << "//////////////////////////////////////////////////////////////////" << endl;
-			Player_Info.IsJump[clientId] = true;
-
-			for (int i = 0; i < MAX_USER; ++i) {
-				tmp.IsUsed[i] = Player_Info.IsUsed[i];
-				tmp.Loc[i] = Player_Info.Loc[i];
-				tmp.IsUsed[i] = Player_Info.IsJump[i];
-			}
-
-
-			for (int i = 0; i < MAX_USER; ++i) {
-				if (Player_Info.IsUsed[i]) {
-					g_clients[i].over.dataBuffer.len = sizeof(tmp);
-					memset(&(g_clients[i].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
-					g_clients[i].over.overlapped.hEvent = (HANDLE)i;
-
-					g_clients[i].over.dataBuffer.buf = reinterpret_cast<char*>(&tmp);
-					WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,
-						&(g_clients[i].over.overlapped), send_callback);
-				}
-			}
-		}
-		break;
 		case PACKET_CS_PLAYERS:
 		{
 			R_Players* packet = reinterpret_cast<R_Players*>(buf);
 			cout << clientId + 1 << "번 플레이어 정보 RECV !!!" << endl;
 
 			Player_Info.HP[clientId] = packet->HP;
-			Player_Info.Loc[clientId] = packet->Loc;
 			Player_Info.Rot[clientId] = packet->Rot;
 			Player_Info.Vel[clientId] = packet->Vel;
 			Player_Info.Aim[clientId] = packet->Aim;
@@ -355,7 +299,6 @@ void Recv_Packet(int clientId, char* buf) {
 				s_packet.Host = Player_Info.Host;
 				s_packet.IsUsed[i] = Player_Info.IsUsed[i];
 				s_packet.HP[i] = Player_Info.HP[i];
-				s_packet.Loc[i] = Player_Info.Loc[i];
 				s_packet.Rot[i] = Player_Info.Rot[i];
 				s_packet.Vel[i] = Player_Info.Vel[i];
 				s_packet.Aim[i] = Player_Info.Aim[i];

@@ -117,42 +117,45 @@ void ASCharacter::Tick(float DeltaTime)
 			Player_info.Loc[PlayerId].x, Player_info.Loc[PlayerId].y, Player_info.Loc[PlayerId].z));*/
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player Pitch : %f, Yaw : %f, Roll : %f"),
 			Player_info.Rot[PlayerId].pitch, Player_info.Rot[PlayerId].yaw, Player_info.Rot[PlayerId].roll));*/
-	}
-
-
-	if (bWantsToRun && !IsSprinting())
-	{
-		SetSprinting(true);
-	}
-
-	if (Controller && Controller->IsLocalController())
-	{
-		ASUsableActor* Usable = GetUsableInView();
-
-		// End Focus
-		if (FocusedUsableActor != Usable)
+		
+		
+		if (bWantsToRun && !IsSprinting())
 		{
-			if (FocusedUsableActor)
-			{
-				FocusedUsableActor->OnEndFocus();
-			}
-
-			bHasNewFocus = true;
+			SetSprinting(true);
 		}
 
-		// Assign new Focus
-		FocusedUsableActor = Usable;
-
-		// Start Focus.
-		if (Usable)
+		if (Controller && Controller->IsLocalController())
 		{
-			if (bHasNewFocus)
+			ASUsableActor* Usable = GetUsableInView();
+
+			// End Focus
+			if (FocusedUsableActor != Usable)
 			{
-				Usable->OnBeginFocus();
-				bHasNewFocus = false;
+				if (FocusedUsableActor)
+				{
+					FocusedUsableActor->OnEndFocus();
+				}
+
+				bHasNewFocus = true;
+			}
+
+			// Assign new Focus
+			FocusedUsableActor = Usable;
+
+			// Start Focus.
+			if (Usable)
+			{
+				if (bHasNewFocus)
+				{
+					Usable->OnBeginFocus();
+					bHasNewFocus = false;
+				}
 			}
 		}
+
 	}
+
+
 
 }
 
@@ -300,7 +303,7 @@ void ASCharacter::OnStartTargeting()
 	}
 
 	SetTargeting(true);
-	if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)
+	if (this->IsControlled())
 		Player_info.IsTargeting[PlayerId] = true;
 }
 
@@ -308,7 +311,7 @@ void ASCharacter::OnStartTargeting()
 void ASCharacter::OnEndTargeting()
 {
 	SetTargeting(false);
-	if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)
+	if (this->IsControlled())
 		Player_info.IsTargeting[PlayerId] = false;
 }
 
@@ -330,7 +333,7 @@ FRotator ASCharacter::GetAimOffsetsOther() const
 void ASCharacter::OnJump()
 {
 	SetIsJumping(true);
-	if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)
+	if (this->IsControlled())
 		Player_info.IsJump[PlayerId] = true;
 	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player Jump : %d"),
 		Player_info.IsJump[PlayerId]));*/
@@ -377,7 +380,7 @@ void ASCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 Pr
 		GetCharacterMovement()->MovementMode != EMovementMode::MOVE_Falling)
 	{
 		SetIsJumping(false);
-		if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)
+		if (this->IsControlled())
 			Player_info.IsJump[PlayerId] = false;
 	/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player Jump : %d"),
 			Player_info.IsJump[PlayerId]));*/
@@ -441,7 +444,7 @@ void ASCharacter::OnCrouchToggle()
 	{
 		SetSprinting(false);
 	}
-	if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)
+	if (this->IsControlled())
 	{
 		Player_info.onCrouchToggle[PlayerId] = true;
 	}
@@ -1044,7 +1047,7 @@ void ASCharacter::SetSprinting(bool NewSprinting)
 	}
 
 	Super::SetSprinting(NewSprinting);
-	if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)
+	if (this->IsControlled())
 		Player_info.IsSprinting[PlayerId] = NewSprinting;
 }
 
