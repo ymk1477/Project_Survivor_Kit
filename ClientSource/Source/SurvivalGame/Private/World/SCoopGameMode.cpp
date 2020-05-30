@@ -203,3 +203,8 @@ void ASCoopGameMode::FinishMatch()
 		}
 	}
 }
+
+void ASCoopGameMode::SetOtherPlayerDefaults(APawn* MyPawn)
+{
+	SetPlayerDefaults(MyPawn);
+}

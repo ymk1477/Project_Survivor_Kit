@@ -41,4 +41,6 @@ class SURVIVALGAME_API ASCoopGameMode : public ASGameMode
 	UPROPERTY(EditDefaultsOnly, Category = "Scoring")
 	int32 ScoreNightSurvived;
 
+	public:
+	void SetOtherPlayerDefaults(APawn* MyPawn);
 };

@@ -87,38 +87,7 @@ void ASCharacter::Tick(float DeltaTime)
 
 	if (Connected)
 	{
-		/*if (GetWorld()->GetFirstPlayerController()->GetPawn() == this)*/
-		/*if(this->IsPlayerControlled())
-		{
 			
-			FVector loc = GetActorLocation();
-			Player_info.Loc[PlayerId].x = loc.X;
-			Player_info.Loc[PlayerId].y = loc.Y;
-			Player_info.Loc[PlayerId].z = loc.Z;
-
-			FRotator rot = GetActorRotation();
-			Player_info.Rot[PlayerId].yaw = rot.Yaw;
-			Player_info.Rot[PlayerId].pitch = rot.Pitch;
-			Player_info.Rot[PlayerId].roll = rot.Roll;
-
-			FVector vel = GetVelocity();
-			Player_info.Vel[PlayerId].x = vel.X;
-			Player_info.Vel[PlayerId].y = vel.Y;
-			Player_info.Vel[PlayerId].z = vel.Z;
-
-			FRotator Aim = GetAimOffsets();
-			Player_info.Aim[PlayerId].yaw = Aim.Yaw;
-			Player_info.Aim[PlayerId].pitch = Aim.Pitch;
-			Player_info.Aim[PlayerId].roll = Aim.Roll;
-
-		}*/
-		
-		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player X : %f, Y : %f, Z : %f"),
-			Player_info.Loc[PlayerId].x, Player_info.Loc[PlayerId].y, Player_info.Loc[PlayerId].z));*/
-		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player Pitch : %f, Yaw : %f, Roll : %f"),
-			Player_info.Rot[PlayerId].pitch, Player_info.Rot[PlayerId].yaw, Player_info.Rot[PlayerId].roll));*/
-		
-		
 		if (bWantsToRun && !IsSprinting())
 		{
 			SetSprinting(true);

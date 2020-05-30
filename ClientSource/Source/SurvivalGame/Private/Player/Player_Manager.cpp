@@ -58,6 +58,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 		
 		Player_info.HP[PlayerId] = MyPawn->GetHealth();
 
+		
 		FRotator MyRotation = MyPawn->GetActorRotation();
 		Player_info.Rot[PlayerId].yaw = MyRotation.Yaw;
 		Player_info.Rot[PlayerId].pitch = MyRotation.Pitch;
@@ -106,8 +107,8 @@ void APlayer_Manager::Tick(float DeltaTime)
 
 				players[i]->SetOtherHealth(Player_info.HP[i]);
 				players[i]->SetActorRotation(NewRotation);
-				players[i]->AddMovementInput(NewVelocity);
 				players[i]->GetMovementComponent()->Velocity = NewVelocity;
+				players[i]->AddMovementInput(NewVelocity);
 				players[i]->SetAimOffset(NewAim);
 				players[i]->SetIsJumping(Player_info.IsJump[i]);
 				players[i]->SetIsTargeting(Player_info.IsTargeting[i]);
@@ -115,8 +116,8 @@ void APlayer_Manager::Tick(float DeltaTime)
 				if (Player_info.onCrouchToggle[i])
 					players[i]->OnCrouchToggle();
 
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player HP -> %f"),
-					i + 1, players[i]->GetHealth()));
+				/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player HP -> %f"),
+					i + 1, players[i]->GetHealth()));*/
 				/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Sprinting -> %d"),
 					i + 1, players[i]->IsSprinting()));*/
 					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Com VELOCITY -> x : %f, y : %f, z : %f"),
@@ -137,6 +138,7 @@ void APlayer_Manager::MakeStartLocation()
 {
 	UWorld* World = GetWorld();
 	ASCharacter* MyCharacter = Cast<ASCharacter>(World->GetFirstPlayerController()->GetCharacter());
+	
 	players.Emplace(MyCharacter);
 
 	FVector PlayerStart = MyCharacter->GetActorLocation();		// 플레이어별 시작지점 지정
@@ -152,6 +154,9 @@ void APlayer_Manager::MakeStartLocation()
 void APlayer_Manager::SpawnPlayers()
 {
 	UWorld* World = GetWorld();
+	ASCoopGameMode* MyGameMode = Cast<ASCoopGameMode>(World->GetAuthGameMode());
+	AAIController* aiController = nullptr;
+
 	if (Playing > 1)
 	{
 		UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/Player/PlayerPawn")));
@@ -177,12 +182,25 @@ void APlayer_Manager::SpawnPlayers()
 		ASPlayerController* Mycontroller = Cast<ASPlayerController>(World->GetFirstPlayerController());
 		for (int i = 1; i < Playing; ++i) {
 			ASCharacter* NewCharacter = World->SpawnActor<ASCharacter>(GenerateBp->GeneratedClass, StartLocation[i], FRotator::ZeroRotator, Spawnparams);
+			
+			if (aiController == nullptr)
+			{
+				aiController = Cast<AAIController>(NewCharacter->GetController());
+			}
 
+			MyGameMode->SetOtherPlayerDefaults(NewCharacter);
 			players.Emplace(NewCharacter);
 		}
 		if (PlayerId != 0)
 		{
 			Mycontroller->Possess(players[PlayerId]);
+		}
+		for (auto i = players.begin(); i != players.end(); ++i)
+		{
+			if (!((*i)->IsPlayerControlled()))
+			{
+				aiController->Possess(*i);
+			}
 		}
 	}
 

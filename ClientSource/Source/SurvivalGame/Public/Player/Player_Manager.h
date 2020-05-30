@@ -13,6 +13,7 @@
 #include "SLocalPlayer.h"
 #include "MyGameInstance.h"
 #include "SCharacter.h"
+#include "AIController.h"
 #include "Player_Manager.generated.h"
 
 
