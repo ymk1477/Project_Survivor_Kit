@@ -73,7 +73,9 @@ void APlayer_Manager::Tick(float DeltaTime)
 		Player_info.Aim[PlayerId].yaw = MyAim.Yaw;
 		Player_info.Aim[PlayerId].pitch = MyAim.Pitch;
 		Player_info.Aim[PlayerId].roll = MyAim.Roll;
-			   
+		
+		Player_info.IsFiring[PlayerId] = MyPawn->IsFiring();
+
 		S_Players S_Packet;
 		S_Packet.HP = Player_info.HP[PlayerId];
 		S_Packet.Rot = Player_info.Rot[PlayerId];
@@ -83,6 +85,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 		S_Packet.IsTargeting = Player_info.IsTargeting[PlayerId];
 		S_Packet.IsSprinting = Player_info.IsSprinting[PlayerId];
 		S_Packet.onCrouchToggle = Player_info.onCrouchToggle[PlayerId];
+		S_Packet.IsFiring = Player_info.IsFiring[PlayerId];
 		MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Packet);
 		Player_info.onCrouchToggle[PlayerId] = false;
 		MySocket::RecvPacket();
@@ -115,6 +118,20 @@ void APlayer_Manager::Tick(float DeltaTime)
 				players[i]->SetSprinting(Player_info.IsSprinting[i]);
 				if (Player_info.onCrouchToggle[i])
 					players[i]->OnCrouchToggle();
+				if (Player_info.IsFiring[i])
+				{
+					
+					players[i]->StartFiringOther();
+					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player FIRE -> %d"),
+					i + 1, players[i]->IsFiring()));*/
+				}
+				else
+				{
+					players[i]->StopFiringOther();
+					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player FIRE -> %d"),
+					i + 1, players[i]->IsFiring()));*/
+				}
+
 
 				/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player HP -> %f"),
 					i + 1, players[i]->GetHealth()));*/

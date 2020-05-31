@@ -281,6 +281,7 @@ void Recv_Packet(int clientId, char* buf) {
 			Player_Info.isTargeting[clientId] = packet->isTargeting;
 			Player_Info.IsSprinting[clientId] = packet->IsSprinting;
 			Player_Info.onCrouchToggle[clientId] = packet->onCrouchToggle;
+			Player_Info.IsFiring[clientId] = packet->IsFiring;
 
 			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
 			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
@@ -306,6 +307,7 @@ void Recv_Packet(int clientId, char* buf) {
 				s_packet.isTargeting[i] = Player_Info.isTargeting[i];
 				s_packet.IsSprinting[i] = Player_Info.IsSprinting[i];
 				s_packet.onCrouchToggle[i] = Player_Info.onCrouchToggle[i];
+				s_packet.IsFiring[i] = Player_Info.IsFiring[i];
 			}
 
 			for (int i = 0; i < MAX_USER; ++i) {

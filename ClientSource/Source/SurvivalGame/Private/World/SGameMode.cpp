@@ -388,7 +388,7 @@ void ASGameMode::SpawnDefaultInventory(APawn* PlayerPawn)
 				FActorSpawnParameters SpawnInfo;
 				SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 				ASWeapon* NewWeapon = GetWorld()->SpawnActor<ASWeapon>(DefaultInventoryClasses[i], SpawnInfo);
-
+				
 				MyPawn->AddWeapon(NewWeapon);
 			}
 		}

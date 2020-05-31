@@ -192,6 +192,7 @@ void MySocket::RecvPacket() {
 					Player_info.IsTargeting[i] = packet->IsTargeting[i];
 					Player_info.IsSprinting[i] = packet->IsSprinting[i];
 					Player_info.onCrouchToggle[i] = packet->onCrouchToggle[i];
+					Player_info.IsFiring[i] = packet->IsFiring[i];
 				}	 
 				if (Player_info.IsUsed[i])
 				{

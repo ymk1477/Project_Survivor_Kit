@@ -515,6 +515,15 @@ bool ASCharacter::IsFiring() const
 	return CurrentWeapon && CurrentWeapon->GetCurrentState() == EWeaponState::Firing;
 }
 
+void ASCharacter::StartFiringOther()
+{
+	OnStartFire();
+}
+
+void ASCharacter::StopFiringOther()
+{
+	OnStopFire();
+}
 
 FName ASCharacter::GetInventoryAttachPoint(EInventorySlot Slot) const
 {
@@ -609,14 +618,19 @@ void ASCharacter::EquipWeapon(ASWeapon* Weapon)
 		if (Weapon == CurrentWeapon)
 			return;
 
-		if (Role == ROLE_Authority)
+		if (this->IsPlayerControlled())
 		{
-			SetCurrentWeapon(Weapon, CurrentWeapon);
+			if (Role == ROLE_Authority)
+			{
+				SetCurrentWeapon(Weapon, CurrentWeapon);
+			}
+			else
+			{
+				ServerEquipWeapon(Weapon);
+			}
 		}
 		else
-		{
-			ServerEquipWeapon(Weapon);
-		}
+			SetCurrentWeapon(Weapon, CurrentWeapon);
 	}
 }
 
@@ -635,7 +649,21 @@ void ASCharacter::ServerEquipWeapon_Implementation(ASWeapon* Weapon)
 
 void ASCharacter::AddWeapon(class ASWeapon* Weapon)
 {
-	if (Weapon && Role == ROLE_Authority)
+	if (this->IsPlayerControlled())
+	{
+		if (Weapon && Role == ROLE_Authority)
+		{
+			Weapon->OnEnterInventory(this);
+			Inventory.AddUnique(Weapon);
+
+			// Equip first weapon in inventory
+			if (Inventory.Num() > 0 && CurrentWeapon == nullptr)
+			{
+				EquipWeapon(Inventory[0]);
+			}
+		}
+	}
+	else
 	{
 		Weapon->OnEnterInventory(this);
 		Inventory.AddUnique(Weapon);

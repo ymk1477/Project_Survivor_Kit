@@ -66,7 +66,7 @@ typedef struct Info_Player {
 	bool IsTargeting[MAX_USER] = { false };
 	bool IsSprinting[MAX_USER] = { false };
 	bool onCrouchToggle[MAX_USER] = { false };
-	bool UseWeapon[MAX_USER] = { false };
+	//bool UseWeapon[MAX_USER] = { false };
 	bool IsFiring[MAX_USER] = { false };
 }Player;
 
@@ -115,7 +115,7 @@ typedef struct Send_Packet_Players {
 	bool IsTargeting;
 	bool IsSprinting;
 	bool onCrouchToggle;
-	bool UseWeapon;
+	//bool UseWeapon;
 	bool IsFiring;
 }S_Players;
 
@@ -131,7 +131,7 @@ typedef struct Recv_Packet_Players {
 	bool IsTargeting[MAX_USER];
 	bool IsSprinting[MAX_USER];
 	bool onCrouchToggle[MAX_USER];
-	bool UseWeapon[MAX_USER];
+	//bool UseWeapon[MAX_USER];
 	bool IsFiring[MAX_USER];
 }R_Players;
 

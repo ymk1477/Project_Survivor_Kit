@@ -72,6 +72,7 @@ typedef struct Info_Player {
 	bool isTargeting[MAX_USER] = { false };
 	bool IsSprinting[MAX_USER] = { false };
 	bool onCrouchToggle[MAX_USER] = { false };
+	bool IsFiring[MAX_USER] = { false };
 }Player;
 
 typedef struct Test_Packet {
@@ -122,6 +123,7 @@ typedef struct Send_Packet_Players {
 	bool isTargeting[MAX_USER];
 	bool IsSprinting[MAX_USER];
 	bool onCrouchToggle[MAX_USER];
+	bool IsFiring[MAX_USER];
 }S_Players;
 
 typedef struct Recv_Packet_Players {
@@ -134,6 +136,7 @@ typedef struct Recv_Packet_Players {
 	bool isTargeting;
 	bool IsSprinting;
 	bool onCrouchToggle;
+	bool IsFiring;
 }R_Players;
 
 typedef struct Recv_Packet_Level_Change {

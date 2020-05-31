@@ -275,6 +275,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	bool IsFiring() const;
 
+	void StartFiringOther();
+
+	void StopFiringOther();
+
 	/* Return socket name for attachments (to match the socket in the character skeleton) */
 	FName GetInventoryAttachPoint(EInventorySlot Slot) const;
 
