@@ -88,6 +88,7 @@ void MySocket::sendBuffer(int PacketType, void* BUF) {
 	{
 		S_Players* packet = reinterpret_cast<S_Players*>(BUF);
 		Success = inst->Send((uint8*)packet, (int32)sizeof(*packet), zero);
+		
 		/*if(Success)
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Complete to Send Player_Info !!")));
 		else
@@ -185,6 +186,7 @@ void MySocket::RecvPacket() {
 				Player_info.IsUsed[i] = packet->IsUsed[i];
 				if ( (i != PlayerId) && Player_info.IsUsed[i])
 				{
+					Player_info.HP[i] = packet->HP[i];
 					Player_info.Rot[i] = packet->Rot[i];
 					Player_info.Vel[i] = packet->Vel[i];
 					Player_info.Aim[i] = packet->Aim[i];
@@ -215,6 +217,8 @@ void MySocket::RecvPacket() {
 		{
 			R_LevelChange* packet = reinterpret_cast<R_LevelChange*>(RECV_BUF);
 			All_level_Changed = packet->changed;
+			if(All_level_Changed)
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("All Level Changed!! ")));
 		}
 		break;
 		}
@@ -282,6 +286,11 @@ void UMyGameInstance::Start()
 {
 	S_Start start;
 	MySocket::sendBuffer(PACKET_CS_GAME_START, &start);
+}
+
+bool UMyGameInstance::IsAllLevelChange()
+{
+	return All_level_Changed;
 }
 
 UMyGameInstance::~UMyGameInstance()

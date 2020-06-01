@@ -16,7 +16,7 @@ AStartUI_Manager::AStartUI_Manager()
 void AStartUI_Manager::BeginPlay()
 {
 	Super::BeginPlay();
-	SetActorTickInterval(0.5f);
+	SetActorTickInterval(0.16f);
 
 }
 

@@ -207,5 +207,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "My_Server")
 		void Start();
 
+	UFUNCTION(BlueprintCallable, Category = "TimeOfDay")
+		bool IsAllLevelChange();
+
 	~UMyGameInstance();
 };

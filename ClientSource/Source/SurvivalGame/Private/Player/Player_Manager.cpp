@@ -53,99 +53,111 @@ void APlayer_Manager::Tick(float DeltaTime)
 				}
 		}*/
 
-		
-		ASCharacter* MyPawn = players[PlayerId];
-		
-		Player_info.HP[PlayerId] = MyPawn->GetHealth();
-
-		
-		FRotator MyRotation = MyPawn->GetActorRotation();
-		Player_info.Rot[PlayerId].yaw = MyRotation.Yaw;
-		Player_info.Rot[PlayerId].pitch = MyRotation.Pitch;
-		Player_info.Rot[PlayerId].roll = MyRotation.Roll;
-
-		FVector MyVelocity = MyPawn->GetVelocity();
-		Player_info.Vel[PlayerId].x = MyVelocity.X;
-		Player_info.Vel[PlayerId].y = MyVelocity.Y;
-		Player_info.Vel[PlayerId].z = MyVelocity.Z;
-
-		FRotator MyAim = MyPawn->GetAimOffsets();
-		Player_info.Aim[PlayerId].yaw = MyAim.Yaw;
-		Player_info.Aim[PlayerId].pitch = MyAim.Pitch;
-		Player_info.Aim[PlayerId].roll = MyAim.Roll;
-		
-		Player_info.IsFiring[PlayerId] = MyPawn->IsFiring();
-
-		S_Players S_Packet;
-		S_Packet.HP = Player_info.HP[PlayerId];
-		S_Packet.Rot = Player_info.Rot[PlayerId];
-		S_Packet.Vel = Player_info.Vel[PlayerId];
-		S_Packet.Aim = Player_info.Aim[PlayerId];
-		S_Packet.IsJump = Player_info.IsJump[PlayerId];
-		S_Packet.IsTargeting = Player_info.IsTargeting[PlayerId];
-		S_Packet.IsSprinting = Player_info.IsSprinting[PlayerId];
-		S_Packet.onCrouchToggle = Player_info.onCrouchToggle[PlayerId];
-		S_Packet.IsFiring = Player_info.IsFiring[PlayerId];
-		MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Packet);
-		Player_info.onCrouchToggle[PlayerId] = false;
-		MySocket::RecvPacket();
-
-		for (int i = 0; i < MAX_USER; ++i)
+		if (All_level_Changed)
 		{
-			if ( (i != PlayerId) && Player_info.IsUsed[i] )
+			ASCharacter* MyPawn = players[PlayerId];
+
+			Player_info.HP[PlayerId] = MyPawn->GetHealth();
+
+			/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("My Player HP : %f "),
+				Player_info.HP[PlayerId]));*/
+
+			FRotator MyRotation = MyPawn->GetActorRotation();
+			Player_info.Rot[PlayerId].yaw = MyRotation.Yaw;
+			Player_info.Rot[PlayerId].pitch = MyRotation.Pitch;
+			Player_info.Rot[PlayerId].roll = MyRotation.Roll;
+
+			FVector MyVelocity = MyPawn->GetVelocity();
+			Player_info.Vel[PlayerId].x = MyVelocity.X;
+			Player_info.Vel[PlayerId].y = MyVelocity.Y;
+			Player_info.Vel[PlayerId].z = MyVelocity.Z;
+
+			FRotator MyAim = MyPawn->GetAimOffsets();
+			Player_info.Aim[PlayerId].yaw = MyAim.Yaw;
+			Player_info.Aim[PlayerId].pitch = MyAim.Pitch;
+			Player_info.Aim[PlayerId].roll = MyAim.Roll;
+
+			Player_info.IsFiring[PlayerId] = MyPawn->IsFiring();
+
+			S_Players S_Packet;
+			S_Packet.HP = Player_info.HP[PlayerId];
+			S_Packet.Rot = Player_info.Rot[PlayerId];
+			S_Packet.Vel = Player_info.Vel[PlayerId];
+			S_Packet.Aim = Player_info.Aim[PlayerId];
+			S_Packet.IsJump = Player_info.IsJump[PlayerId];
+			S_Packet.IsTargeting = Player_info.IsTargeting[PlayerId];
+			S_Packet.IsSprinting = Player_info.IsSprinting[PlayerId];
+			S_Packet.onCrouchToggle = Player_info.onCrouchToggle[PlayerId];
+			S_Packet.IsFiring = Player_info.IsFiring[PlayerId];
+			MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Packet);
+			Player_info.onCrouchToggle[PlayerId] = false;
+			//MySocket::RecvPacket();
+
+			for (int i = 0; i < MAX_USER; ++i)
 			{
-
-				FRotator NewRotation;
-				NewRotation.Pitch = Player_info.Rot[i].pitch;
-				NewRotation.Yaw = Player_info.Rot[i].yaw;
-				NewRotation.Roll = Player_info.Rot[i].roll;
-				FVector NewVelocity;
-				NewVelocity.X = Player_info.Vel[i].x;
-				NewVelocity.Y = Player_info.Vel[i].y;
-				NewVelocity.Z = Player_info.Vel[i].z;
-				FRotator NewAim;
-				NewAim.Pitch = Player_info.Aim[i].pitch;
-				NewAim.Yaw = Player_info.Aim[i].yaw;
-				NewAim.Roll = Player_info.Aim[i].roll;
-
-				players[i]->SetOtherHealth(Player_info.HP[i]);
-				players[i]->SetActorRotation(NewRotation);
-				players[i]->GetMovementComponent()->Velocity = NewVelocity;
-				players[i]->AddMovementInput(NewVelocity);
-				players[i]->SetAimOffset(NewAim);
-				players[i]->SetIsJumping(Player_info.IsJump[i]);
-				players[i]->SetIsTargeting(Player_info.IsTargeting[i]);
-				players[i]->SetSprinting(Player_info.IsSprinting[i]);
-				if (Player_info.onCrouchToggle[i])
-					players[i]->OnCrouchToggle();
-				if (Player_info.IsFiring[i])
+				if ((i != PlayerId) && Player_info.IsUsed[i])
 				{
-					
-					players[i]->StartFiringOther();
-					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player FIRE -> %d"),
-					i + 1, players[i]->IsFiring()));*/
+
+					FRotator NewRotation;
+					NewRotation.Pitch = Player_info.Rot[i].pitch;
+					NewRotation.Yaw = Player_info.Rot[i].yaw;
+					NewRotation.Roll = Player_info.Rot[i].roll;
+					FVector NewVelocity;
+					NewVelocity.X = Player_info.Vel[i].x;
+					NewVelocity.Y = Player_info.Vel[i].y;
+					NewVelocity.Z = Player_info.Vel[i].z;
+					FRotator NewAim;
+					NewAim.Pitch = Player_info.Aim[i].pitch;
+					NewAim.Yaw = Player_info.Aim[i].yaw;
+					NewAim.Roll = Player_info.Aim[i].roll;
+
+					players[i]->SetOtherHealth(Player_info.HP[i]);
+					/*if (players[i]->GetHealth() > Player_info.HP[i])		// 몬스터 동기화 하면서 같이 해줘야함 (TakeDamage).
+					{
+						FPointDamageEvent DmgEvent;
+						DmgEvent.DamageTypeClass = PunchDamageType;
+						DmgEvent.Damage = MeleeDamage;
+
+						players[i]->TakeDamage(DmgEvent.Damage, DmgEvent, GetController(), this);
+					}*/
+
+					players[i]->SetActorRotation(NewRotation);
+					players[i]->GetMovementComponent()->Velocity = NewVelocity;
+					players[i]->AddMovementInput(NewVelocity);
+					players[i]->SetAimOffset(NewAim);
+					players[i]->SetIsJumping(Player_info.IsJump[i]);
+					players[i]->SetIsTargeting(Player_info.IsTargeting[i]);
+					players[i]->SetSprinting(Player_info.IsSprinting[i]);
+					if (Player_info.onCrouchToggle[i])
+						players[i]->OnCrouchToggle();
+					if (Player_info.IsFiring[i])
+					{
+
+						players[i]->StartFiringOther();
+						/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player FIRE -> %d"),
+						i + 1, players[i]->IsFiring()));*/
+					}
+					else
+					{
+						players[i]->StopFiringOther();
+						/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player FIRE -> %d"),
+						i + 1, players[i]->IsFiring()));*/
+					}
+
+
+					/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player HP -> %f"),
+							i + 1, players[i]->GetHealth()));*/
+							/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Sprinting -> %d"),
+								i + 1, players[i]->IsSprinting()));*/
+								/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Com VELOCITY -> x : %f, y : %f, z : %f"),
+									i + 1, players[i]->GetRootComponent()->ComponentVelocity.X, players[i]->GetRootComponent()->ComponentVelocity.Y, players[i]->GetRootComponent()->ComponentVelocity.Z));
+								GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Get VELOCITY -> x : %f, y : %f, z : %f"),
+									i + 1, players[i]->GetVelocity().X, players[i]->GetVelocity().Y, players[i]->GetVelocity().Z));*/
+
+
 				}
-				else
-				{
-					players[i]->StopFiringOther();
-					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player FIRE -> %d"),
-					i + 1, players[i]->IsFiring()));*/
-				}
-
-
-				/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player HP -> %f"),
-					i + 1, players[i]->GetHealth()));*/
-				/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Sprinting -> %d"),
-					i + 1, players[i]->IsSprinting()));*/
-					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Com VELOCITY -> x : %f, y : %f, z : %f"),
-						i + 1, players[i]->GetRootComponent()->ComponentVelocity.X, players[i]->GetRootComponent()->ComponentVelocity.Y, players[i]->GetRootComponent()->ComponentVelocity.Z));
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Get VELOCITY -> x : %f, y : %f, z : %f"),
-						i + 1, players[i]->GetVelocity().X, players[i]->GetVelocity().Y, players[i]->GetVelocity().Z));*/
-
-
 			}
 		}
-			
 	}
 
 }

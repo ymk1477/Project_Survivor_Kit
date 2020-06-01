@@ -271,7 +271,7 @@ void Recv_Packet(int clientId, char* buf) {
 		case PACKET_CS_PLAYERS:
 		{
 			R_Players* packet = reinterpret_cast<R_Players*>(buf);
-			cout << clientId + 1 << "번 플레이어 정보 RECV !!!" << endl;
+			///cout << clientId + 1 << "번 플레이어 정보 RECV !!!" << endl;
 
 			Player_Info.HP[clientId] = packet->HP;
 			Player_Info.Rot[clientId] = packet->Rot;
@@ -347,7 +347,14 @@ void Recv_Packet(int clientId, char* buf) {
 
 			LevelChange[clientId] = packet->changed;
 
+			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
+			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
+
+			memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
+			g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
+
 			S_LevelChange s_packet;
+
 			int num = 0;
 			int ischange = 0;
 			for (int i = 0; i < MAX_USER; ++i)
@@ -367,19 +374,27 @@ void Recv_Packet(int clientId, char* buf) {
 
 
 			for (int i = 0; i < MAX_USER; ++i) {
-				g_clients[i].over.dataBuffer.len = sizeof(s_packet);
-				memset(&(g_clients[i].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
-				g_clients[i].over.overlapped.hEvent = (HANDLE)i;
-
-				g_clients[i].over.dataBuffer.buf = reinterpret_cast<char*>(&s_packet);
 				if (Player_Info.IsUsed[i]) {
-					retval = WSASend(g_clients[i].socket, &(g_clients[i].over.dataBuffer), 1, NULL, 0,	 // 수정
-						&(g_clients[i].over.overlapped), send_callback);
+					OVER_EX* SendingOverlapped = new OVER_EX;
+
+					SendingOverlapped->dataBuffer.len = sizeof(s_packet);
+					memset(&(SendingOverlapped->overlapped), 0x00, sizeof(WSAOVERLAPPED));
+					SendingOverlapped->overlapped.hEvent = (HANDLE)i;
+
+					SendingOverlapped->dataBuffer.buf = reinterpret_cast<char*>(&s_packet);
+
+					retval = WSASend(g_clients[i].socket, &(SendingOverlapped->dataBuffer), 1, NULL, 0,	 // 수정
+						&(SendingOverlapped->overlapped), send_callback);
+
 					if (retval == SOCKET_ERROR)
 					{
 						if (WSAGetLastError() != WSA_IO_PENDING)
 						{
 							printf("Error - %d CLINET Fail WSASend(error_code : %d)\n", i, WSAGetLastError());
+						}
+						else
+						{
+							delete SendingOverlapped;
 						}
 					}
 				}

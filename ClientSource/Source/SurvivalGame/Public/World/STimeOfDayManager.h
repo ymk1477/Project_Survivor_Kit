@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "MyGameInstance.h"
 #include "STimeOfDayManager.generated.h"
 
 UCLASS(ABSTRACT)

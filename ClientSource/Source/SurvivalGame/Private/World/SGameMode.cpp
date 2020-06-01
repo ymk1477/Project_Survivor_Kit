@@ -65,7 +65,7 @@ void ASGameMode::StartMatch()
 		/* Spawn a new bot every 5 seconds (bothandler will opt-out based on his own rules for example to only spawn during night time) */
 		GetWorldTimerManager().SetTimer(TimerHandle_BotSpawns, this, &ASGameMode::SpawnBotHandler, BotSpawnInterval, true);
 	}
-
+	
 	Super::StartMatch();
 }
 

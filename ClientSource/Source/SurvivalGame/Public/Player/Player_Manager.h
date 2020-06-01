@@ -14,6 +14,7 @@
 #include "MyGameInstance.h"
 #include "SCharacter.h"
 #include "AIController.h"
+#include "SZombieCharacter.h"
 #include "Player_Manager.generated.h"
 
 

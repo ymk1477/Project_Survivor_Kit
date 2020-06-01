@@ -43,67 +43,70 @@ void ASTimeOfDayManager::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	ASGameState* MyGameState = Cast<ASGameState>(GetWorld()->GetGameState());
-	if (MyGameState)
+	if (All_level_Changed)
 	{
-		/* Update the position of the sun. */
-		if (PrimarySunLight)
+		ASGameState* MyGameState = Cast<ASGameState>(GetWorld()->GetGameState());
+		if (MyGameState)
 		{
-			if (LastTimeOfDay == MyGameState->ElapsedGameMinutes)
+			/* Update the position of the sun. */
+			if (PrimarySunLight)
 			{
-				TimeSinceLastIncrement += DeltaSeconds;
+				if (LastTimeOfDay == MyGameState->ElapsedGameMinutes)
+				{
+					TimeSinceLastIncrement += DeltaSeconds;
+				}
+				else
+				{
+					/* Reset prediction */
+					TimeSinceLastIncrement = 0;
+				}
+
+				/* Predict the movement of the sun to smooth out the rotations between replication updates of the actual time of day */
+				const float PredictedIncrement = MyGameState->GetTimeOfDayIncrement() * TimeSinceLastIncrement;
+
+				/* TimeOfDay is expressed in minutes, we need to convert this into a pitch rotation */
+				const float MinutesInDay = 24 * 60;
+				const float PitchOffset = 90; /* The offset to account for time of day 0 should equal midnight */
+				const float PitchRotation = 360 * ((MyGameState->ElapsedGameMinutes + PredictedIncrement) / MinutesInDay);
+
+				FRotator NewSunRotation = FRotator(PitchRotation + PitchOffset, 45.0f, 0);
+				PrimarySunLight->SetActorRelativeRotation(NewSunRotation);
+
+				LastTimeOfDay = MyGameState->ElapsedGameMinutes;
 			}
-			else
+
+			bool CurrentNightState = MyGameState->GetIsNight();
+			if (CurrentNightState != LastNightState)
 			{
-				/* Reset prediction */
-				TimeSinceLastIncrement = 0;
+				if (CurrentNightState)
+				{
+					// Play night started cue (position is irrelevant for non spatialized & attenuated sounds)
+					UGameplayStatics::PlaySoundAtLocation(this, SoundNightStarted, GetActorLocation());
+					TargetSunBrightness = 0.01f;
+				}
+				else
+				{
+					// Play daytime started cue (position is irrelevant for non spatialized & attenuated sounds)
+					UGameplayStatics::PlaySoundAtLocation(this, SoundNightEnded, GetActorLocation());
+					TargetSunBrightness = OriginalSunBrightness;
+				}
+
+				/* Change to a new ambient loop */
+				PlayAmbientLoop();
 			}
 
-			/* Predict the movement of the sun to smooth out the rotations between replication updates of the actual time of day */
-			const float PredictedIncrement = MyGameState->GetTimeOfDayIncrement() * TimeSinceLastIncrement;
+			/* Update sun brightness to transition between day and night
+				(Note: We cannot disable the sunlight because BP_SkySphere depends on an enabled light to update the skydome) */
+			const float LerpSpeed = 0.1f * GetWorldSettings()->GetEffectiveTimeDilation();
+			float CurrentSunBrightness = PrimarySunLight->GetBrightness();
+			float NewSunBrightness = FMath::Lerp(CurrentSunBrightness, TargetSunBrightness, LerpSpeed);
+			PrimarySunLight->SetBrightness(NewSunBrightness);
 
-			/* TimeOfDay is expressed in minutes, we need to convert this into a pitch rotation */
-			const float MinutesInDay = 24 * 60;
-			const float PitchOffset = 90; /* The offset to account for time of day 0 should equal midnight */
-			const float PitchRotation = 360 * ((MyGameState->ElapsedGameMinutes + PredictedIncrement) / MinutesInDay);
-
-			FRotator NewSunRotation = FRotator(PitchRotation + PitchOffset, 45.0f, 0);
-			PrimarySunLight->SetActorRelativeRotation(NewSunRotation);
-
-			LastTimeOfDay = MyGameState->ElapsedGameMinutes;
+			LastNightState = CurrentNightState;
 		}
 
-		bool CurrentNightState = MyGameState->GetIsNight();
-		if (CurrentNightState != LastNightState)
-		{
-			if (CurrentNightState)
-			{
-				// Play night started cue (position is irrelevant for non spatialized & attenuated sounds)
-				UGameplayStatics::PlaySoundAtLocation(this, SoundNightStarted, GetActorLocation());
-				TargetSunBrightness = 0.01f;
-			}
-			else
-			{
-				// Play daytime started cue (position is irrelevant for non spatialized & attenuated sounds)
-				UGameplayStatics::PlaySoundAtLocation(this, SoundNightEnded, GetActorLocation());
-				TargetSunBrightness = OriginalSunBrightness;
-			}
-
-			/* Change to a new ambient loop */
-			PlayAmbientLoop();
-		}
-
-		/* Update sun brightness to transition between day and night
-			(Note: We cannot disable the sunlight because BP_SkySphere depends on an enabled light to update the skydome) */
-		const float LerpSpeed = 0.1f * GetWorldSettings()->GetEffectiveTimeDilation();
-		float CurrentSunBrightness = PrimarySunLight->GetBrightness();
-		float NewSunBrightness = FMath::Lerp(CurrentSunBrightness, TargetSunBrightness, LerpSpeed);
-		PrimarySunLight->SetBrightness(NewSunBrightness);
-
-		LastNightState = CurrentNightState;
+		UpdateSkylight();
 	}
-
-	UpdateSkylight();
 }
 
 
