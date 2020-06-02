@@ -10,6 +10,10 @@ using namespace std;
 #define SERVER_PORT 9000
 #define MAX_USER 4
 
+#define WEAPON_IDLE 10
+#define WEAPON_FIRING 11
+#define WEAPON_RERODING 12
+
 #define PACKET_CS_GAME_START 300
 #define PACKET_SC_GAME_START 301
 #define PACKET_CS_LEVEL_CHANGE 302
@@ -72,7 +76,7 @@ typedef struct Info_Player {
 	bool isTargeting[MAX_USER] = { false };
 	bool IsSprinting[MAX_USER] = { false };
 	bool onCrouchToggle[MAX_USER] = { false };
-	bool IsFiring[MAX_USER] = { false };
+	int WeaponState[MAX_USER] = { WEAPON_IDLE };
 }Player;
 
 typedef struct Test_Packet {
@@ -123,7 +127,7 @@ typedef struct Send_Packet_Players {
 	bool isTargeting[MAX_USER];
 	bool IsSprinting[MAX_USER];
 	bool onCrouchToggle[MAX_USER];
-	bool IsFiring[MAX_USER];
+	int WeaponState[MAX_USER];
 }S_Players;
 
 typedef struct Recv_Packet_Players {
@@ -136,7 +140,7 @@ typedef struct Recv_Packet_Players {
 	bool isTargeting;
 	bool IsSprinting;
 	bool onCrouchToggle;
-	bool IsFiring;
+	int WeaponState;
 }R_Players;
 
 typedef struct Recv_Packet_Level_Change {

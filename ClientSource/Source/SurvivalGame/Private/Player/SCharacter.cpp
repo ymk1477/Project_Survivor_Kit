@@ -515,6 +515,19 @@ bool ASCharacter::IsFiring() const
 	return CurrentWeapon && CurrentWeapon->GetCurrentState() == EWeaponState::Firing;
 }
 
+int ASCharacter::GetOtherWeaponState()
+{
+	if (CurrentWeapon && CurrentWeapon->GetCurrentState() == EWeaponState::Firing)
+	{
+		return WEAPON_FIRING;
+	}
+	else if (CurrentWeapon && CurrentWeapon->GetCurrentState() == EWeaponState::Reloading)
+	{
+		return WEAPON_RELOADING;
+	}
+	return WEAPON_IDLE;
+}
+
 void ASCharacter::StartFiringOther()
 {
 	OnStartFire();
@@ -523,6 +536,11 @@ void ASCharacter::StartFiringOther()
 void ASCharacter::StopFiringOther()
 {
 	OnStopFire();
+}
+
+void ASCharacter::ReloadingOther()
+{
+	OnReload();
 }
 
 FName ASCharacter::GetInventoryAttachPoint(EInventorySlot Slot) const
@@ -722,6 +740,8 @@ void ASCharacter::OnReload()
 {
 	if (CurrentWeapon)
 	{
+		if (!(this->IsPlayerControlled()))
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Other Player OnReload()")));
 		CurrentWeapon->StartReload();
 	}
 }
@@ -754,11 +774,14 @@ void ASCharacter::OnStopFire()
 
 void ASCharacter::StartWeaponFire()
 {
+
 	if (!bWantsToFire)
 	{
 		bWantsToFire = true;
 		if (CurrentWeapon)
 		{
+			if(!(this->IsPlayerControlled()))
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Other Player StartWeaponFire()")));
 			CurrentWeapon->StartFire();
 		}
 	}
@@ -772,6 +795,8 @@ void ASCharacter::StopWeaponFire()
 		bWantsToFire = false;
 		if (CurrentWeapon)
 		{
+			if (!(this->IsPlayerControlled()))
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Other Player StopWeaponFire()")));
 			CurrentWeapon->StopFire();
 		}
 	}

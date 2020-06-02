@@ -43,8 +43,8 @@ void ASTimeOfDayManager::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (All_level_Changed)
-	{
+	/*if (All_level_Changed)
+	{*/
 		ASGameState* MyGameState = Cast<ASGameState>(GetWorld()->GetGameState());
 		if (MyGameState)
 		{
@@ -106,7 +106,7 @@ void ASTimeOfDayManager::Tick(float DeltaSeconds)
 		}
 
 		UpdateSkylight();
-	}
+	//}
 }
 
 
