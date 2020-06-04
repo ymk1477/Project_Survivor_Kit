@@ -1,6 +1,8 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "SurvivalGame.h"
+
+
 #include "Player_Manager.h"
 
 
@@ -26,6 +28,10 @@ void APlayer_Manager::BeginPlay()
 	MakeStartLocation();
 	SpawnPlayers();
 
+	TActorIterator<AZombie_Manager> It(GetWorld());
+
+	zombie_manager = *It;
+
 	/*S_LevelChange s_packet;
 	s_packet.changed = true;
 	MySocket::sendBuffer(PACKET_CS_LEVEL_CHANGE, &s_packet);*/
@@ -38,29 +44,11 @@ void APlayer_Manager::Tick(float DeltaTime)
 	
 	if (Connected)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PlayerId : %d "), PlayerId));
-		
-		/*for (int i = 0; i < MAX_USER; ++i)
-		{
-			if(Player_info.IsUsed[i])
-				if (players[i]->IsControlled())
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player Controller: TRUE "), i));
-				}
-				else
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player Controller: FALSE "), i));
-				}
-		}*/
-
 		/*if (All_level_Changed)
 		{*/
 			ASCharacter* MyPawn = players[PlayerId];
 
 			Player_info.HP[PlayerId] = MyPawn->GetHealth();
-
-			/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("My Player HP : %f "),
-				Player_info.HP[PlayerId]));*/
 
 			FRotator MyRotation = MyPawn->GetActorRotation();
 			Player_info.Rot[PlayerId].yaw = MyRotation.Yaw;
@@ -91,6 +79,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 			S_Packet.WeaponState = Player_info.WeaponState[PlayerId];
 			MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Packet);
 			Player_info.onCrouchToggle[PlayerId] = false;
+
 			MySocket::RecvPacket();
 
 			for (int i = 0; i < MAX_USER; ++i)
@@ -132,10 +121,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 						players[i]->OnCrouchToggle();
 					if (Player_info.WeaponState[i] == WEAPON_FIRING)
 					{
-
 						players[i]->StartFiringOther();
-						/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player FIRE -> %d"),
-						i + 1, players[i]->IsFiring()));*/
 					}
 					else if(Player_info.WeaponState[i] == WEAPON_RELOADING)
 					{
@@ -144,21 +130,32 @@ void APlayer_Manager::Tick(float DeltaTime)
 					}
 					else
 						players[i]->StopFiringOther();
-
-
-					/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player HP -> %f"),
-							i + 1, players[i]->GetHealth()));*/
-							/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Sprinting -> %d"),
-								i + 1, players[i]->IsSprinting()));*/
-								/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Com VELOCITY -> x : %f, y : %f, z : %f"),
-									i + 1, players[i]->GetRootComponent()->ComponentVelocity.X, players[i]->GetRootComponent()->ComponentVelocity.Y, players[i]->GetRootComponent()->ComponentVelocity.Z));
-								GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Get VELOCITY -> x : %f, y : %f, z : %f"),
-									i + 1, players[i]->GetVelocity().X, players[i]->GetVelocity().Y, players[i]->GetVelocity().Z));*/
-
-
 				}
 			}
 		//}
+
+			// 좀비 샌드리시브
+			auto ZombieArray = zombie_manager->GetZombieArray();
+			for (int i = 0; i < ZombieArray->Num(); ++i)
+			{
+				Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
+			}
+			S_Zombies s_zombie_packet;
+			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			{
+				s_zombie_packet.IsAlive[i] = Zombie_info.IsAlive[i];
+				s_zombie_packet.HP[i] = Zombie_info.HP[i];
+			}
+			MySocket::sendBuffer(PACKET_CS_ZOMBIE, &S_Packet);
+			MySocket::RecvPacket();
+			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			{
+				if (Zombie_info.IsAlive[i])
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie HP : %f "),
+						i, Zombie_info.HP[i]));
+				}
+			}
 	}
 
 }
@@ -172,13 +169,13 @@ void APlayer_Manager::MakeStartLocation()
 	players.Emplace(MyCharacter);
 
 	FVector PlayerStart = MyCharacter->GetActorLocation();		// 플레이어별 시작지점 지정
-	StartLocation.Emplace(PlayerStart);							// Player1
+	PlayerStartLocation.Emplace(PlayerStart);							// Player1
 	PlayerStart.Y += 300;
-	StartLocation.Emplace(PlayerStart);							// Player2
+	PlayerStartLocation.Emplace(PlayerStart);							// Player2
 	PlayerStart.X -= 300;
-	StartLocation.Emplace(PlayerStart);							// Player3
+	PlayerStartLocation.Emplace(PlayerStart);							// Player3
 	PlayerStart.Y -= 300;
-	StartLocation.Emplace(PlayerStart);							// Player4
+	PlayerStartLocation.Emplace(PlayerStart);							// Player4
 }
 
 void APlayer_Manager::SpawnPlayers()
@@ -211,7 +208,7 @@ void APlayer_Manager::SpawnPlayers()
 
 		ASPlayerController* Mycontroller = Cast<ASPlayerController>(World->GetFirstPlayerController());
 		for (int i = 1; i < Playing; ++i) {
-			ASCharacter* NewCharacter = World->SpawnActor<ASCharacter>(GenerateBp->GeneratedClass, StartLocation[i], FRotator::ZeroRotator, Spawnparams);
+			ASCharacter* NewCharacter = World->SpawnActor<ASCharacter>(GenerateBp->GeneratedClass, PlayerStartLocation[i], FRotator::ZeroRotator, Spawnparams);
 			
 			if (aiController == nullptr)
 			{

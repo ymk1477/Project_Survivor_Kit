@@ -13,6 +13,7 @@
 #include "MyGameInstance.generated.h"
 
 #define MAX_USER 4
+#define MAX_ZOMBIE 30
 #define SERVERPORT 9000
 #define MAX_BUFFER 2048
 
@@ -35,9 +36,11 @@
 #define PACKET_CS_JUMP 202
 #define PACKET_CS_PLAYERS 203
 
-#define PACKET_SC_ZOMBIE 400
+#define PACKET_SC_ZOMBIE_INIT 400
+#define PACKET_SC_ZOMBIE 401
 
-#define PACKET_CS_ZOMBIE 500
+#define PACKET_CS_ZOMBIE_INIT 500
+#define PACKET_CS_ZOMBIE 501
 
 typedef struct LOCATION {
 	float x;
@@ -77,6 +80,11 @@ typedef struct Info_Player {
 	//bool UseWeapon[MAX_USER] = { false };
 	int WeaponState[MAX_USER] = { WEAPON_IDLE };
 }Player;
+
+typedef struct Info_Zombie {
+	float HP[MAX_ZOMBIE];
+	bool IsAlive[MAX_ZOMBIE] = { false };
+}Zombie;
 
 typedef struct Test_Packet {
 	int packet_type;
@@ -153,14 +161,19 @@ typedef struct Recv_Packet_Level_Change {
 	bool changed;
 }R_LevelChange;
 
+
 typedef struct Recv_Packet_Zombie
 {
-	int hp;
+	int packet_type = PACKET_SC_ZOMBIE;
+	bool IsAlive[MAX_ZOMBIE];
+	float HP[MAX_ZOMBIE];
 }R_Zombies;
 
 typedef struct Send_Packet_Zombie
 {
-	int hp;
+	int packet_type = PACKET_CS_ZOMBIE;
+	bool IsAlive[MAX_ZOMBIE];
+	float HP[MAX_ZOMBIE];
 }S_Zombies;
 
 class MySocket {
@@ -172,11 +185,11 @@ public:
 	static void initializeServer();
 	static void sendBuffer(int PacketType, void* BUF);
 	static void RecvPacket();
-
-
+	
 };
 
 static Player Player_info;
+static Zombie Zombie_info;
 static int PlayerId;
 static int Playing;
 static FString Adress;
@@ -200,8 +213,6 @@ private:
 public:
 
 	UMyGameInstance();
-
-	void SetPlayer_Loc(float x, float y, float z);
 
 	UFUNCTION(BlueprintCallable, Category = "My_Server")
 		void SetIpAdress(FString Ip_Adress);

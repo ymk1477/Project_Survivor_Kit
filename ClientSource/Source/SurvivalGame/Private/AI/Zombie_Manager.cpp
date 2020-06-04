@@ -1,6 +1,7 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "SurvivalGame.h"
+#include "MyGameInstance.h"
 
 #include "Zombie_Manager.h"
 
@@ -20,6 +21,8 @@ void AZombie_Manager::FindSpawnPoints()
 		AZombieSpawnPoint* NewPoint = *It;
 		ZombieSpawnPoints.Emplace(NewPoint);
 	}
+
+
 }
 void AZombie_Manager::SpawnZombies()
 {
@@ -33,13 +36,20 @@ void AZombie_Manager::SpawnZombies()
 
 	FRotator NewRotator;
 
+	int ZombieNum = 0;
+
 	for (auto i = ZombieSpawnPoints.begin(); i != ZombieSpawnPoints.end(); ++i)
 	{
 		NewRotator.Yaw = FMath::RandRange(0.0f, 360.0f);
 		ASZombieCharacter* NewZombie = CurrentWorld->SpawnActor<ASZombieCharacter>(GenerateBp->GeneratedClass, (*i)->GetActorLocation(), NewRotator, Spawnparams);
 		ASZombieAIController* ZombieController = Cast<ASZombieAIController>(NewZombie->GetController());
+		Zombies.Emplace(NewZombie);
 		ZombieController->Possess(NewZombie);
-	}
+		Zombie_info.HP[ZombieNum] = NewZombie->GetHealth();
+		Zombie_info.IsAlive[ZombieNum] = true;
+		ZombieNum++;
+	}		
+	
 }
 
 // Called when the game starts or when spawned
@@ -58,3 +68,7 @@ void AZombie_Manager::Tick(float DeltaTime)
 
 }
 
+TArray<ASZombieCharacter*>* AZombie_Manager::GetZombieArray()
+{
+	return &Zombies;
+}

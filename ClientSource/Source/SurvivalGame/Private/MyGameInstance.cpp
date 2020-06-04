@@ -2,6 +2,7 @@
 
 #include "SurvivalGame.h"
 #include "MyGameInstance.h"
+#include "Player_Manager.h"
 
 static FSocket* inst = nullptr;
 
@@ -101,6 +102,12 @@ void MySocket::sendBuffer(int PacketType, void* BUF) {
 		Success = inst->Send((uint8*)packet, (int32)sizeof(*packet), zero);
 	}
 	break;
+	case PACKET_CS_ZOMBIE:
+	{
+		S_Zombies* packet = reinterpret_cast<S_Zombies*>(BUF);
+		Success = inst->Send((uint8*)packet, (int32)sizeof(*packet), zero);
+	}
+	break;
 	}
 
 	//MySocket::RecvPacket();
@@ -196,15 +203,10 @@ void MySocket::RecvPacket() {
 					Player_info.onCrouchToggle[i] = packet->onCrouchToggle[i];
 					Player_info.WeaponState[i] = packet->WeaponState[i];
 				}	 
+								
 				if (Player_info.IsUsed[i])
 				{
-					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player -> X : %f, Y : %f, Z: %f "),
-						i + 1, Player_info.Loc[i].x, Player_info.Loc[i].y, Player_info.Loc[i].z));*/
-				/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player -> Pitch : %f, Yaw : %f, Roll : %f"),
-						Player_info.Rot[PlayerId].pitch, Player_info.Rot[PlayerId].yaw, Player_info.Rot[PlayerId].roll));*/
-				/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player VELOCITY -> x : %f, y : %f, z : %f"),
-						i + 1, Player_info.Vel[i].x, Player_info.Vel[i].y, Player_info.Vel[i].z));*/
-				
+						
 				}
 				
 			}
@@ -221,8 +223,21 @@ void MySocket::RecvPacket() {
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("All Level Changed!! ")));
 		}
 		break;
+		case PACKET_SC_ZOMBIE:
+		{
+			R_Zombies* packet = reinterpret_cast<R_Zombies*>(RECV_BUF);
+			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			{
+				Zombie_info.IsAlive[i] = packet->IsAlive[i];
+				if (packet->IsAlive[i])
+				{
+					Zombie_info.HP[i] = packet->HP[i];
+				}
+			}
 		}
-
+		break;
+		}
+			   
 	}
 
 	delete[] RECV_BUF;

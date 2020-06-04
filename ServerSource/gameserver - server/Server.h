@@ -9,6 +9,7 @@ using namespace std;
 #define MAX_BUFFER 2048
 #define SERVER_PORT 9000
 #define MAX_USER 4
+#define MAX_ZOMBIE 30
 
 #define WEAPON_IDLE 10
 #define WEAPON_FIRING 11
@@ -29,9 +30,9 @@ using namespace std;
 #define PACKET_CS_JUMP 202
 #define PACKET_CS_PLAYERS 203
 
-#define PACKET_SC_ZOMBIE 400
+#define PACKET_SC_ZOMBIE 401
 
-#define PACKET_CS_ZOMBIE 500
+#define PACKET_CS_ZOMBIE 501
 
 typedef struct LOCATION {
 	float x;
@@ -82,6 +83,11 @@ typedef struct Info_Player {
 	bool onCrouchToggle[MAX_USER] = { false };
 	int WeaponState[MAX_USER] = { WEAPON_IDLE };
 }Player;
+
+typedef struct Info_Zombie {
+	float HP[MAX_ZOMBIE];
+	bool IsAlive[MAX_ZOMBIE] = { false };
+}Zombie;
 
 typedef struct Test_Packet {
 	int packet_type;
@@ -159,13 +165,19 @@ typedef struct Send_Packet_Level_Change {
 
 typedef struct Recv_Packet_Zombie
 {
-
+	int packet_type = PACKET_CS_ZOMBIE;
+	bool IsAlive[MAX_ZOMBIE];
+	float HP[MAX_ZOMBIE];
 }R_Zombies;
 
 typedef struct Send_Packet_Zombie
 {
-
+	int packet_type = PACKET_SC_ZOMBIE;
+	bool IsAlive[MAX_ZOMBIE];
+	float HP[MAX_ZOMBIE];
 }S_Zombies;
+
+
 
 void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overlapped, DWORD lnFlags);
 void CALLBACK send_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overlapped, DWORD lnFlags);

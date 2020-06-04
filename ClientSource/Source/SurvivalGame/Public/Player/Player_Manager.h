@@ -15,6 +15,7 @@
 #include "SCharacter.h"
 #include "AIController.h"
 #include "SZombieCharacter.h"
+#include "Zombie_Manager.h"
 #include "Player_Manager.generated.h"
 
 
@@ -25,8 +26,9 @@ class SURVIVALGAME_API APlayer_Manager : public AActor
 	GENERATED_BODY()
 
 	TArray<ASCharacter*> players;
-	TArray<FVector> StartLocation;
+	TArray<FVector> PlayerStartLocation;
 
+	AZombie_Manager* zombie_manager;
 	bool test = false;
 
 public:
