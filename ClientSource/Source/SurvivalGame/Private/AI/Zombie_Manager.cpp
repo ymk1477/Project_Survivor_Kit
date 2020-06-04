@@ -31,9 +31,12 @@ void AZombie_Manager::SpawnZombies()
 	Spawnparams.Owner = this;
 	Spawnparams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
+	FRotator NewRotator;
+
 	for (auto i = ZombieSpawnPoints.begin(); i != ZombieSpawnPoints.end(); ++i)
 	{
-		ASZombieCharacter* NewZombie = CurrentWorld->SpawnActor<ASZombieCharacter>(GenerateBp->GeneratedClass, (*i)->GetActorLocation(), FRotator::ZeroRotator, Spawnparams);
+		NewRotator.Yaw = FMath::RandRange(0.0f, 360.0f);
+		ASZombieCharacter* NewZombie = CurrentWorld->SpawnActor<ASZombieCharacter>(GenerateBp->GeneratedClass, (*i)->GetActorLocation(), NewRotator, Spawnparams);
 		ASZombieAIController* ZombieController = Cast<ASZombieAIController>(NewZombie->GetController());
 		ZombieController->Possess(NewZombie);
 	}

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Math/UnrealMathUtility.h"
 #include "GameFramework/Actor.h"
 #include "ZombieSpawnPoint.h"
 #include "SZombieCharacter.h"

@@ -29,6 +29,10 @@ using namespace std;
 #define PACKET_CS_JUMP 202
 #define PACKET_CS_PLAYERS 203
 
+#define PACKET_SC_ZOMBIE 400
+
+#define PACKET_CS_ZOMBIE 500
+
 typedef struct LOCATION {
 	float x;
 	float y;
@@ -152,6 +156,16 @@ typedef struct Send_Packet_Level_Change {
 	int packet_type = PACKET_SC_LEVEL_CHANGE;
 	bool changed;
 }S_LevelChange;
+
+typedef struct Recv_Packet_Zombie
+{
+
+}R_Zombies;
+
+typedef struct Send_Packet_Zombie
+{
+
+}S_Zombies;
 
 void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overlapped, DWORD lnFlags);
 void CALLBACK send_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overlapped, DWORD lnFlags);

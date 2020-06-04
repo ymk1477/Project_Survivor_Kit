@@ -564,7 +564,7 @@ void ASWeapon::DetermineWeaponState()
 		{
 			if (CanReload())
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player WeaponState : RERODING")));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player WeaponState : RERODING")));
 				NewState = EWeaponState::Reloading;
 			}
 			else
@@ -574,13 +574,13 @@ void ASWeapon::DetermineWeaponState()
 		}
 		else if (!bPendingReload && bWantsToFire && CanFire())
 		{	
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player WeaponState : FIRING")));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player WeaponState : FIRING")));
 			NewState = EWeaponState::Firing;
 		}
 	}
 	else if (bPendingEquip)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player WeaponState : EQUIPPING")));
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player WeaponState : EQUIPPING")));
 		NewState = EWeaponState::Equipping;
 	}
 

@@ -18,15 +18,15 @@
 #include "Player_Manager.generated.h"
 
 
+
 UCLASS()
 class SURVIVALGAME_API APlayer_Manager : public AActor
 {
 	GENERATED_BODY()
 
-		//ASCharacter* Array_Player[MAX_USER] = { NULL };
-
 	TArray<ASCharacter*> players;
 	TArray<FVector> StartLocation;
+
 	bool test = false;
 
 public:
@@ -43,6 +43,6 @@ public:
 
 	void MakeStartLocation();
 	void SpawnPlayers();
-	//void CheckNewPlayer();
+	
 };
 

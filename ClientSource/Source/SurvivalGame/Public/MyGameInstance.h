@@ -35,6 +35,10 @@
 #define PACKET_CS_JUMP 202
 #define PACKET_CS_PLAYERS 203
 
+#define PACKET_SC_ZOMBIE 400
+
+#define PACKET_CS_ZOMBIE 500
+
 typedef struct LOCATION {
 	float x;
 	float y;
@@ -149,6 +153,15 @@ typedef struct Recv_Packet_Level_Change {
 	bool changed;
 }R_LevelChange;
 
+typedef struct Recv_Packet_Zombie
+{
+	int hp;
+}R_Zombies;
+
+typedef struct Send_Packet_Zombie
+{
+	int hp;
+}S_Zombies;
 
 class MySocket {
 private:

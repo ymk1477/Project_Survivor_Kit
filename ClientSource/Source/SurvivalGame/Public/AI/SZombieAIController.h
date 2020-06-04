@@ -46,7 +46,6 @@ public:
 
 	ASBaseCharacter* GetTargetEnemy();
 
-
 	void SetWaypoint(ASBotWaypoint* NewWaypoint);
 
 	void SetTargetEnemy(APawn* NewTarget);
