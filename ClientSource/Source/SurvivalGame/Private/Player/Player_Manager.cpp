@@ -138,23 +138,41 @@ void APlayer_Manager::Tick(float DeltaTime)
 			auto ZombieArray = zombie_manager->GetZombieArray();
 			for (int i = 0; i < ZombieArray->Num(); ++i)
 			{
-				Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
+				if (Zombie_info.HP[i] < (*ZombieArray)[i]->GetHealth())
+					Zombie_info.Hit[i] = true;
 			}
 			S_Zombies s_zombie_packet;
 			for (int i = 0; i < MAX_ZOMBIE; ++i)
 			{
 				s_zombie_packet.IsAlive[i] = Zombie_info.IsAlive[i];
 				s_zombie_packet.HP[i] = Zombie_info.HP[i];
+				s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
 			}
 			MySocket::sendBuffer(PACKET_CS_ZOMBIE, &S_Packet);
+			for (int i = 0; i < ZombieArray->Num(); ++i)
+			{
+				Zombie_info.Hit[i] = false;
+			}
 			MySocket::RecvPacket();
 			for (int i = 0; i < MAX_ZOMBIE; ++i)
 			{
 				if (Zombie_info.IsAlive[i])
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie HP : %f "),
-						i, Zombie_info.HP[i]));
+					if (Zombie_info.Hit[i])
+					{
+						FPointDamageEvent PointDmg;
+					
+						(*ZombieArray)[i]->OthertakeDamage(26.0f, PointDmg, GetWorld()->GetFirstPlayerController(), this);
+					}
+					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie Hit : %d "),
+						i, Zombie_info.HP[i]));*/
+					Zombie_info.Hit[i] = false;
 				}
+			}
+			for (int i = 0; i < ZombieArray->Num(); ++i)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie Hit : %d "),
+					i, (*ZombieArray)[i]->GetHealth()));
 			}
 	}
 

@@ -87,6 +87,7 @@ typedef struct Info_Player {
 typedef struct Info_Zombie {
 	float HP[MAX_ZOMBIE];
 	bool IsAlive[MAX_ZOMBIE] = { false };
+	bool Hit[MAX_ZOMBIE] = { false };
 }Zombie;
 
 typedef struct Test_Packet {
@@ -168,6 +169,7 @@ typedef struct Recv_Packet_Zombie
 	int packet_type = PACKET_CS_ZOMBIE;
 	bool IsAlive[MAX_ZOMBIE];
 	float HP[MAX_ZOMBIE];
+	bool Hit[MAX_ZOMBIE];
 }R_Zombies;
 
 typedef struct Send_Packet_Zombie
@@ -175,6 +177,7 @@ typedef struct Send_Packet_Zombie
 	int packet_type = PACKET_SC_ZOMBIE;
 	bool IsAlive[MAX_ZOMBIE];
 	float HP[MAX_ZOMBIE];
+	bool Hit[MAX_ZOMBIE];
 }S_Zombies;
 
 

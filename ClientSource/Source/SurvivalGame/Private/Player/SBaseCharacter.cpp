@@ -384,6 +384,11 @@ FRotator ASBaseCharacter::GetAimOffsets() const
 	
 }
 
+void ASBaseCharacter::OthertakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
+{
+	TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+}
+
 
 void ASBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

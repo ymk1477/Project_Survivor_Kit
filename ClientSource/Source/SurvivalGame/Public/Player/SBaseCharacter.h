@@ -103,6 +103,8 @@ public:
 	/* Damage & Death                                                       */
 	/************************************************************************/
 
+	void OthertakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser);
+
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerCondition", Replicated)
