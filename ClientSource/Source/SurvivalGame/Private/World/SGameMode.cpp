@@ -138,6 +138,7 @@ bool ASGameMode::CanDealDamage(class ASPlayerState* DamageCauser, class ASPlayer
 
 	// Compare Team Numbers
 	return DamageCauser && DamagedPlayer && (DamageCauser->GetTeamNumber() != DamagedPlayer->GetTeamNumber());
+	//return true;
 }
 
 
@@ -160,10 +161,12 @@ float ASGameMode::ModifyDamage(float Damage, AActor* DamagedActor, struct FDamag
 	float ActualDamage = Damage;
 
 	ASBaseCharacter* DamagedPawn = Cast<ASBaseCharacter>(DamagedActor);
+	ASBaseCharacter* InstigatorPawn = Cast<ASBaseCharacter>(EventInstigator->GetPawn());
 	if (DamagedPawn && EventInstigator)
 	{
 		ASPlayerState* DamagedPlayerState = Cast<ASPlayerState>(DamagedPawn->GetPlayerState());
-		ASPlayerState* InstigatorPlayerState = Cast<ASPlayerState>(EventInstigator->PlayerState);
+		//ASPlayerState* InstigatorPlayerState = Cast<ASPlayerState>(EventInstigator->PlayerState);   // 20.06.05 ??????????????????????????
+		ASPlayerState* InstigatorPlayerState = Cast<ASPlayerState>(InstigatorPawn->GetPlayerState());
 
 		// Check for friendly fire
 		if (!CanDealDamage(InstigatorPlayerState, DamagedPlayerState))

@@ -11,6 +11,7 @@
 #include "SPlayerController.h"
 #include "SPlayerCameraManager.h"
 #include "SLocalPlayer.h"
+#include "SPlayerState.h"
 #include "MyGameInstance.h"
 #include "SCharacter.h"
 #include "AIController.h"

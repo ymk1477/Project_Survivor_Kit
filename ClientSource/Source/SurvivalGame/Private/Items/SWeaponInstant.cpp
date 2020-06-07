@@ -45,7 +45,7 @@ void ASWeaponInstant::FireWeapon()
 		/* Use the maximum distance as the adjust direction */
 		Impact.ImpactPoint = FVector_NetQuantize(EndPos);
 	}
-
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("FireWeapon() ")));
 	ProcessInstantHit(Impact, MuzzleOrigin, AdjustedAimDir);
 }
 
@@ -69,6 +69,7 @@ bool ASWeaponInstant::ShouldDealDamage(AActor* TestActor) const
 
 void ASWeaponInstant::DealDamage(const FHitResult& Impact, const FVector& ShootDir)
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("DealDamage() ")));
 	float ActualHitDamage = HitDamage;
 
 	/* Handle special damage location on the zombie body (types are setup in the Physics Asset of the zombie */
@@ -91,7 +92,8 @@ void ASWeaponInstant::DealDamage(const FHitResult& Impact, const FVector& ShootD
 	PointDmg.HitInfo = Impact;
 	PointDmg.ShotDirection = ShootDir;
 	PointDmg.Damage = ActualHitDamage;
-
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Damage : %f "),
+		PointDmg.Damage));*/
 	Impact.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, MyPawn->Controller, this);
 }
 

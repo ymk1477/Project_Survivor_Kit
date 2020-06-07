@@ -131,6 +131,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 					else
 						players[i]->StopFiringOther();
 				}
+
 			}
 		//}
 
@@ -160,20 +161,20 @@ void APlayer_Manager::Tick(float DeltaTime)
 				{
 					if (Zombie_info.Hit[i])
 					{
-						FPointDamageEvent PointDmg;
+						//FPointDamageEvent PointDmg;
 					
-						(*ZombieArray)[i]->OthertakeDamage(26.0f, PointDmg, GetWorld()->GetFirstPlayerController(), this);
+						//(*ZombieArray)[i]->OthertakeDamage(26.0f, PointDmg, GetWorld()->GetFirstPlayerController(), this);
 					}
 					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie Hit : %d "),
 						i, Zombie_info.HP[i]));*/
 					Zombie_info.Hit[i] = false;
 				}
 			}
-			for (int i = 0; i < ZombieArray->Num(); ++i)
+			/*for (int i = 0; i < ZombieArray->Num(); ++i)
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie Hit : %d "),
 					i, (*ZombieArray)[i]->GetHealth()));
-			}
+			}*/
 	}
 
 }
@@ -225,9 +226,19 @@ void APlayer_Manager::SpawnPlayers()
 		Spawnparams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		ASPlayerController* Mycontroller = Cast<ASPlayerController>(World->GetFirstPlayerController());
+		
+		ASCharacter* MyCharacter = Cast<ASCharacter>(Mycontroller->GetPawn());
+		ASPlayerState* MyCharacterState = Cast< ASPlayerState>(MyCharacter->GetPlayerState());
+		
+		
 		for (int i = 1; i < Playing; ++i) {
 			ASCharacter* NewCharacter = World->SpawnActor<ASCharacter>(GenerateBp->GeneratedClass, PlayerStartLocation[i], FRotator::ZeroRotator, Spawnparams);
-			
+			NewCharacter->SetPlayerState(MyCharacterState);
+			ASPlayerState* NewPlayerState = Cast< ASPlayerState>(NewCharacter->GetPlayerState());
+			if (NewPlayerState)
+			{
+				NewPlayerState->SetTeamNumber(MyCharacterState->GetTeamNumber());
+			}
 			if (aiController == nullptr)
 			{
 				aiController = Cast<AAIController>(NewCharacter->GetController());
