@@ -285,13 +285,14 @@ FVector ASWeapon::GetAdjustedAim() const
 
 	if (PC)
 	{
+		
 		FVector CamLoc;
 		FRotator CamRot;
 		PC->GetPlayerViewPoint(CamLoc, CamRot);
 
 		FinalAim = CamRot.Vector();
 	}
-	else if (Instigator)
+	else if (Instigator)							// 2020.06.08 ! ºÙ¿´´Âµ¥ ³òºÏÀÌ¶ó È®ÀÎÀÌ ¾ÈµÊ
 	{
 		FinalAim = Instigator->GetBaseAimRotation().Vector();
 	}
