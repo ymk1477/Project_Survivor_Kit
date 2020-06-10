@@ -18,6 +18,8 @@ class SURVIVALGAME_API AZombie_Manager : public AActor
 
 	TArray< AZombieSpawnPoint*> ZombieSpawnPoints;
 	TArray< ASZombieCharacter*> Zombies;
+	TArray< APatrolZombieSpawnPoint*> PatrolZombieSpawnPoints;
+	TArray< ASZombieCharacter*> PatrolZombies;
 
 public:	
 	// Sets default values for this actor's properties

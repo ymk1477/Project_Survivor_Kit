@@ -22,6 +22,12 @@ void AZombie_Manager::FindSpawnPoints()
 		ZombieSpawnPoints.Emplace(NewPoint);
 	}
 
+	for (TActorIterator< APatrolZombieSpawnPoint> It(CurrentWorld); It; ++It)
+	{
+		APatrolZombieSpawnPoint* NewPoint = *It;
+		PatrolZombieSpawnPoints.Emplace(NewPoint);
+	}
+
 
 }
 void AZombie_Manager::SpawnZombies()
@@ -50,6 +56,17 @@ void AZombie_Manager::SpawnZombies()
 		ZombieNum++;
 	}		
 	
+	SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/zombie/ZombiePatrol1")));
+
+	for (auto i = PatrolZombieSpawnPoints.begin(); i != PatrolZombieSpawnPoints.end(); ++i)
+	{
+		NewRotator.Yaw = FMath::RandRange(0.0f, 360.0f);
+		ASZombieCharacter* NewPatrolZombie = CurrentWorld->SpawnActor<ASZombieCharacter>(GenerateBp->GeneratedClass, (*i)->GetActorLocation(), NewRotator, Spawnparams);
+		ASZombieAIController* ZombieController = Cast<ASZombieAIController>(NewPatrolZombie->GetController());
+		PatrolZombies.Emplace(NewPatrolZombie);
+		ZombieController->Possess(NewPatrolZombie);
+	}
+
 }
 
 // Called when the game starts or when spawned
@@ -65,6 +82,44 @@ void AZombie_Manager::BeginPlay()
 void AZombie_Manager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	int32 indexNum = -1;
+	if (Zombies.Num() > 0)
+	{
+		for (int32 i = 0; i < Zombies.Num(); ++i)
+		{
+			if (Zombies[i]->IsDie())
+			{
+				indexNum = i;
+				break;
+			}
+		}
+		if (Zombies.IsValidIndex(indexNum))
+		{
+			Zombies.RemoveAt(indexNum);
+		}
+	}
+
+	indexNum = -1;
+	if (PatrolZombies.Num() > 0)
+	{
+		for (int32 i = 0; i < PatrolZombies.Num(); ++i)
+		{
+			if (PatrolZombies[i]->IsDie())
+			{
+				indexNum = i;
+				break;
+			}
+		}
+		if (PatrolZombies.IsValidIndex(indexNum))
+		{
+			PatrolZombies.RemoveAt(indexNum);
+		}
+	}
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("ZombieSpawnPoints : %d , PatrolZombiesSpawnPoints : %d "),
+		ZombieSpawnPoints.Num(), PatrolZombieSpawnPoints.Num()));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Zombies : %d , PatrolZombies : %d "),
+		Zombies.Num(),PatrolZombies.Num()));*/
 
 }
 

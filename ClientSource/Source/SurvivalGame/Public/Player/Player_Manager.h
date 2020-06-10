@@ -47,5 +47,8 @@ public:
 	void MakeStartLocation();
 	void SpawnPlayers();
 	
+	UFUNCTION(BlueprintCallable, Category = "My_Server")
+	TArray<ASCharacter*> GetPlayerArray();
+
 };
 

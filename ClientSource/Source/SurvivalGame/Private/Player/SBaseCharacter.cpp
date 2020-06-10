@@ -408,3 +408,8 @@ void ASBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME(ASBaseCharacter, Health);
 	DOREPLIFETIME(ASBaseCharacter, LastTakeHitInfo);
 }
+
+bool ASBaseCharacter::IsDie() 
+{
+	return bIsDying;
+}

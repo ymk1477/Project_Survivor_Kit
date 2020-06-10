@@ -262,3 +262,8 @@ void APlayer_Manager::SpawnPlayers()
 
 	
 }
+
+TArray<ASCharacter*> APlayer_Manager::GetPlayerArray()
+{
+	return players;
+}

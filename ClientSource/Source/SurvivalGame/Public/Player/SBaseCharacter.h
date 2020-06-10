@@ -135,4 +135,8 @@ protected:
 	void OnRep_LastTakeHitInfo();
 
 	bool bIsDying;
+
+public:
+
+	bool IsDie();
 };

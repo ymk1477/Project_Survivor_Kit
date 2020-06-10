@@ -343,7 +343,7 @@ void ASGameMode::SpawnBotHandler()
 
 	ASGameState* MyGameState = Cast<ASGameState>(GameState);
 	if (MyGameState)
-	{
+	{ 
 		/* Only spawn bots during night time */
 		if (MyGameState->GetIsNight())
 		{
