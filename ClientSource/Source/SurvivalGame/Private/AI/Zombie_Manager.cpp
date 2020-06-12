@@ -46,8 +46,8 @@ void AZombie_Manager::SpawnZombies()
 
 	for (auto i = ZombieSpawnPoints.begin(); i != ZombieSpawnPoints.end(); ++i)
 	{
-		NewRotator.Yaw = FMath::RandRange(0.0f, 360.0f);
-		ASZombieCharacter* NewZombie = CurrentWorld->SpawnActor<ASZombieCharacter>(GenerateBp->GeneratedClass, (*i)->GetActorLocation(), NewRotator, Spawnparams);
+		//NewRotator.Yaw = FMath::RandRange(0.0f, 360.0f);
+		ASZombieCharacter* NewZombie = CurrentWorld->SpawnActor<ASZombieCharacter>(GenerateBp->GeneratedClass, (*i)->GetActorLocation(), FRotator::ZeroRotator, Spawnparams);
 		ASZombieAIController* ZombieController = Cast<ASZombieAIController>(NewZombie->GetController());
 		Zombies.Emplace(NewZombie);
 		ZombieController->Possess(NewZombie);
@@ -60,8 +60,8 @@ void AZombie_Manager::SpawnZombies()
 
 	for (auto i = PatrolZombieSpawnPoints.begin(); i != PatrolZombieSpawnPoints.end(); ++i)
 	{
-		NewRotator.Yaw = FMath::RandRange(0.0f, 360.0f);
-		ASZombieCharacter* NewPatrolZombie = CurrentWorld->SpawnActor<ASZombieCharacter>(GenerateBp->GeneratedClass, (*i)->GetActorLocation(), NewRotator, Spawnparams);
+		//NewRotator.Yaw = FMath::RandRange(0.0f, 360.0f);
+		ASZombieCharacter* NewPatrolZombie = CurrentWorld->SpawnActor<ASZombieCharacter>(GenerateBp->GeneratedClass, (*i)->GetActorLocation(), FRotator::ZeroRotator, Spawnparams);
 		ASZombieAIController* ZombieController = Cast<ASZombieAIController>(NewPatrolZombie->GetController());
 		PatrolZombies.Emplace(NewPatrolZombie);
 		ZombieController->Possess(NewPatrolZombie);

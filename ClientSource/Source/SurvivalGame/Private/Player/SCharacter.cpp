@@ -692,6 +692,7 @@ void ASCharacter::AddWeapon(class ASWeapon* Weapon)
 			EquipWeapon(Inventory[0]);
 		}
 	}
+	
 }
 
 

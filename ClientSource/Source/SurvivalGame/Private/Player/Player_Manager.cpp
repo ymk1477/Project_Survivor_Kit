@@ -60,7 +60,12 @@ void APlayer_Manager::Tick(float DeltaTime)
 			Player_info.Vel[PlayerId].y = MyVelocity.Y;
 			Player_info.Vel[PlayerId].z = MyVelocity.Z;
 
-			FRotator MyAim = MyPawn->GetAimOffsets();
+			/*FRotator MyAim = MyPawn->GetAimOffsets();
+			Player_info.Aim[PlayerId].yaw = MyAim.Yaw;
+			Player_info.Aim[PlayerId].pitch = MyAim.Pitch;
+			Player_info.Aim[PlayerId].roll = MyAim.Roll;*/
+
+			FRotator MyAim = MyPawn->GetControlRotation();
 			Player_info.Aim[PlayerId].yaw = MyAim.Yaw;
 			Player_info.Aim[PlayerId].pitch = MyAim.Pitch;
 			Player_info.Aim[PlayerId].roll = MyAim.Roll;
@@ -111,9 +116,10 @@ void APlayer_Manager::Tick(float DeltaTime)
 					}*/
 
 					players[i]->SetActorRotation(NewRotation);
+					players[i]->Controller->SetControlRotation(NewAim);
 					players[i]->GetMovementComponent()->Velocity = NewVelocity;
 					players[i]->AddMovementInput(NewVelocity);
-					players[i]->SetAimOffset(NewAim);
+					//players[i]->SetAimOffset(NewAim);
 					players[i]->SetIsJumping(Player_info.IsJump[i]);
 					players[i]->SetIsTargeting(Player_info.IsTargeting[i]);
 					players[i]->SetSprinting(Player_info.IsSprinting[i]);
@@ -257,6 +263,7 @@ void APlayer_Manager::SpawnPlayers()
 			{
 				aiController->Possess(*i);
 			}
+
 		}
 	}
 
