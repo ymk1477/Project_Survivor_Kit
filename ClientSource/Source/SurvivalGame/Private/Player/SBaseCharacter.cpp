@@ -381,7 +381,7 @@ float ASBaseCharacter::GetTargetingSpeedModifier() const
 
 FRotator ASBaseCharacter::GetAimOffsets() const
 {
-
+	
 	const FVector AimDirWS = GetBaseAimRotation().Vector();
 	const FVector AimDirLS = ActorToWorld().InverseTransformVectorNoScale(AimDirWS);
 	const FRotator AimRotLS = AimDirLS.Rotation();

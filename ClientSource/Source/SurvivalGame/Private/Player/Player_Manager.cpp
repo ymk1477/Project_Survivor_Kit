@@ -72,6 +72,12 @@ void APlayer_Manager::Tick(float DeltaTime)
 
 			Player_info.WeaponState[PlayerId] = MyPawn->GetOtherWeaponState();
 
+			/*FVector POVLoc;
+			FRotator POVRot;
+			MyPawn->Controller->GetPlayerViewPoint(POVLoc, POVRot);
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player POVRot - YAW : %f, PITCH : %f, ROLL : %f"),
+						POVRot.Yaw, POVRot.Pitch, POVRot.Roll));*/
+
 			S_Players S_Packet;
 			S_Packet.HP = Player_info.HP[PlayerId];
 			S_Packet.Rot = Player_info.Rot[PlayerId];
@@ -115,10 +121,25 @@ void APlayer_Manager::Tick(float DeltaTime)
 						players[i]->TakeDamage(DmgEvent.Damage, DmgEvent, GetController(), this);
 					}*/
 
-					players[i]->SetActorRotation(NewRotation);
+					players[i]->SetActorRelativeRotation(NewRotation);
 					players[i]->Controller->SetControlRotation(NewAim);
 					players[i]->GetMovementComponent()->Velocity = NewVelocity;
 					players[i]->AddMovementInput(NewVelocity);
+					
+					
+					
+					/*FVector POVLoc;
+					FRotator POVRot;
+					players[i]->Controller->GetPlayerViewPoint(POVLoc, POVRot);*/
+
+					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player Desired Rot - YAW : %f, PITCH : %f, ROLL : %f"),
+						i + 1, players[i]->Controller->GetDesiredRotation().Yaw, players[i]->Controller->GetDesiredRotation().Pitch, players[i]->Controller->GetDesiredRotation().Roll));*/
+					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player POVLoc - X : %f, Y : %f, Z : %f"),
+						i+1, POVLoc.X, POVLoc.Y, POVLoc.Z));*/
+					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player POVRot - YAW : %f, PITCH : %f, ROLL : %f"),
+						i + 1, POVRot.Yaw, POVRot.Pitch, POVRot.Roll));*/
+					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player BaseAimRotation - YAW : %f, PITCH : %f, ROLL : %f"),
+						i + 1, players[i]->GetBaseAimRotation().Yaw, players[i]->GetBaseAimRotation().Pitch, players[i]->GetBaseAimRotation().Roll));*/
 					//players[i]->SetAimOffset(NewAim);
 					players[i]->SetIsJumping(Player_info.IsJump[i]);
 					players[i]->SetIsTargeting(Player_info.IsTargeting[i]);

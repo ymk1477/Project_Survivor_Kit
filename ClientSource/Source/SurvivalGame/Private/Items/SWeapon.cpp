@@ -294,8 +294,11 @@ FVector ASWeapon::GetAdjustedAim() const
 	}
 	else if (Instigator)							// 2020.06.08 ! ºÙ¿´´Âµ¥ ³òºÏÀÌ¶ó È®ÀÎÀÌ ¾ÈµÊ
 	{
-		
-		FinalAim = Instigator->GetBaseAimRotation().Vector();
+		FVector CamLoc;
+		FRotator CamRot;
+		Instigator->Controller->GetPlayerViewPoint(CamLoc, CamRot);
+		FinalAim = CamRot.Vector();
+		//FinalAim = Instigator->GetBaseAimRotation().Vector();
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("FINAL AIM - X : %f, Y : %f, Z : %f "),
 		FinalAim.X, FinalAim.Y, FinalAim.Z));
