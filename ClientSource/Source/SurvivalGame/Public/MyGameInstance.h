@@ -66,6 +66,12 @@ typedef struct AimOffset {
 	float roll;
 }AimOffset;
 
+typedef struct ViewPoint
+{
+	Location Loc;
+	Rotation Rot;
+}ViewPoint;
+
 typedef struct Info_Player {
 	bool IsUsed[MAX_USER] = { false };
 	int Host = -1;
@@ -79,6 +85,7 @@ typedef struct Info_Player {
 	bool onCrouchToggle[MAX_USER] = { false };
 	//bool UseWeapon[MAX_USER] = { false };
 	int WeaponState[MAX_USER] = { WEAPON_IDLE };
+	ViewPoint View[MAX_USER];
 }Player;
 
 typedef struct Info_Zombie {
@@ -134,6 +141,7 @@ typedef struct Send_Packet_Players {
 	bool onCrouchToggle;
 	//bool UseWeapon;
 	int WeaponState;
+	ViewPoint View;
 }S_Players;
 
 typedef struct Recv_Packet_Players {
@@ -150,6 +158,7 @@ typedef struct Recv_Packet_Players {
 	bool onCrouchToggle[MAX_USER];
 	//bool UseWeapon[MAX_USER];
 	int WeaponState[MAX_USER];
+	ViewPoint View[MAX_USER];
 }R_Players;
 
 typedef struct Send_Packet_Level_Change {

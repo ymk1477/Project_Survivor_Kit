@@ -202,6 +202,7 @@ void MySocket::RecvPacket() {
 					Player_info.IsSprinting[i] = packet->IsSprinting[i];
 					Player_info.onCrouchToggle[i] = packet->onCrouchToggle[i];
 					Player_info.WeaponState[i] = packet->WeaponState[i];
+					Player_info.View[i] = packet->View[i];
 				}	 
 								
 				if (Player_info.IsUsed[i])

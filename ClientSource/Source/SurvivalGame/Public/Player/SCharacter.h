@@ -3,7 +3,7 @@
 #pragma once
 
 #include "SBaseCharacter.h"
-#include "MyGameInstance.h"
+
 #include "SCharacter.generated.h"
 
 UCLASS()

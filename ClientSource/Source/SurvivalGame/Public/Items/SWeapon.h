@@ -4,6 +4,8 @@
 
 #include "GameFramework/Actor.h"
 #include "SCharacter.h"
+
+
 #include "SWeapon.generated.h"
 
 UENUM()

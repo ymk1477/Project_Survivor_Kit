@@ -6,6 +6,8 @@
 #include "STypes.h"
 #include "SWeaponPickup.h"
 #include "SPlayerController.h"
+#include "Player_Manager.h"
+#include "MyGameInstance.h"
 
 
 ASWeapon::ASWeapon(const class FObjectInitializer& PCIP)
@@ -292,12 +294,29 @@ FVector ASWeapon::GetAdjustedAim() const
 
 		FinalAim = CamRot.Vector();
 	}
-	else if (Instigator)							// 2020.06.08 ! ∫Ÿø¥¥¬µ• ≥Ú∫œ¿Ã∂Û »Æ¿Œ¿Ã æ»µ 
+	else if (Instigator)							
 	{
-		FVector CamLoc;
+		UWorld* CurrentWorld = GetWorld();
+		TArray<ASCharacter*> PlayerArray;
+		for (TActorIterator<APlayer_Manager> It(CurrentWorld); It; ++It)
+			PlayerArray = (*It)->GetPlayerArray();
+
 		FRotator CamRot;
-		Instigator->Controller->GetPlayerViewPoint(CamLoc, CamRot);
+		int num = 0;
+		for (auto p = PlayerArray.begin(); p != PlayerArray.end(); ++p)
+		{
+			if (Instigator == Cast<APawn>(*p))
+			{
+				break;
+			}
+			++num;
+		}
+
+		CamRot.Yaw = Player_info.View[num].Rot.yaw;
+		CamRot.Pitch = Player_info.View[num].Rot.pitch;
+		CamRot.Roll = Player_info.View[num].Rot.roll;
 		FinalAim = CamRot.Vector();
+
 		//FinalAim = Instigator->GetBaseAimRotation().Vector();
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("FINAL AIM - X : %f, Y : %f, Z : %f "),

@@ -6,6 +6,7 @@
 #include "STypes.h"
 #include "MyGameInstance.h"
 
+
 #include "SBaseCharacter.generated.h"
 
 UCLASS(ABSTRACT)

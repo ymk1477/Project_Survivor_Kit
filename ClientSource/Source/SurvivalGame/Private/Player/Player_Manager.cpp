@@ -70,6 +70,16 @@ void APlayer_Manager::Tick(float DeltaTime)
 			Player_info.Aim[PlayerId].pitch = MyAim.Pitch;
 			Player_info.Aim[PlayerId].roll = MyAim.Roll;
 
+			FVector POVLoc;
+			FRotator POVRot;
+			players[PlayerId]->Controller->GetPlayerViewPoint(POVLoc, POVRot);
+			Player_info.View[PlayerId].Loc.x = POVLoc.X;
+			Player_info.View[PlayerId].Loc.y = POVLoc.Y;
+			Player_info.View[PlayerId].Loc.z = POVLoc.Z;
+			Player_info.View[PlayerId].Rot.yaw = POVRot.Yaw;
+			Player_info.View[PlayerId].Rot.pitch = POVRot.Pitch;
+			Player_info.View[PlayerId].Rot.roll = POVRot.Roll;
+
 			Player_info.WeaponState[PlayerId] = MyPawn->GetOtherWeaponState();
 
 			/*FVector POVLoc;

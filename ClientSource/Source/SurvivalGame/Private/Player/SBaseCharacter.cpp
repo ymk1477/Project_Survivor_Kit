@@ -5,6 +5,7 @@
 #include "SGameMode.h"
 #include "SCharacterMovementComponent.h"
 #include "SDamageType.h"
+#include "Player_Manager.h"
 
 
 ASBaseCharacter::ASBaseCharacter(const class FObjectInitializer& ObjectInitializer)
@@ -381,8 +382,32 @@ float ASBaseCharacter::GetTargetingSpeedModifier() const
 
 FRotator ASBaseCharacter::GetAimOffsets() const
 {
-	
-	const FVector AimDirWS = GetBaseAimRotation().Vector();
+	FVector AimDirWS;
+	if(this->IsPlayerControlled())
+		AimDirWS = GetBaseAimRotation().Vector();
+	else
+	{
+		UWorld* CurrentWorld = GetWorld();
+		TArray<ASCharacter*> PlayerArray;
+		for (TActorIterator<APlayer_Manager> It(CurrentWorld); It; ++It)
+			PlayerArray = (*It)->GetPlayerArray();
+
+		FRotator CamRot;
+		int num = 0;
+		for (auto p = PlayerArray.begin(); p != PlayerArray.end(); ++p)
+		{
+			if (Instigator == Cast<APawn>(*p))
+			{
+				break;
+			}
+			++num;
+		}
+
+		CamRot.Yaw = Player_info.View[num].Rot.yaw;
+		CamRot.Pitch = Player_info.View[num].Rot.pitch;
+		CamRot.Roll = Player_info.View[num].Rot.roll;
+		AimDirWS = CamRot.Vector();
+	}
 	const FVector AimDirLS = ActorToWorld().InverseTransformVectorNoScale(AimDirWS);
 	const FRotator AimRotLS = AimDirLS.Rotation();
 

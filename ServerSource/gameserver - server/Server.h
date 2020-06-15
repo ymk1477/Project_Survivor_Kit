@@ -58,6 +58,11 @@ typedef struct AimOffset {
 	float roll;
 }AimOffset;
 
+typedef struct ViewPoint {
+	Location Loc;
+	Rotation Rot;
+}ViewPoint;
+
 struct OVER_EX {
 	WSAOVERLAPPED overlapped;
 	WSABUF dataBuffer;
@@ -82,6 +87,7 @@ typedef struct Info_Player {
 	bool IsSprinting[MAX_USER] = { false };
 	bool onCrouchToggle[MAX_USER] = { false };
 	int WeaponState[MAX_USER] = { WEAPON_IDLE };
+	ViewPoint View[MAX_USER];
 }Player;
 
 typedef struct Info_Zombie {
@@ -139,6 +145,7 @@ typedef struct Send_Packet_Players {
 	bool IsSprinting[MAX_USER];
 	bool onCrouchToggle[MAX_USER];
 	int WeaponState[MAX_USER];
+	ViewPoint View[MAX_USER];
 }S_Players;
 
 typedef struct Recv_Packet_Players {
@@ -152,6 +159,7 @@ typedef struct Recv_Packet_Players {
 	bool IsSprinting;
 	bool onCrouchToggle;
 	int WeaponState;
+	ViewPoint View;
 }R_Players;
 
 typedef struct Recv_Packet_Level_Change {
