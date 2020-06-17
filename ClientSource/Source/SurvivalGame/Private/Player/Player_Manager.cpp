@@ -72,7 +72,8 @@ void APlayer_Manager::Tick(float DeltaTime)
 
 			FVector POVLoc;
 			FRotator POVRot;
-			MyPawn->Controller->GetPlayerViewPoint(POVLoc, POVRot);
+			if(MyPawn)
+				MyPawn->Controller->GetPlayerViewPoint(POVLoc, POVRot);
 			Player_info.View[PlayerId].Loc.x = POVLoc.X;
 			Player_info.View[PlayerId].Loc.y = POVLoc.Y;
 			Player_info.View[PlayerId].Loc.z = POVLoc.Z;
@@ -80,12 +81,19 @@ void APlayer_Manager::Tick(float DeltaTime)
 			Player_info.View[PlayerId].Rot.pitch = POVRot.Pitch;
 			Player_info.View[PlayerId].Rot.roll = POVRot.Roll;
 
+			/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player POVRot - YAW : %f, PITCH : %f, ROLL : %f"),
+				Player_info.View[PlayerId].Rot.yaw, Player_info.View[PlayerId].Rot.pitch, Player_info.View[PlayerId].Rot.roll)); */
+
+		/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player POVRot - YAW : %f, PITCH : %f, ROLL : %f"),
+				MyPawn->GetAimOffsets().Yaw, MyPawn->GetAimOffsets().Pitch, MyPawn->GetAimOffsets().Roll));*/
+
 			Player_info.WeaponState[PlayerId] = MyPawn->GetOtherWeaponState();
 
-			/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player POVRot - YAW : %f, PITCH : %f, ROLL : %f"),
-						POVRot.Yaw, POVRot.Pitch, POVRot.Roll));
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Player POVRot - YAW : %f, PITCH : %f, ROLL : %f"),
-				MyPawn->GetCameraComponent()->GetComponentRotation().Yaw, MyPawn->GetCameraComponent()->GetComponentRotation().Pitch, MyPawn->GetCameraComponent()->GetComponentRotation().Roll));*/
+			/*FVector POVLoc;
+			FRotator POVRot;
+			MyPawn->Controller->GetPlayerViewPoint(POVLoc, POVRot);
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Player POVRot - YAW : %f, PITCH : %f, ROLL : %f"),
+						POVRot.Yaw, POVRot.Pitch, POVRot.Roll));*/
 
 			S_Players S_Packet;
 			S_Packet.HP = Player_info.HP[PlayerId];
@@ -133,23 +141,10 @@ void APlayer_Manager::Tick(float DeltaTime)
 
 					players[i]->SetActorRelativeRotation(NewRotation);
 					players[i]->Controller->SetControlRotation(NewAim);
-
-					FRotator ViewRotation;
-					ViewRotation.Yaw = Player_info.View[i].Rot.yaw;
-					ViewRotation.Pitch = Player_info.View[i].Rot.pitch;
-					ViewRotation.Roll = Player_info.View[i].Rot.roll;
-					players[i]->GetCameraComponent()->SetWorldRotation(ViewRotation);
 					players[i]->GetMovementComponent()->Velocity = NewVelocity;
 					players[i]->AddMovementInput(NewVelocity);
 					
-					FVector TempVec;
-					FRotator TempRot;
-					players[i]->GetActorEyesViewPoint(TempVec, TempRot);
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player EyesViewRotate - YAW : %f, PITCH : %f, ROLL : %f"),
-						i+1, TempRot.Yaw, TempRot.Pitch, TempRot.Roll));
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player CameraRotate - YAW : %f, PITCH : %f, ROLL : %f"),
-						i+1 ,players[i]->GetCameraComponent()->GetComponentRotation().Yaw, players[i]->GetCameraComponent()->GetComponentRotation().Pitch, 
-						players[i]->GetCameraComponent()->GetComponentRotation().Roll));
+					
 					
 					/*FVector POVLoc;
 					FRotator POVRot;

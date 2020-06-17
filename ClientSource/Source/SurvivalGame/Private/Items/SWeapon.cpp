@@ -333,13 +333,40 @@ FVector ASWeapon::GetCameraDamageStartLocation(const FVector& AimDir) const
 
 	if (PC)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("GetCameraDamageStartLocation() PC : TRUE")));
 		FRotator DummyRot;
 		PC->GetPlayerViewPoint(OutStartTrace, DummyRot);
-
 		// Adjust trace so there is nothing blocking the ray between the camera and the pawn, and calculate distance from adjusted start
 		OutStartTrace = OutStartTrace + AimDir * (FVector::DotProduct((Instigator->GetActorLocation() - OutStartTrace), AimDir));
 	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("GetCameraDamageStartLocation() PC : FALSE")));
+		UWorld* CurrentWorld = GetWorld();
+		TArray<ASCharacter*> PlayerArray;
+		for (TActorIterator<APlayer_Manager> It(CurrentWorld); It; ++It)
+			PlayerArray = (*It)->GetPlayerArray();
 
+		FRotator DummyRot;
+		int num = 0;
+		for (auto p = PlayerArray.begin(); p != PlayerArray.end(); ++p)
+		{
+			if (Instigator == Cast<APawn>(*p))
+			{
+				break;
+			}
+			++num;
+		}
+		OutStartTrace.X = Player_info.View[num].Loc.x;
+		OutStartTrace.Y = Player_info.View[num].Loc.y;
+		OutStartTrace.Z = Player_info.View[num].Loc.z;
+		DummyRot.Yaw = Player_info.View[num].Rot.yaw;
+		DummyRot.Pitch = Player_info.View[num].Rot.pitch;
+		DummyRot.Roll = Player_info.View[num].Rot.roll;
+
+		OutStartTrace = OutStartTrace + AimDir * (FVector::DotProduct((Instigator->GetActorLocation() - OutStartTrace), AimDir));
+	
+	}
 	return OutStartTrace;
 }
 

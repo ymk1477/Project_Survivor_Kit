@@ -383,10 +383,14 @@ float ASBaseCharacter::GetTargetingSpeedModifier() const
 FRotator ASBaseCharacter::GetAimOffsets() const
 {
 	FVector AimDirWS;
-	if(this->IsPlayerControlled())
+	if (this->IsPlayerControlled())
+	{
 		AimDirWS = GetBaseAimRotation().Vector();
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("GetAimOffsets() Player Controlled : TRUE")));
+	}
 	else
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("GetAimOffsets() Player Controlled : FALSE")));
 		UWorld* CurrentWorld = GetWorld();
 		TArray<ASCharacter*> PlayerArray;
 		for (TActorIterator<APlayer_Manager> It(CurrentWorld); It; ++It)
@@ -402,7 +406,8 @@ FRotator ASBaseCharacter::GetAimOffsets() const
 			}
 			++num;
 		}
-
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("GetAimOffsets() Player Controlled : FALSE / NUM : %d"),
+			num));
 		CamRot.Yaw = Player_info.View[num].Rot.yaw;
 		CamRot.Pitch = Player_info.View[num].Rot.pitch;
 		CamRot.Roll = Player_info.View[num].Rot.roll;
