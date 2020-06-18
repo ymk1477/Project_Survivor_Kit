@@ -81,6 +81,8 @@ void APlayer_Manager::Tick(float DeltaTime)
 			Player_info.View[PlayerId].Rot.pitch = POVRot.Pitch;
 			Player_info.View[PlayerId].Rot.roll = POVRot.Roll;
 
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Player TeamNumber : %d "), Cast< ASPlayerState>(MyPawn->GetPlayerState())->GetTeamNumber()));
+
 			/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player POVRot - YAW : %f, PITCH : %f, ROLL : %f"),
 				Player_info.View[PlayerId].Rot.yaw, Player_info.View[PlayerId].Rot.pitch, Player_info.View[PlayerId].Rot.roll)); */
 
@@ -140,12 +142,12 @@ void APlayer_Manager::Tick(float DeltaTime)
 					}*/
 
 					players[i]->SetActorRelativeRotation(NewRotation);
-					players[i]->Controller->SetControlRotation(NewAim);
+					players[i]->SetAimOffset(i);
+					//players[i]->Controller->SetControlRotation(NewAim);
 					players[i]->GetMovementComponent()->Velocity = NewVelocity;
 					players[i]->AddMovementInput(NewVelocity);
 					
-					
-					
+
 					/*FVector POVLoc;
 					FRotator POVRot;
 					players[i]->Controller->GetPlayerViewPoint(POVLoc, POVRot);*/

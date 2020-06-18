@@ -142,7 +142,7 @@ public:
 
 	FRotator AimOffset;
 
-	void SetAimOffset(FRotator NewAim);
+	void SetAimOffset(int num);
 
 	UFUNCTION(BlueprintCallable, Category = "Targeting")
 	FRotator GetAimOffsetsOther() const;
