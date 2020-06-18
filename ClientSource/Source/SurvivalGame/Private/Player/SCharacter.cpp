@@ -290,18 +290,20 @@ void ASCharacter::SetIsTargeting(bool Targeting)
 	SetTargeting(Targeting);	
 }
 
-void ASCharacter::SetAimOffset(int num)
+void ASCharacter::SetAimOffset(FRotator NewAim)
 {
-	FVector AimDirWS;
-	FRotator CamRot;
-	CamRot.Yaw = Player_info.View[num].Rot.yaw;
-	CamRot.Pitch = Player_info.View[num].Rot.pitch;
-	CamRot.Roll = Player_info.View[num].Rot.roll;
-	AimDirWS = CamRot.Vector();
-	const FVector AimDirLS = ActorToWorld().InverseTransformVectorNoScale(AimDirWS);
-	const FRotator AimRotLS = AimDirLS.Rotation();
-	
-	AimOffset = AimRotLS;
+	//FVector AimDirWS;
+	//FRotator CamRot;
+	//CamRot.Yaw = Player_info.View[num].Rot.yaw;
+	//CamRot.Pitch = Player_info.View[num].Rot.pitch;
+	//CamRot.Roll = Player_info.View[num].Rot.roll;
+	//AimDirWS = CamRot.Vector();
+	//const FVector AimDirLS = ActorToWorld().InverseTransformVectorNoScale(AimDirWS);
+	//const FRotator AimRotLS = AimDirLS.Rotation();
+	//
+	//AimOffset = AimRotLS;
+
+	AimOffset = NewAim;
 }
 
 FRotator ASCharacter::GetAimOffsetsOther() const
