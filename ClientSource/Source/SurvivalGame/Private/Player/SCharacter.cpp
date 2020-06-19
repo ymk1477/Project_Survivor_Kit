@@ -308,6 +308,8 @@ void ASCharacter::SetAimOffset(FRotator NewAim)
 
 FRotator ASCharacter::GetAimOffsetsOther() const
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Called GetAimOffsetsOtehrs() ")));
+
 	return AimOffset;
 }
 

@@ -75,6 +75,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 			Player_info.View[PlayerId].Rot.yaw = POVRot.Yaw;
 			Player_info.View[PlayerId].Rot.pitch = POVRot.Pitch;
 			Player_info.View[PlayerId].Rot.roll = POVRot.Roll;
+			
 			Player_info.WeaponState[PlayerId] = MyPawn->GetOtherWeaponState();
 
 		
@@ -261,10 +262,9 @@ void APlayer_Manager::SpawnPlayers()
 			MyGameMode->SetOtherPlayerDefaults(NewCharacter);
 			players.Emplace(NewCharacter);
 		}
-		if (PlayerId != 0)
-		{
-			Mycontroller->Possess(players[PlayerId]);
-		}
+		
+		Mycontroller->Possess(players[PlayerId]);
+		
 		for (auto i = players.begin(); i != players.end(); ++i)
 		{
 			if (!((*i)->IsPlayerControlled()))
