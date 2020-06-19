@@ -140,12 +140,7 @@ public:
 
 	void SetIsTargeting(bool Targeting);
 
-	FRotator AimOffset;
-
-	void SetAimOffset(FRotator NewAim);
-
-	UFUNCTION(BlueprintCallable, Category = "Targeting")
-	FRotator GetAimOffsetsOther() const;
+	
 
 	/************************************************************************/
 	/* Hunger                                                               */

@@ -383,34 +383,15 @@ float ASBaseCharacter::GetTargetingSpeedModifier() const
 FRotator ASBaseCharacter::GetAimOffsets() const
 {
 	FVector AimDirWS;
-	if (this->IsPlayerControlled())
+	if (PlayerNum == PlayerId)
 	{
 		AimDirWS = GetBaseAimRotation().Vector();
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("GetAimOffsets() Player Controlled : TRUE")));
 	}
 	else
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("GetAimOffsets() Player Controlled : FALSE")));
-		UWorld* CurrentWorld = GetWorld();
-		TArray<ASCharacter*> PlayerArray;
-		for (TActorIterator<APlayer_Manager> It(CurrentWorld); It; ++It)
-			PlayerArray = (*It)->GetPlayerArray();
-
-		FRotator CamRot;
-		int num = 0;
-		for (auto p = PlayerArray.begin(); p != PlayerArray.end(); ++p)
-		{
-			if (Instigator == Cast<APawn>(*p))
-			{
-				break;
-			}
-			++num;
-		}
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("GetAimOffsets() Player Controlled : FALSE / NUM : %d"), num));
-		CamRot.Yaw = Player_info.View[num].Rot.yaw;
-		CamRot.Pitch = Player_info.View[num].Rot.pitch;
-		CamRot.Roll = Player_info.View[num].Rot.roll;
-		AimDirWS = CamRot.Vector();
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("GetAimOffsets() Player Controlled : FALSE")));
+		return AimOffset;
 	}
 	const FVector AimDirLS = ActorToWorld().InverseTransformVectorNoScale(AimDirWS);
 	const FRotator AimRotLS = AimDirLS.Rotation();
@@ -418,6 +399,13 @@ FRotator ASBaseCharacter::GetAimOffsets() const
 	return AimRotLS;
 	
 }
+
+void ASBaseCharacter::SetAimOffset(FRotator NewAim)
+{
+	AimOffset = NewAim;
+}
+
+
 
 void ASBaseCharacter::OthertakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
 {

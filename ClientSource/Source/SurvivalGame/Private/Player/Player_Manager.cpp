@@ -13,6 +13,7 @@ APlayer_Manager::APlayer_Manager()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	
 }
 
 // Called when the game starts or when spawned
@@ -195,6 +196,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 }
 
 
+
 void APlayer_Manager::MakeStartLocation()
 {
 	UWorld* World = GetWorld();
@@ -263,19 +265,24 @@ void APlayer_Manager::SpawnPlayers()
 			players.Emplace(NewCharacter);
 		}
 		
-		Mycontroller->Possess(players[PlayerId]);
-		
+		if (!(PlayerId == 0)) 
+			Mycontroller->Possess(players[PlayerId]);
+	
+		int num = 0;
 		for (auto i = players.begin(); i != players.end(); ++i)
 		{
 			if (!((*i)->IsPlayerControlled()))
 			{
 				aiController->Possess(*i);
+			
 			}
-
+			(*i)->PlayerNum = num;
+			++num;
 		}
 	}
 
 	
+		
 }
 
 TArray<ASCharacter*> APlayer_Manager::GetPlayerArray()

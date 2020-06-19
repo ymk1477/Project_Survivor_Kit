@@ -32,6 +32,7 @@ class SURVIVALGAME_API APlayer_Manager : public AActor
 	AZombie_Manager* zombie_manager;
 	bool test = false;
 
+
 public:
 	// Sets default values for this actor's properties
 	APlayer_Manager();
@@ -43,6 +44,7 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
 
 	void MakeStartLocation();
 	void SpawnPlayers();

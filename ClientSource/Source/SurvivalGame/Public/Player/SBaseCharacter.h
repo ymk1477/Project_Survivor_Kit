@@ -95,11 +95,16 @@ public:
 	float GetTargetingSpeedModifier() const;
 
 	/* Retrieve Pitch/Yaw from current camera */
-
-
+	   
 	UFUNCTION(BlueprintCallable, Category = "Targeting")
 	FRotator GetAimOffsets() const;
-		
+	
+	FRotator AimOffset;
+
+	int PlayerNum;
+
+	void SetAimOffset(FRotator NewAim);
+	
 	/************************************************************************/
 	/* Damage & Death                                                       */
 	/************************************************************************/
