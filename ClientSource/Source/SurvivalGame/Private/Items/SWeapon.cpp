@@ -319,8 +319,8 @@ FVector ASWeapon::GetAdjustedAim() const
 
 		//FinalAim = Instigator->GetBaseAimRotation().Vector();
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("FINAL AIM - X : %f, Y : %f, Z : %f "),
-		FinalAim.X, FinalAim.Y, FinalAim.Z));
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("FINAL AIM - X : %f, Y : %f, Z : %f "),
+		FinalAim.X, FinalAim.Y, FinalAim.Z));*/
 
 	return FinalAim;
 }
@@ -333,7 +333,7 @@ FVector ASWeapon::GetCameraDamageStartLocation(const FVector& AimDir) const
 
 	if (PC)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("GetCameraDamageStartLocation() PC : TRUE")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("GetCameraDamageStartLocation() PC : TRUE")));
 		FRotator DummyRot;
 		PC->GetPlayerViewPoint(OutStartTrace, DummyRot);
 		// Adjust trace so there is nothing blocking the ray between the camera and the pawn, and calculate distance from adjusted start
@@ -341,7 +341,7 @@ FVector ASWeapon::GetCameraDamageStartLocation(const FVector& AimDir) const
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("GetCameraDamageStartLocation() PC : FALSE")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("GetCameraDamageStartLocation() PC : FALSE")));
 		UWorld* CurrentWorld = GetWorld();
 		TArray<ASCharacter*> PlayerArray;
 		for (TActorIterator<APlayer_Manager> It(CurrentWorld); It; ++It)

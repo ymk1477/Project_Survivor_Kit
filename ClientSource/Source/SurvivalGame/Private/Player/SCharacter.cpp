@@ -734,8 +734,8 @@ void ASCharacter::OnReload()
 {
 	if (CurrentWeapon)
 	{
-		if (!(this->IsPlayerControlled()))
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Other Player OnReload()")));
+		/*if (!(this->IsPlayerControlled()))
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Other Player OnReload()")));*/
 		CurrentWeapon->StartReload();
 	}
 }

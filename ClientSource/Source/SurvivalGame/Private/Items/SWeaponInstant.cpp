@@ -92,8 +92,12 @@ void ASWeaponInstant::DealDamage(const FHitResult& Impact, const FVector& ShootD
 	PointDmg.HitInfo = Impact;
 	PointDmg.ShotDirection = ShootDir;
 	PointDmg.Damage = ActualHitDamage;
-	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Damage : %f "),
-		PointDmg.Damage));*/
+	
+	if(MyPawn->Controller)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("MyPawn->Controller : TRUE")));
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("MyPawn->Controller : FALSE")));
+	
 	Impact.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, MyPawn->Controller, this);
 }
 

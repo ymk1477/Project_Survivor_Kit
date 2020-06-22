@@ -124,6 +124,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 						players[i]->TakeDamage(DmgEvent.Damage, DmgEvent, GetController(), this);
 					}*/
 
+					
 
 					players[i]->SetActorRelativeRotation(NewRotation);
 					players[i]->SetAimOffset(NewAim);
@@ -267,13 +268,15 @@ void APlayer_Manager::SpawnPlayers()
 		
 		if (!(PlayerId == 0)) 
 			Mycontroller->Possess(players[PlayerId]);
-	
+		
+		aiController->bWantsPlayerState = true;
 		int num = 0;
 		for (auto i = players.begin(); i != players.end(); ++i)
 		{
 			if (!((*i)->IsPlayerControlled()))
 			{
 				aiController->Possess(*i);
+				(*i)->SetPlayerState(MyCharacterState);
 			
 			}
 			(*i)->PlayerNum = num;
