@@ -136,6 +136,11 @@ bool ASGameMode::CanDealDamage(class ASPlayerState* DamageCauser, class ASPlayer
 		return true;
 	}
 
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("DamageCauser->GetTeamNumber() : %d "),
+		DamageCauser->GetTeamNumber()));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("DamagedPlayer->GetTeamNumber() : %d "),
+		DamagedPlayer->GetTeamNumber()));
+
 	// Compare Team Numbers
 	return DamageCauser && DamagedPlayer && (DamageCauser->GetTeamNumber() != DamagedPlayer->GetTeamNumber());
 	//return true;
@@ -161,16 +166,17 @@ float ASGameMode::ModifyDamage(float Damage, AActor* DamagedActor, struct FDamag
 	float ActualDamage = Damage;
 
 	ASBaseCharacter* DamagedPawn = Cast<ASBaseCharacter>(DamagedActor);
-	
+
 	if (DamagedPawn && EventInstigator)
 	{
 		ASPlayerState* DamagedPlayerState = Cast<ASPlayerState>(DamagedPawn->GetPlayerState());
-		ASPlayerState* InstigatorPlayerState = Cast<ASPlayerState>(EventInstigator->PlayerState);  
-		
+		ASPlayerState* InstigatorPlayerState = Cast<ASPlayerState>(EventInstigator->PlayerState);
+	
 		if(EventInstigator->PlayerState)
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("InstigaotrPlayerState : TRUE")));
 		else
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("InstigaotrPlayerState : FALSE")));
+
 		// Check for friendly fire
 		if (!CanDealDamage(InstigatorPlayerState, DamagedPlayerState))
 		{

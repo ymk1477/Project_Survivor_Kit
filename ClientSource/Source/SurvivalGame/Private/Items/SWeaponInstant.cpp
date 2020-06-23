@@ -7,6 +7,7 @@
 #include "SDamageType.h"
 
 
+
 ASWeaponInstant::ASWeaponInstant(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
@@ -92,11 +93,6 @@ void ASWeaponInstant::DealDamage(const FHitResult& Impact, const FVector& ShootD
 	PointDmg.HitInfo = Impact;
 	PointDmg.ShotDirection = ShootDir;
 	PointDmg.Damage = ActualHitDamage;
-	
-	if(MyPawn->Controller)
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("MyPawn->Controller : TRUE")));
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("MyPawn->Controller : FALSE")));
 	
 	Impact.GetActor()->TakeDamage(PointDmg.Damage, PointDmg, MyPawn->Controller, this);
 }

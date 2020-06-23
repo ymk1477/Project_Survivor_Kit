@@ -98,6 +98,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 
 			for (int i = 0; i < MAX_USER; ++i)
 			{
+			
 				if ((i != PlayerId) && Player_info.IsUsed[i])
 				{
 
@@ -219,7 +220,7 @@ void APlayer_Manager::SpawnPlayers()
 {
 	UWorld* World = GetWorld();
 	ASCoopGameMode* MyGameMode = Cast<ASCoopGameMode>(World->GetAuthGameMode());
-	AAIController* aiController = nullptr;
+	ASPlayerController* aiController = nullptr;
 
 	if (Playing > 1)
 	{
@@ -252,14 +253,15 @@ void APlayer_Manager::SpawnPlayers()
 		for (int i = 1; i < Playing; ++i) {
 			ASCharacter* NewCharacter = World->SpawnActor<ASCharacter>(GenerateBp->GeneratedClass, PlayerStartLocation[i], FRotator::ZeroRotator, Spawnparams);
 			NewCharacter->SetPlayerState(MyCharacterState);
-			ASPlayerState* NewPlayerState = Cast< ASPlayerState>(NewCharacter->GetPlayerState());
+			ASPlayerState* NewPlayerState = Cast< ASPlayerState>(NewCharacter->GetController()->PlayerState);
 			if (NewPlayerState)
 			{
+				
 				NewPlayerState->SetTeamNumber(MyCharacterState->GetTeamNumber());
 			}
 			if (aiController == nullptr)
 			{
-				aiController = Cast<AAIController>(NewCharacter->GetController());
+				aiController = Cast<ASPlayerController>(NewCharacter->GetController());
 			}
 
 			MyGameMode->SetOtherPlayerDefaults(NewCharacter);
@@ -269,7 +271,7 @@ void APlayer_Manager::SpawnPlayers()
 		if (!(PlayerId == 0)) 
 			Mycontroller->Possess(players[PlayerId]);
 		
-		aiController->bWantsPlayerState = true;
+		
 		int num = 0;
 		for (auto i = players.begin(); i != players.end(); ++i)
 		{
