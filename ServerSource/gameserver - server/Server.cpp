@@ -16,6 +16,7 @@ Zombie Zombie_Info;
 bool IsStarted = false;
 bool recving[MAX_USER] = { false };
 bool LevelChange[MAX_USER] = { false };
+int Elapsed_Time;
 
 void err_display(DWORD msg)
 {
@@ -456,6 +457,52 @@ void Recv_Packet(int clientId, char* buf) {
 				}
 			}
 
+		}
+		break;
+		case PACKET_CS_TIME:
+		{
+			R_Time* packet = reinterpret_cast<R_Time*>(buf);
+			if (packet->PlayerNum == Player_Info.Host)
+			{
+				Elapsed_Time = packet->ElapsedTime;
+				cout << "Elapsed Time : " << Elapsed_Time << endl;
+			}
+			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
+			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
+
+			memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
+			g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
+
+			S_Time s_packet;
+			s_packet.ElapsedTime = Elapsed_Time;
+
+			for (int i = 0; i < MAX_USER; ++i) {
+				if (Player_Info.IsUsed[i]) {
+
+					OVER_EX* SendingOverlapped = new OVER_EX;
+
+					SendingOverlapped->dataBuffer.len = sizeof(s_packet);
+					memset(&(SendingOverlapped->overlapped), 0x00, sizeof(WSAOVERLAPPED));
+					SendingOverlapped->overlapped.hEvent = (HANDLE)i;
+
+					SendingOverlapped->dataBuffer.buf = reinterpret_cast<char*>(&s_packet);
+
+					retval = WSASend(g_clients[i].socket, &(SendingOverlapped->dataBuffer), 1, NULL, 0,	 // ¼öÁ¤
+						&(SendingOverlapped->overlapped), send_callback);
+
+					if (retval == SOCKET_ERROR)
+					{
+						if (WSAGetLastError() != WSA_IO_PENDING)
+						{
+							printf("Error - %d CLINET Fail WSASend(error_code : %d)\n", i, WSAGetLastError());
+						}
+						else
+						{
+							delete SendingOverlapped;
+						}
+					}
+				}
+			}
 		}
 		break;
 		}

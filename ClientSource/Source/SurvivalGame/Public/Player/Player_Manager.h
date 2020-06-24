@@ -17,6 +17,7 @@
 #include "AIController.h"
 #include "SZombieCharacter.h"
 #include "Zombie_Manager.h"
+#include "SGameState.h"
 #include "Player_Manager.generated.h"
 
 

@@ -108,6 +108,12 @@ void MySocket::sendBuffer(int PacketType, void* BUF) {
 		Success = inst->Send((uint8*)packet, (int32)sizeof(*packet), zero);
 	}
 	break;
+	case PACKET_CS_TIME:
+	{
+		S_Time* packet = reinterpret_cast<S_Time*>(BUF);
+		Success = inst->Send((uint8*)packet, (int32)sizeof(*packet), zero);
+	}
+	break;
 	}
 
 	//MySocket::RecvPacket();
@@ -236,6 +242,12 @@ void MySocket::RecvPacket() {
 					Zombie_info.HP[i] = packet->HP[i];
 				}
 			}
+		}
+		break;
+		case PACKET_SC_TIME:
+		{
+			R_Time* packet = reinterpret_cast<R_Time*>(RECV_BUF);
+			Elapsed_Time = packet->ElapsedTime;
 		}
 		break;
 		}

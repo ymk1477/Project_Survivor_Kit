@@ -42,6 +42,9 @@
 #define PACKET_CS_ZOMBIE_INIT 500
 #define PACKET_CS_ZOMBIE 501
 
+#define PACKET_SC_TIME 600
+#define PACKET_CS_TIME 601
+
 typedef struct LOCATION {
 	float x;
 	float y;
@@ -188,6 +191,19 @@ typedef struct Send_Packet_Zombie
 	bool Hit[MAX_ZOMBIE];
 }S_Zombies;
 
+typedef struct Send_Packet_Time
+{
+	int packet_type = PACKET_CS_TIME;
+	int PlayerNum;
+	int ElapsedTime = 0;
+}S_Time;
+
+typedef struct Recv_Packet_Time
+{
+	int packet_type = PACKET_SC_TIME;
+	int ElapsedTime;
+}R_Time;
+
 class MySocket {
 private:
 	MySocket() {}
@@ -210,7 +226,7 @@ static int HostPlayer;
 static bool GameStart;
 static bool PlayerLogin;
 static bool All_level_Changed;
-
+static int Elapsed_Time;
 /**
  *
  */

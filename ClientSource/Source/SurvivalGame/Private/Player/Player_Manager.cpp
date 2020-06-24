@@ -1,8 +1,7 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
+
 #include "SurvivalGame.h"
-
-
 #include "Player_Manager.h"
 
 
@@ -47,154 +46,171 @@ void APlayer_Manager::Tick(float DeltaTime)
 	{
 		/*if (All_level_Changed)
 		{*/
-			ASCharacter* MyPawn = players[PlayerId];
+		ASCharacter* MyPawn = players[PlayerId];
 
-			Player_info.HP[PlayerId] = MyPawn->GetHealth();
+		Player_info.HP[PlayerId] = MyPawn->GetHealth();
 
-			FRotator MyRotation = MyPawn->GetActorRotation();
-			Player_info.Rot[PlayerId].yaw = MyRotation.Yaw;
-			Player_info.Rot[PlayerId].pitch = MyRotation.Pitch;
-			Player_info.Rot[PlayerId].roll = MyRotation.Roll;
+		FRotator MyRotation = MyPawn->GetActorRotation();
+		Player_info.Rot[PlayerId].yaw = MyRotation.Yaw;
+		Player_info.Rot[PlayerId].pitch = MyRotation.Pitch;
+		Player_info.Rot[PlayerId].roll = MyRotation.Roll;
 
-			FVector MyVelocity = MyPawn->GetVelocity();
-			Player_info.Vel[PlayerId].x = MyVelocity.X;
-			Player_info.Vel[PlayerId].y = MyVelocity.Y;
-			Player_info.Vel[PlayerId].z = MyVelocity.Z;
+		FVector MyVelocity = MyPawn->GetVelocity();
+		Player_info.Vel[PlayerId].x = MyVelocity.X;
+		Player_info.Vel[PlayerId].y = MyVelocity.Y;
+		Player_info.Vel[PlayerId].z = MyVelocity.Z;
 
-			FRotator MyAim = MyPawn->GetAimOffsets();
-			Player_info.Aim[PlayerId].yaw = MyAim.Yaw;
-			Player_info.Aim[PlayerId].pitch = MyAim.Pitch;
-			Player_info.Aim[PlayerId].roll = MyAim.Roll;
+		FRotator MyAim = MyPawn->GetAimOffsets();
+		Player_info.Aim[PlayerId].yaw = MyAim.Yaw;
+		Player_info.Aim[PlayerId].pitch = MyAim.Pitch;
+		Player_info.Aim[PlayerId].roll = MyAim.Roll;
 
-			FVector POVLoc;
-			FRotator POVRot;
-			if(MyPawn)
-				MyPawn->Controller->GetPlayerViewPoint(POVLoc, POVRot);
-			Player_info.View[PlayerId].Loc.x = POVLoc.X;
-			Player_info.View[PlayerId].Loc.y = POVLoc.Y;
-			Player_info.View[PlayerId].Loc.z = POVLoc.Z;
-			Player_info.View[PlayerId].Rot.yaw = POVRot.Yaw;
-			Player_info.View[PlayerId].Rot.pitch = POVRot.Pitch;
-			Player_info.View[PlayerId].Rot.roll = POVRot.Roll;
-			
-			Player_info.WeaponState[PlayerId] = MyPawn->GetOtherWeaponState();
+		FVector POVLoc;
+		FRotator POVRot;
+		if (MyPawn->GetHealth() > 0)
+			MyPawn->Controller->GetPlayerViewPoint(POVLoc, POVRot);
+		Player_info.View[PlayerId].Loc.x = POVLoc.X;
+		Player_info.View[PlayerId].Loc.y = POVLoc.Y;
+		Player_info.View[PlayerId].Loc.z = POVLoc.Z;
+		Player_info.View[PlayerId].Rot.yaw = POVRot.Yaw;
+		Player_info.View[PlayerId].Rot.pitch = POVRot.Pitch;
+		Player_info.View[PlayerId].Rot.roll = POVRot.Roll;
 
-		
-			S_Players S_Packet;
-			S_Packet.HP = Player_info.HP[PlayerId];
-			S_Packet.Rot = Player_info.Rot[PlayerId];
-			S_Packet.Vel = Player_info.Vel[PlayerId];
-			S_Packet.Aim = Player_info.Aim[PlayerId];
-			S_Packet.IsJump = Player_info.IsJump[PlayerId];
-			S_Packet.IsTargeting = Player_info.IsTargeting[PlayerId];
-			S_Packet.IsSprinting = Player_info.IsSprinting[PlayerId];
-			S_Packet.onCrouchToggle = Player_info.onCrouchToggle[PlayerId];
-			S_Packet.WeaponState = Player_info.WeaponState[PlayerId];
-			S_Packet.View = Player_info.View[PlayerId];
-			MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Packet);
-			Player_info.onCrouchToggle[PlayerId] = false;
+		Player_info.WeaponState[PlayerId] = MyPawn->GetOtherWeaponState();
 
-			MySocket::RecvPacket();
 
-			for (int i = 0; i < MAX_USER; ++i)
+		S_Players S_Packet;
+		S_Packet.HP = Player_info.HP[PlayerId];
+		S_Packet.Rot = Player_info.Rot[PlayerId];
+		S_Packet.Vel = Player_info.Vel[PlayerId];
+		S_Packet.Aim = Player_info.Aim[PlayerId];
+		S_Packet.IsJump = Player_info.IsJump[PlayerId];
+		S_Packet.IsTargeting = Player_info.IsTargeting[PlayerId];
+		S_Packet.IsSprinting = Player_info.IsSprinting[PlayerId];
+		S_Packet.onCrouchToggle = Player_info.onCrouchToggle[PlayerId];
+		S_Packet.WeaponState = Player_info.WeaponState[PlayerId];
+		S_Packet.View = Player_info.View[PlayerId];
+		MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Packet);
+		Player_info.onCrouchToggle[PlayerId] = false;
+
+		MySocket::RecvPacket();
+
+		for (int i = 0; i < MAX_USER; ++i)
+		{
+
+			if ((i != PlayerId) && Player_info.IsUsed[i])
 			{
-			
-				if ((i != PlayerId) && Player_info.IsUsed[i])
+
+				FRotator NewRotation;
+				NewRotation.Pitch = Player_info.Rot[i].pitch;
+				NewRotation.Yaw = Player_info.Rot[i].yaw;
+				NewRotation.Roll = Player_info.Rot[i].roll;
+				FVector NewVelocity;
+				NewVelocity.X = Player_info.Vel[i].x;
+				NewVelocity.Y = Player_info.Vel[i].y;
+				NewVelocity.Z = Player_info.Vel[i].z;
+				FRotator NewAim;
+				NewAim.Pitch = Player_info.Aim[i].pitch;
+				NewAim.Yaw = Player_info.Aim[i].yaw;
+				NewAim.Roll = Player_info.Aim[i].roll;
+
+				players[i]->SetOtherHealth(Player_info.HP[i]);
+				/*if (players[i]->GetHealth() > Player_info.HP[i])		// 몬스터 동기화 하면서 같이 해줘야함 (TakeDamage).
+				{
+					FPointDamageEvent DmgEvent;
+					DmgEvent.DamageTypeClass = PunchDamageType;
+					DmgEvent.Damage = MeleeDamage;
+
+					players[i]->TakeDamage(DmgEvent.Damage, DmgEvent, GetController(), this);
+				}*/
+
+
+
+				players[i]->SetActorRelativeRotation(NewRotation);
+				players[i]->SetAimOffset(NewAim);
+				players[i]->GetMovementComponent()->Velocity = NewVelocity;
+				players[i]->AddMovementInput(NewVelocity);
+
+				players[i]->SetIsJumping(Player_info.IsJump[i]);
+				players[i]->SetIsTargeting(Player_info.IsTargeting[i]);
+				players[i]->SetSprinting(Player_info.IsSprinting[i]);
+				if (Player_info.onCrouchToggle[i])
+					players[i]->OnCrouchToggle();
+				if (Player_info.WeaponState[i] == WEAPON_FIRING)
+				{
+					players[i]->StartFiringOther();
+				}
+				else if (Player_info.WeaponState[i] == WEAPON_RELOADING)
 				{
 
-					FRotator NewRotation;
-					NewRotation.Pitch = Player_info.Rot[i].pitch;
-					NewRotation.Yaw = Player_info.Rot[i].yaw;
-					NewRotation.Roll = Player_info.Rot[i].roll;
-					FVector NewVelocity;
-					NewVelocity.X = Player_info.Vel[i].x;
-					NewVelocity.Y = Player_info.Vel[i].y;
-					NewVelocity.Z = Player_info.Vel[i].z;
-					FRotator NewAim;
-					NewAim.Pitch = Player_info.Aim[i].pitch;
-					NewAim.Yaw = Player_info.Aim[i].yaw;
-					NewAim.Roll = Player_info.Aim[i].roll;
-
-					players[i]->SetOtherHealth(Player_info.HP[i]);
-					/*if (players[i]->GetHealth() > Player_info.HP[i])		// 몬스터 동기화 하면서 같이 해줘야함 (TakeDamage).
-					{
-						FPointDamageEvent DmgEvent;
-						DmgEvent.DamageTypeClass = PunchDamageType;
-						DmgEvent.Damage = MeleeDamage;
-
-						players[i]->TakeDamage(DmgEvent.Damage, DmgEvent, GetController(), this);
-					}*/
-
-					
-
-					players[i]->SetActorRelativeRotation(NewRotation);
-					players[i]->SetAimOffset(NewAim);
-					players[i]->GetMovementComponent()->Velocity = NewVelocity;
-					players[i]->AddMovementInput(NewVelocity);
-					
-					players[i]->SetIsJumping(Player_info.IsJump[i]);
-					players[i]->SetIsTargeting(Player_info.IsTargeting[i]);
-					players[i]->SetSprinting(Player_info.IsSprinting[i]);
-					if (Player_info.onCrouchToggle[i])
-						players[i]->OnCrouchToggle();
-					if (Player_info.WeaponState[i] == WEAPON_FIRING)
-					{
-						players[i]->StartFiringOther();
-					}
-					else if(Player_info.WeaponState[i] == WEAPON_RELOADING)
-					{
-						
-						players[i]->ReloadingOther();
-					}
-					else
-						players[i]->StopFiringOther();
+					players[i]->ReloadingOther();
 				}
-
+				else
+					players[i]->StopFiringOther();
 			}
+
+		}
 		//}
 
 			// 좀비 샌드리시브
-			auto ZombieArray = zombie_manager->GetZombieArray();
-			for (int i = 0; i < ZombieArray->Num(); ++i)
+		auto ZombieArray = zombie_manager->GetZombieArray();
+		for (int i = 0; i < ZombieArray->Num(); ++i)
+		{
+			if (Zombie_info.HP[i] < (*ZombieArray)[i]->GetHealth())
+				Zombie_info.Hit[i] = true;
+		}
+		S_Zombies s_zombie_packet;
+		for (int i = 0; i < MAX_ZOMBIE; ++i)
+		{
+			s_zombie_packet.IsAlive[i] = Zombie_info.IsAlive[i];
+			s_zombie_packet.HP[i] = Zombie_info.HP[i];
+			s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
+		}
+		MySocket::sendBuffer(PACKET_CS_ZOMBIE, &S_Packet);
+		for (int i = 0; i < ZombieArray->Num(); ++i)
+		{
+			Zombie_info.Hit[i] = false;
+		}
+		MySocket::RecvPacket();
+		for (int i = 0; i < MAX_ZOMBIE; ++i)
+		{
+			if (Zombie_info.IsAlive[i])
 			{
-				if (Zombie_info.HP[i] < (*ZombieArray)[i]->GetHealth())
-					Zombie_info.Hit[i] = true;
-			}
-			S_Zombies s_zombie_packet;
-			for (int i = 0; i < MAX_ZOMBIE; ++i)
-			{
-				s_zombie_packet.IsAlive[i] = Zombie_info.IsAlive[i];
-				s_zombie_packet.HP[i] = Zombie_info.HP[i];
-				s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
-			}
-			MySocket::sendBuffer(PACKET_CS_ZOMBIE, &S_Packet);
-			for (int i = 0; i < ZombieArray->Num(); ++i)
-			{
+				if (Zombie_info.Hit[i])
+				{
+					//FPointDamageEvent PointDmg;
+
+					//(*ZombieArray)[i]->OthertakeDamage(26.0f, PointDmg, GetWorld()->GetFirstPlayerController(), this);
+				}
+				/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie Hit : %d "),
+					i, Zombie_info.HP[i]));*/
 				Zombie_info.Hit[i] = false;
 			}
-			MySocket::RecvPacket();
-			for (int i = 0; i < MAX_ZOMBIE; ++i)
-			{
-				if (Zombie_info.IsAlive[i])
-				{
-					if (Zombie_info.Hit[i])
-					{
-						//FPointDamageEvent PointDmg;
-					
-						//(*ZombieArray)[i]->OthertakeDamage(26.0f, PointDmg, GetWorld()->GetFirstPlayerController(), this);
-					}
-					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie Hit : %d "),
-						i, Zombie_info.HP[i]));*/
-					Zombie_info.Hit[i] = false;
-				}
-			}
-			/*for (int i = 0; i < ZombieArray->Num(); ++i)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie Hit : %d "),
-					i, (*ZombieArray)[i]->GetHealth()));
-			}*/
-	}
+		}
+		/*for (int i = 0; i < ZombieArray->Num(); ++i)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie Hit : %d "),
+				i, (*ZombieArray)[i]->GetHealth()));
+		}*/
 
+		// 시간 샌드리시브
+		ASGameState* MyGameState = Cast<ASGameState>(GetWorld()->GetAuthGameMode()->GameState);
+		S_Time Timepacket;
+		Timepacket.PlayerNum = PlayerId;
+		if (PlayerId == HostPlayer)
+		{
+			
+			Timepacket.ElapsedTime = MyGameState->ElapsedGameMinutes;
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Elapsed Time : %d"), 
+				MyGameState->ElapsedGameMinutes));
+		}
+		MySocket::sendBuffer(PACKET_CS_TIME, &Timepacket);
+		MySocket::RecvPacket();
+		UMyGameInstance* MyInstance = Cast<UMyGameInstance>(GetWorld()->GetGameInstance());
+		if(!(MyInstance->IsHost()))
+			MyGameState->ElapsedGameMinutes = Elapsed_Time;
+		
+	}
 }
 
 

@@ -43,7 +43,7 @@ public:
 	/* Current time of day in the gamemode represented in full minutes */
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = "TimeOfDay")
 	int32 ElapsedGameMinutes;
-
+	 
 	/* Conversion of 1 second real time to X seconds gametime of the day/night cycle */
 	UPROPERTY(EditDefaultsOnly, Category = "TimeOfDay")
 	float TimeScale;
