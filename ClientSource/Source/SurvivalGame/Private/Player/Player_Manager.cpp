@@ -201,9 +201,9 @@ void APlayer_Manager::Tick(float DeltaTime)
 		{
 			
 			Timepacket.ElapsedTime = MyGameState->ElapsedGameMinutes;
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Elapsed Time : %d"), 
-				MyGameState->ElapsedGameMinutes));
 		}
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Elapsed Time : %d"), 
+			MyGameState->ElapsedGameMinutes));*/
 		MySocket::sendBuffer(PACKET_CS_TIME, &Timepacket);
 		MySocket::RecvPacket();
 		UMyGameInstance* MyInstance = Cast<UMyGameInstance>(GetWorld()->GetGameInstance());

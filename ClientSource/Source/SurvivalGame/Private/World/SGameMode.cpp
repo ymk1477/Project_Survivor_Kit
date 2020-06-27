@@ -14,6 +14,7 @@
 #include "SPlayerStart.h"
 #include "SMutator.h"
 #include "SWeapon.h"
+#include "MyGameInstance.h"
 
 
 ASGameMode::ASGameMode(const FObjectInitializer& ObjectInitializer)
@@ -87,9 +88,12 @@ void ASGameMode::DefaultTimer()
 		ASGameState* MyGameState = Cast<ASGameState>(GameState);
 		if (MyGameState)
 		{
-			/* Increment our time of day */
-			MyGameState->ElapsedGameMinutes += MyGameState->GetTimeOfDayIncrement();
 
+			if (HostPlayer == PlayerId)
+			{
+				/* Increment our time of day */
+				MyGameState->ElapsedGameMinutes += MyGameState->GetTimeOfDayIncrement();
+			}
 			/* Determine our state */
 			MyGameState->GetAndUpdateIsNight();
 
@@ -295,8 +299,10 @@ void ASGameMode::SpawnNewBot()
 {
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
+	
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("SpawnNewBot()")));
 	ASZombieAIController* AIC = GetWorld()->SpawnActor<ASZombieAIController>(SpawnInfo);
+
 	RestartPlayer(AIC);
 }
 

@@ -6,6 +6,7 @@
 #include "Math/UnrealMathUtility.h"
 #include "GameFramework/Actor.h"
 #include "ZombieSpawnPoint.h"
+#include "PatrolZombieSpawnPoint.h"
 #include "SZombieCharacter.h"
 #include "SZombieAIController.h"
 

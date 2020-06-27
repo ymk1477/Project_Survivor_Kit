@@ -100,6 +100,9 @@ void AZombie_Manager::Tick(float DeltaTime)
 		}
 	}
 
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Zobies : %d "),
+		Zombies.Num()));
+
 	indexNum = -1;
 	if (PatrolZombies.Num() > 0)
 	{

@@ -6,7 +6,7 @@
 #include "SPlayerState.h"
 #include "SCharacter.h"
 #include "SGameState.h"
-
+#include "Zombie_Manager.h"
 
 
 ASCoopGameMode::ASCoopGameMode(const FObjectInitializer& ObjectInitializer)
@@ -28,10 +28,24 @@ void ASCoopGameMode::RestartPlayer(class AController* NewPlayer)
 	/* Fallback to PlayerStart picking if team spawning is disabled or we're trying to spawn a bot. */
 	if (!bSpawnAtTeamPlayer || (NewPlayer->PlayerState && NewPlayer->PlayerState->bIsABot))
 	{
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Restart Player() ")));
 		Super::RestartPlayer(NewPlayer);
+
+		TActorIterator<AZombie_Manager> It(GetWorld());
+		ASZombieCharacter* NewZombie = Cast<ASZombieCharacter>(NewPlayer->GetPawn());
+		(*It)->GetZombieArray()->Emplace(NewZombie);
+		for (int i = 0; i < MAX_ZOMBIE; ++i)
+		{
+			if (!Zombie_info.IsAlive[i])
+			{
+				Zombie_info.IsAlive[i] = true;
+				Zombie_info.HP[i] = NewZombie->GetHealth();
+				break;
+			}
+		}
 		return;
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Restart Player() ")));
+
 	/* Look for a live player to spawn next to */
 	FVector SpawnOrigin = FVector::ZeroVector;
 	FRotator StartRotation = FRotator::ZeroRotator;
@@ -54,7 +68,7 @@ void ASCoopGameMode::RestartPlayer(class AController* NewPlayer)
 		return;
 	}
 
-	///* Get a point on the nav mesh near the other player */
+	/* Get a point on the nav mesh near the other player */
 	//FNavLocation StartLocation;		
 	//UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(this);
 	//if (NavSystem && NavSystem->GetRandomPointInNavigableRadius(SpawnOrigin, 250.0f, StartLocation))
