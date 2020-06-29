@@ -30,6 +30,7 @@ void AZombie_Manager::FindSpawnPoints()
 
 
 }
+
 void AZombie_Manager::SpawnZombies()
 {
 	UWorld* CurrentWorld = GetWorld();
@@ -55,18 +56,29 @@ void AZombie_Manager::SpawnZombies()
 		Zombie_info.IsAlive[ZombieNum] = true;
 		ZombieNum++;
 	}		
-	
-	SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/zombie/ZombiePatrol1")));
+
+	UObject* SpawnActor2 = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/zombie/ZombiePatrol1")));
+	UBlueprint* GenerateBp2 = Cast<UBlueprint>(SpawnActor2);
 
 	for (auto i = PatrolZombieSpawnPoints.begin(); i != PatrolZombieSpawnPoints.end(); ++i)
 	{
 		//NewRotator.Yaw = FMath::RandRange(0.0f, 360.0f);
-		ASZombieCharacter* NewPatrolZombie = CurrentWorld->SpawnActor<ASZombieCharacter>(GenerateBp->GeneratedClass, (*i)->GetActorLocation(), FRotator::ZeroRotator, Spawnparams);
-		ASZombieAIController* ZombieController = Cast<ASZombieAIController>(NewPatrolZombie->GetController());
+		ASZombieCharacter* NewPatrolZombie = CurrentWorld->SpawnActor<ASZombieCharacter>(GenerateBp2->GeneratedClass, (*i)->GetActorLocation(), FRotator::ZeroRotator, Spawnparams);
+		//ASZombieAIController* ZombieController = Cast<ASZombieAIController>(NewPatrolZombie->GetController());
 		PatrolZombies.Emplace(NewPatrolZombie);
-		ZombieController->Possess(NewPatrolZombie);
+		//ZombieController->Possess(NewPatrolZombie);
 	}
 
+}
+
+void AZombie_Manager::FindWayPoints()
+{
+	UWorld* CurrentWorld = GetWorld();
+	for (TActorIterator<ASBotWaypoint> It(CurrentWorld); It; ++It)
+	{
+		ASBotWaypoint* NewPoint = *It;
+		Waypoints.Emplace(NewPoint);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -75,6 +87,7 @@ void AZombie_Manager::BeginPlay()
 	Super::BeginPlay();
 	
 	FindSpawnPoints();
+	FindWayPoints();
 	SpawnZombies();
 }
 
@@ -100,8 +113,8 @@ void AZombie_Manager::Tick(float DeltaTime)
 		}
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Zobies : %d "),
-		Zombies.Num()));
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Zobies : %d "),
+		Zombies.Num()));*/
 
 	indexNum = -1;
 	if (PatrolZombies.Num() > 0)
@@ -129,4 +142,14 @@ void AZombie_Manager::Tick(float DeltaTime)
 TArray<ASZombieCharacter*>* AZombie_Manager::GetZombieArray()
 {
 	return &Zombies;
+}
+
+TArray<ASBotWaypoint*> AZombie_Manager::GetWayPoints()
+{
+	return Waypoints;
+}
+
+TArray<ASZombieCharacter*> AZombie_Manager::GetPatrolZombies()
+{
+	return PatrolZombies;
 }

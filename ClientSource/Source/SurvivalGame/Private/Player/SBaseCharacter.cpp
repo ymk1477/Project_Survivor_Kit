@@ -56,8 +56,8 @@ float ASBaseCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damag
 	/* Modify based based on gametype rules */
 	ASGameMode* MyGameMode = Cast<ASGameMode>(GetWorld()->GetAuthGameMode());
 	Damage = MyGameMode ? MyGameMode->ModifyDamage(Damage, this, DamageEvent, EventInstigator, DamageCauser) : Damage;
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Damage : %f "),
-		Damage));
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Damage : %f "),
+		Damage));*/
 
 	const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
