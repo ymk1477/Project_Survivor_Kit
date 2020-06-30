@@ -24,6 +24,7 @@ class SURVIVALGAME_API AZombie_Manager : public AActor
 	TArray< ASZombieCharacter*> PatrolZombies;
 	TArray< ASBotWaypoint*> Waypoints;
 
+	int32 PatrolZombieNumber;
 public:	
 	// Sets default values for this actor's properties
 	AZombie_Manager();
@@ -49,4 +50,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Zombie WayPoint")
 	TArray<ASBotWaypoint*> GetWayPoints();
 
+	UFUNCTION(BlueprintCallable, Category = "Patrol Zombie")
+	int32 GetPatrolNumber();
 };

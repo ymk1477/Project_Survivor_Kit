@@ -86,6 +86,7 @@ void AZombie_Manager::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	PatrolZombieNumber = 0;
 	FindSpawnPoints();
 	FindWayPoints();
 	SpawnZombies();
@@ -152,4 +153,10 @@ TArray<ASBotWaypoint*> AZombie_Manager::GetWayPoints()
 TArray<ASZombieCharacter*> AZombie_Manager::GetPatrolZombies()
 {
 	return PatrolZombies;
+}
+
+int32 AZombie_Manager::GetPatrolNumber()
+{
+	PatrolZombieNumber++;
+	return PatrolZombieNumber;
 }
