@@ -297,7 +297,9 @@ void Recv_Packet(int clientId, char* buf) {
 			/*cout << "Pitch : " << Player_Info.Rot[clientId].pitch << " Yaw : " << Player_Info.Rot[clientId].yaw
 				<< " Roll : " << Player_Info.Rot[clientId].roll << endl;*/
 				//cout << "VELOCITY - x : " << Player_Info.Vel[clientId].x << " y : " << Player_Info.Vel[clientId].y << " z : " << Player_Info.Vel[clientId].z << endl;
-
+			/*cout << clientId + 1 << "번 플레이어 View : Pitch - " << Player_Info.View[clientId].Rot.pitch
+				<< " Roll - " << Player_Info.View[clientId].Rot.roll << " Yaw - " << Player_Info.View[clientId].Rot.yaw << endl;*/
+			
 			S_Players s_packet;
 			for (int i = 0; i < MAX_USER; ++i) {
 				s_packet.Host = Player_Info.Host;
@@ -465,7 +467,7 @@ void Recv_Packet(int clientId, char* buf) {
 			if (packet->PlayerNum == Player_Info.Host)
 			{
 				Elapsed_Time = packet->ElapsedTime;
-				cout << "Elapsed Time : " << Elapsed_Time << endl;
+				//cout << "Elapsed Time : " << Elapsed_Time << endl;
 			}
 			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
 			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);

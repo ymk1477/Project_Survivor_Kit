@@ -76,6 +76,9 @@ void APlayer_Manager::Tick(float DeltaTime)
 		Player_info.View[PlayerId].Rot.pitch = POVRot.Pitch;
 		Player_info.View[PlayerId].Rot.roll = POVRot.Roll;
 
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player View Rot : Pitch - %f , Roll - %f , Yaw - %f"),
+			Player_info.View[PlayerId].Rot.pitch, Player_info.View[PlayerId].Rot.roll, Player_info.View[PlayerId].Rot.yaw ));*/
+
 		Player_info.WeaponState[PlayerId] = MyPawn->GetOtherWeaponState();
 
 
@@ -115,6 +118,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 				NewAim.Roll = Player_info.Aim[i].roll;
 
 				players[i]->SetOtherHealth(Player_info.HP[i]);
+
 				/*if (players[i]->GetHealth() > Player_info.HP[i])		// 몬스터 동기화 하면서 같이 해줘야함 (TakeDamage).
 				{
 					FPointDamageEvent DmgEvent;
@@ -124,7 +128,8 @@ void APlayer_Manager::Tick(float DeltaTime)
 					players[i]->TakeDamage(DmgEvent.Damage, DmgEvent, GetController(), this);
 				}*/
 
-
+				/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player View Rot : Pitch - %f , Roll - %f , Yaw - %f"),
+					Player_info.View[i].Rot.pitch, Player_info.View[i].Rot.roll, Player_info.View[i].Rot.yaw));*/
 
 				players[i]->SetActorRelativeRotation(NewRotation);
 				players[i]->SetAimOffset(NewAim);
@@ -152,41 +157,41 @@ void APlayer_Manager::Tick(float DeltaTime)
 		}
 		//}
 
-			// 좀비 샌드리시브
-		auto ZombieArray = zombie_manager->GetZombieArray();
-		for (int i = 0; i < ZombieArray->Num(); ++i)
-		{
-			if (Zombie_info.HP[i] < (*ZombieArray)[i]->GetHealth())
-				Zombie_info.Hit[i] = true;
-		}
-		S_Zombies s_zombie_packet;
-		for (int i = 0; i < MAX_ZOMBIE; ++i)
-		{
-			s_zombie_packet.IsAlive[i] = Zombie_info.IsAlive[i];
-			s_zombie_packet.HP[i] = Zombie_info.HP[i];
-			s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
-		}
-		MySocket::sendBuffer(PACKET_CS_ZOMBIE, &S_Packet);
-		for (int i = 0; i < ZombieArray->Num(); ++i)
-		{
-			Zombie_info.Hit[i] = false;
-		}
-		MySocket::RecvPacket();
-		for (int i = 0; i < MAX_ZOMBIE; ++i)
-		{
-			if (Zombie_info.IsAlive[i])
-			{
-				if (Zombie_info.Hit[i])
-				{
-					//FPointDamageEvent PointDmg;
+		//	// 좀비 샌드리시브
+		//auto ZombieArray = zombie_manager->GetZombieArray();
+		//for (int i = 0; i < ZombieArray->Num(); ++i)
+		//{
+		//	if (Zombie_info.HP[i] < (*ZombieArray)[i]->GetHealth())
+		//		Zombie_info.Hit[i] = true;
+		//}
+		//S_Zombies s_zombie_packet;
+		//for (int i = 0; i < MAX_ZOMBIE; ++i)
+		//{
+		//	s_zombie_packet.IsAlive[i] = Zombie_info.IsAlive[i];
+		//	s_zombie_packet.HP[i] = Zombie_info.HP[i];
+		//	s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
+		//}
+		//MySocket::sendBuffer(PACKET_CS_ZOMBIE, &S_Packet);
+		//for (int i = 0; i < ZombieArray->Num(); ++i)
+		//{
+		//	Zombie_info.Hit[i] = false;
+		//}
+		//MySocket::RecvPacket();
+		//for (int i = 0; i < MAX_ZOMBIE; ++i)
+		//{
+		//	if (Zombie_info.IsAlive[i])
+		//	{
+		//		if (Zombie_info.Hit[i])
+		//		{
+		//			//FPointDamageEvent PointDmg;
 
-					//(*ZombieArray)[i]->OthertakeDamage(26.0f, PointDmg, GetWorld()->GetFirstPlayerController(), this);
-				}
-				/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie Hit : %d "),
-					i, Zombie_info.HP[i]));*/
-				Zombie_info.Hit[i] = false;
-			}
-		}
+		//			//(*ZombieArray)[i]->OthertakeDamage(26.0f, PointDmg, GetWorld()->GetFirstPlayerController(), this);
+		//		}
+		//		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie Hit : %d "),
+		//			i, Zombie_info.HP[i]));*/
+		//		Zombie_info.Hit[i] = false;
+		//	}
+		//}
 		/*for (int i = 0; i < ZombieArray->Num(); ++i)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie Hit : %d "),
