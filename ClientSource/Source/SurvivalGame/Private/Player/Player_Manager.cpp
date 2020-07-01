@@ -128,15 +128,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 				NewAim.Roll = Player_info.Aim[i].roll;
 
 				players[i]->SetOtherHealth(Player_info.HP[i]);
-				/*if (players[i]->GetHealth() > Player_info.HP[i])		// 몬스터 동기화 하면서 같이 해줘야함 (TakeDamage).
-				{
-					FPointDamageEvent DmgEvent;
-					DmgEvent.DamageTypeClass = PunchDamageType;
-					DmgEvent.Damage = MeleeDamage;
-
-					players[i]->TakeDamage(DmgEvent.Damage, DmgEvent, GetController(), this);
-				}*/
-
+				
 				/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player View Rot : Pitch - %f , Roll - %f , Yaw - %f"),
 					Player_info.View[i].Rot.pitch, Player_info.View[i].Rot.roll, Player_info.View[i].Rot.yaw));*/
 
@@ -145,14 +137,24 @@ void APlayer_Manager::Tick(float DeltaTime)
 				players[i]->GetMovementComponent()->Velocity = NewVelocity;
 				players[i]->AddMovementInput(NewVelocity);
 
-				FVector Player_Loc;
-				Player_Loc.X = Player_info.Loc[i].x;
-				Player_Loc.Y = Player_info.Loc[i].y;
-				Player_Loc.Z = Player_info.Loc[i].z;
-				const FVector NewLoc = Player_Loc;
-
-				if ((FVector::Dist(players[i]->GetActorLocation(), NewLoc)) > 1.0f)
-					players[i]->SetActorLocation(NewLoc);
+				const FVector NewLoc = NewLocation;
+				
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player GetLoc = X : %f, Y : %f, Z : %f"), i + 1,
+					players[i]->GetActorLocation().X, players[i]->GetActorLocation().Y, players[i]->GetActorLocation().Z));
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player NewLoc = X: %f, Y : %f, Z : %f"), i + 1,
+					NewLoc.X, NewLoc.Y, NewLoc.Z));
+				
+				if ((FVector::Dist(players[i]->GetActorLocation(), NewLoc)) > 3.0f)
+				{
+					//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player Distance > 10.0f"), i + 1));
+					const FVector InterpVec = FMath::VInterpTo(players[i]->GetActorLocation(), NewLoc, DeltaTime, NewVelocity.Size());
+					players[i]->SetActorLocation(InterpVec, true, nullptr, ETeleportType::None);
+					
+				}
+				else
+				{
+					//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player Distance < 10.0f"), i + 1));
+				}
 
 				players[i]->SetIsJumping(Player_info.IsJump[i]);
 				players[i]->SetIsTargeting(Player_info.IsTargeting[i]);
