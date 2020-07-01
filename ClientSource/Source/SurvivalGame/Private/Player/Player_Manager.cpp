@@ -3,7 +3,7 @@
 
 #include "SurvivalGame.h"
 #include "Player_Manager.h"
-
+#include "Math/Vector.h"
 
 
 // Sets default values
@@ -50,6 +50,11 @@ void APlayer_Manager::Tick(float DeltaTime)
 
 		Player_info.HP[PlayerId] = MyPawn->GetHealth();
 
+		FVector MyLocation = MyPawn->GetActorLocation();
+		Player_info.Loc[PlayerId].x = MyLocation.X;
+		Player_info.Loc[PlayerId].y = MyLocation.Y;
+		Player_info.Loc[PlayerId].z = MyLocation.Z;
+
 		FRotator MyRotation = MyPawn->GetActorRotation();
 		Player_info.Rot[PlayerId].yaw = MyRotation.Yaw;
 		Player_info.Rot[PlayerId].pitch = MyRotation.Pitch;
@@ -84,6 +89,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 
 		S_Players S_Packet;
 		S_Packet.HP = Player_info.HP[PlayerId];
+		S_Packet.Loc = Player_info.Loc[PlayerId];
 		S_Packet.Rot = Player_info.Rot[PlayerId];
 		S_Packet.Vel = Player_info.Vel[PlayerId];
 		S_Packet.Aim = Player_info.Aim[PlayerId];
@@ -103,6 +109,10 @@ void APlayer_Manager::Tick(float DeltaTime)
 
 			if ((i != PlayerId) && Player_info.IsUsed[i])
 			{
+				FVector NewLocation;
+				NewLocation.X = Player_info.Loc[i].x;
+				NewLocation.Y = Player_info.Loc[i].y;
+				NewLocation.Z = Player_info.Loc[i].z;
 
 				FRotator NewRotation;
 				NewRotation.Pitch = Player_info.Rot[i].pitch;
@@ -118,7 +128,6 @@ void APlayer_Manager::Tick(float DeltaTime)
 				NewAim.Roll = Player_info.Aim[i].roll;
 
 				players[i]->SetOtherHealth(Player_info.HP[i]);
-
 				/*if (players[i]->GetHealth() > Player_info.HP[i])		// 몬스터 동기화 하면서 같이 해줘야함 (TakeDamage).
 				{
 					FPointDamageEvent DmgEvent;
@@ -135,6 +144,15 @@ void APlayer_Manager::Tick(float DeltaTime)
 				players[i]->SetAimOffset(NewAim);
 				players[i]->GetMovementComponent()->Velocity = NewVelocity;
 				players[i]->AddMovementInput(NewVelocity);
+
+				FVector Player_Loc;
+				Player_Loc.X = Player_info.Loc[i].x;
+				Player_Loc.Y = Player_info.Loc[i].y;
+				Player_Loc.Z = Player_info.Loc[i].z;
+				const FVector NewLoc = Player_Loc;
+
+				if ((FVector::Dist(players[i]->GetActorLocation(), NewLoc)) > 1.0f)
+					players[i]->SetActorLocation(NewLoc);
 
 				players[i]->SetIsJumping(Player_info.IsJump[i]);
 				players[i]->SetIsTargeting(Player_info.IsTargeting[i]);

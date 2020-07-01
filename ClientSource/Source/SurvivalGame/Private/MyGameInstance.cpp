@@ -200,6 +200,7 @@ void MySocket::RecvPacket() {
 				if ( (i != PlayerId) && Player_info.IsUsed[i])
 				{
 					Player_info.HP[i] = packet->HP[i];
+					Player_info.Loc[i] = packet->Loc[i];
 					Player_info.Rot[i] = packet->Rot[i];
 					Player_info.Vel[i] = packet->Vel[i];
 					Player_info.Aim[i] = packet->Aim[i];

@@ -276,6 +276,7 @@ void Recv_Packet(int clientId, char* buf) {
 			///cout << clientId + 1 << "번 플레이어 정보 RECV !!!" << endl;
 
 			Player_Info.HP[clientId] = packet->HP;
+			Player_Info.Loc[clientId] = packet->Loc;
 			Player_Info.Rot[clientId] = packet->Rot;
 			Player_Info.Vel[clientId] = packet->Vel;
 			Player_Info.Aim[clientId] = packet->Aim;
@@ -305,6 +306,7 @@ void Recv_Packet(int clientId, char* buf) {
 				s_packet.Host = Player_Info.Host;
 				s_packet.IsUsed[i] = Player_Info.IsUsed[i];
 				s_packet.HP[i] = Player_Info.HP[i];
+				s_packet.Loc[i] = Player_Info.Loc[i];
 				s_packet.Rot[i] = Player_Info.Rot[i];
 				s_packet.Vel[i] = Player_Info.Vel[i];
 				s_packet.Aim[i] = Player_Info.Aim[i];
