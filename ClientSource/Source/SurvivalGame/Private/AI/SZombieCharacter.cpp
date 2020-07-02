@@ -7,6 +7,8 @@
 #include "SBaseCharacter.h"
 #include "SBotWaypoint.h"
 #include "SPlayerState.h"
+#include "Zombie_Manager.h"
+#include "Player_Manager.h"
 
 /* AI Include */
 #include "Perception/PawnSensingComponent.h"
@@ -65,6 +67,24 @@ void ASZombieCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UWorld* CurrentWorld = GetWorld();
+	TActorIterator<APlayer_Manager> Player_It(GetWorld());
+	TActorIterator<AZombie_Manager> Zombie_It(GetWorld());
+	Players = (*Player_It)->GetPlayerArray();
+	Zombies = (*Zombie_It)->GetZombieArray();
+
+	Zombie_Index = 0;
+	for (int i = 0; i < MAX_ZOMBIE; ++i)
+	{
+		if (Zombie_info.IsAlive[i])
+		{
+			if (this == (*Zombies)[i])
+			{
+				Zombie_Index = i;
+			}
+		}
+	}
+
 	/* This is the earliest moment we can bind our delegates to the component */
 	if (PawnSensingComp)
 	{
@@ -85,6 +105,7 @@ void ASZombieCharacter::BeginPlay()
 		PS->SetPlayerName("Bot");
 		PS->bIsABot = true;
 	}
+
 }
 
 
@@ -102,6 +123,7 @@ void ASZombieCharacter::Tick(float DeltaSeconds)
 			bSensedTarget = false;
 			/* Reset */
 			AIController->SetTargetEnemy(nullptr);
+			Zombie_info.Target[Zombie_Index] = -1;
 
 			/* Stop playing the hunting sound */
 			BroadcastUpdateAudioLoop(false);
@@ -128,10 +150,24 @@ void ASZombieCharacter::OnSeePlayer(APawn* Pawn)
 
 	ASZombieAIController* AIController = Cast<ASZombieAIController>(GetController());
 	ASBaseCharacter* SensedPawn = Cast<ASBaseCharacter>(Pawn);
-	if (AIController && SensedPawn->IsAlive())
+	
+	
+	for (int i = 0; i < MAX_USER; ++i)
 	{
-		AIController->SetTargetEnemy(SensedPawn);
+		if (Player_info.IsUsed[i])
+		{
+			if (SensedPawn == Cast<ASBaseCharacter>(Players[i]))
+			{
+				if (AIController && SensedPawn->IsAlive())
+				{
+					AIController->SetTargetEnemy(SensedPawn);
+					Zombie_info.Target[Zombie_Index] = i;
+				}
+			}
+		}
 	}
+
+	
 }
 
 
@@ -147,14 +183,27 @@ void ASZombieCharacter::OnHearNoise(APawn* PawnInstigator, const FVector& Locati
 		BroadcastUpdateAudioLoop(true);
 	}
 
+
 	bSensedTarget = true;
 	LastHeardTime = GetWorld()->GetTimeSeconds();
 
 	ASZombieAIController* AIController = Cast<ASZombieAIController>(GetController());
-	if (AIController)
+
+	for (int i = 0; i < MAX_USER; ++i)
 	{
-		AIController->SetTargetEnemy(PawnInstigator);
+		if (Player_info.IsUsed[i])
+		{
+			if (PawnInstigator == Cast<APawn>(Players[i]))
+			{
+				if (AIController)
+				{
+					AIController->SetTargetEnemy(PawnInstigator);
+					Zombie_info.Target[Zombie_Index] = i;
+				}
+			}
+		}
 	}
+
 }
 
 
@@ -313,4 +362,9 @@ void ASZombieCharacter::BroadcastUpdateAudioLoop_Implementation(bool bNewSensedT
 			AudioLoopComp->Play();
 		}
 	}
+}
+
+void ASZombieCharacter::SetHP(float hp)
+{
+	Health = hp;
 }

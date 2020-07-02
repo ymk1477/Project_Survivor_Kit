@@ -104,6 +104,7 @@ void AZombie_Manager::Tick(float DeltaTime)
 		{
 			if (Zombies[i]->IsDie())
 			{
+				Zombie_info.IsAlive[i] = false;
 				indexNum = i;
 				break;
 			}

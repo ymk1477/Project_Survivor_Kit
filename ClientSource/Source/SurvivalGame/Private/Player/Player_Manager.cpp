@@ -3,6 +3,7 @@
 
 #include "SurvivalGame.h"
 #include "Player_Manager.h"
+
 #include "Math/Vector.h"
 
 
@@ -139,10 +140,10 @@ void APlayer_Manager::Tick(float DeltaTime)
 
 				const FVector NewLoc = NewLocation;
 				
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player GetLoc = X : %f, Y : %f, Z : %f"), i + 1,
+				/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player GetLoc = X : %f, Y : %f, Z : %f"), i + 1,
 					players[i]->GetActorLocation().X, players[i]->GetActorLocation().Y, players[i]->GetActorLocation().Z));
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player NewLoc = X: %f, Y : %f, Z : %f"), i + 1,
-					NewLoc.X, NewLoc.Y, NewLoc.Z));
+					NewLoc.X, NewLoc.Y, NewLoc.Z));*/
 				
 				if ((FVector::Dist(players[i]->GetActorLocation(), NewLoc)) > 3.0f)
 				{
@@ -175,65 +176,75 @@ void APlayer_Manager::Tick(float DeltaTime)
 			}
 
 		}
-		//}
 
-		//	// 좀비 샌드리시브
-		//auto ZombieArray = zombie_manager->GetZombieArray();
-		//for (int i = 0; i < ZombieArray->Num(); ++i)
-		//{
-		//	if (Zombie_info.HP[i] < (*ZombieArray)[i]->GetHealth())
-		//		Zombie_info.Hit[i] = true;
-		//}
-		//S_Zombies s_zombie_packet;
-		//for (int i = 0; i < MAX_ZOMBIE; ++i)
-		//{
-		//	s_zombie_packet.IsAlive[i] = Zombie_info.IsAlive[i];
-		//	s_zombie_packet.HP[i] = Zombie_info.HP[i];
-		//	s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
-		//}
-		//MySocket::sendBuffer(PACKET_CS_ZOMBIE, &S_Packet);
-		//for (int i = 0; i < ZombieArray->Num(); ++i)
-		//{
-		//	Zombie_info.Hit[i] = false;
-		//}
-		//MySocket::RecvPacket();
-		//for (int i = 0; i < MAX_ZOMBIE; ++i)
-		//{
-		//	if (Zombie_info.IsAlive[i])
-		//	{
-		//		if (Zombie_info.Hit[i])
-		//		{
-		//			//FPointDamageEvent PointDmg;
-
-		//			//(*ZombieArray)[i]->OthertakeDamage(26.0f, PointDmg, GetWorld()->GetFirstPlayerController(), this);
-		//		}
-		//		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie Hit : %d "),
-		//			i, Zombie_info.HP[i]));*/
-		//		Zombie_info.Hit[i] = false;
-		//	}
-		//}
-		/*for (int i = 0; i < ZombieArray->Num(); ++i)
+		// 좀비 샌드리시브
+		auto ZombieArray = zombie_manager->GetZombieArray();
+		
+		for (int i = 0; i < MAX_ZOMBIE; ++i)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Zombie Hit : %d "),
-				i, (*ZombieArray)[i]->GetHealth()));
-		}*/
+			if(Zombie_info.IsAlive[i])
+				Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
+		}
+
+		S_Zombies s_zombie_packet;
+		for (int i = 0; i < MAX_ZOMBIE; ++i)
+		{
+			s_zombie_packet.IsAlive[i] = Zombie_info.IsAlive[i];
+			s_zombie_packet.Target[i] = Zombie_info.Target[i];
+			s_zombie_packet.HP[i] = Zombie_info.HP[i];
+			//s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
+		}
+		MySocket::sendBuffer(PACKET_CS_ZOMBIE, &S_Packet);
+		
+		MySocket::RecvPacket();
+		for (int i = 0; i < MAX_ZOMBIE; ++i)
+		{
+			if (Zombie_info.IsAlive[i])
+			{
+				if (Zombie_info.HP[i] > (*ZombieArray)[i]->GetHealth())
+				{
+					Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
+				}
+				else if (Zombie_info.HP[i] < (*ZombieArray)[i]->GetHealth())
+				{
+					(*ZombieArray)[i]->SetHP(Zombie_info.HP[i]);
+				}
+
+				ASZombieAIController* ZombieController = Cast<ASZombieAIController>((*ZombieArray)[i]->GetController());
+				if(ZombieController -> GetTargetEnemy())
+				{
+					if (ZombieController->GetTargetEnemy() != players[Zombie_info.Target[i]])
+					{
+						ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
+					}
+				}
+				else
+				{
+					if (Zombie_info.Target[i] != -1)
+					{
+						ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
+					}
+				}
+			}
+		}
+	
 
 		// 시간 샌드리시브
-		ASGameState* MyGameState = Cast<ASGameState>(GetWorld()->GetAuthGameMode()->GameState);
-		S_Time Timepacket;
-		Timepacket.PlayerNum = PlayerId;
-		if (PlayerId == HostPlayer)
-		{
-			
-			Timepacket.ElapsedTime = MyGameState->ElapsedGameMinutes;
-		}
-		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Elapsed Time : %d"), 
-			MyGameState->ElapsedGameMinutes));*/
-		MySocket::sendBuffer(PACKET_CS_TIME, &Timepacket);
-		MySocket::RecvPacket();
-		UMyGameInstance* MyInstance = Cast<UMyGameInstance>(GetWorld()->GetGameInstance());
-		if(!(MyInstance->IsHost()))
-			MyGameState->ElapsedGameMinutes = Elapsed_Time;
+		//ASGameState* MyGameState = Cast<ASGameState>(GetWorld()->GetAuthGameMode()->GameState);
+		//S_Time Timepacket;
+		//Timepacket.PlayerNum = PlayerId;
+		//if (PlayerId == HostPlayer)
+		//{
+		//	
+		//	Timepacket.ElapsedTime = MyGameState->ElapsedGameMinutes;
+		//}
+		///*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Elapsed Time : %d"), 
+		//	MyGameState->ElapsedGameMinutes));*/
+		//MySocket::sendBuffer(PACKET_CS_TIME, &Timepacket);
+		//MySocket::RecvPacket();
+		//UMyGameInstance* MyInstance = Cast<UMyGameInstance>(GetWorld()->GetGameInstance());
+		//if(!(MyInstance->IsHost()))
+		//	MyGameState->ElapsedGameMinutes = Elapsed_Time;
 		
 	}
 }
