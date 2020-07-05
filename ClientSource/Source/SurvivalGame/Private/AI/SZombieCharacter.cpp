@@ -13,6 +13,10 @@
 /* AI Include */
 #include "Perception/PawnSensingComponent.h"
 
+TArray<ASCharacter*> Players;
+TArray<ASZombieCharacter*>* Zombies;
+int Zombie_Index;
+
 // Sets default values
 ASZombieCharacter::ASZombieCharacter(const class FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
@@ -67,23 +71,7 @@ void ASZombieCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UWorld* CurrentWorld = GetWorld();
-	TActorIterator<APlayer_Manager> Player_It(GetWorld());
-	TActorIterator<AZombie_Manager> Zombie_It(GetWorld());
-	Players = (*Player_It)->GetPlayerArray();
-	Zombies = (*Zombie_It)->GetZombieArray();
-
-	Zombie_Index = 0;
-	for (int i = 0; i < MAX_ZOMBIE; ++i)
-	{
-		if (Zombie_info.IsAlive[i])
-		{
-			if (this == (*Zombies)[i])
-			{
-				Zombie_Index = i;
-			}
-		}
-	}
+	
 
 	/* This is the earliest moment we can bind our delegates to the component */
 	if (PawnSensingComp)
@@ -150,13 +138,33 @@ void ASZombieCharacter::OnSeePlayer(APawn* Pawn)
 
 	ASZombieAIController* AIController = Cast<ASZombieAIController>(GetController());
 	ASBaseCharacter* SensedPawn = Cast<ASBaseCharacter>(Pawn);
-	
+	UWorld* CurrentWorld = GetWorld();
+	TActorIterator<APlayer_Manager> Player_It(GetWorld());
+	TActorIterator<AZombie_Manager> Zombie_It(GetWorld());
+	Players = (*Player_It)->GetPlayerArray();
+	Zombies = (*Zombie_It)->GetZombieArray();
+
+	Zombie_Index = 0;
+	for (int i = 0; i < MAX_ZOMBIE; ++i)
+	{
+		if (Zombie_info.IsAlive[i])
+		{
+			if ((*Zombies).IsValidIndex(i))
+			{
+				if (this == (*Zombies)[i])
+				{
+					Zombie_Index = i;
+				}
+			}
+		}
+	}
 	
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		if (Player_info.IsUsed[i])
 		{
-			if (SensedPawn == Cast<ASBaseCharacter>(Players[i]))
+			ASBaseCharacter* TestPawn = Cast<ASBaseCharacter>(Players[i]);
+			if (SensedPawn == TestPawn)
 			{
 				if (AIController && SensedPawn->IsAlive())
 				{
@@ -188,7 +196,26 @@ void ASZombieCharacter::OnHearNoise(APawn* PawnInstigator, const FVector& Locati
 	LastHeardTime = GetWorld()->GetTimeSeconds();
 
 	ASZombieAIController* AIController = Cast<ASZombieAIController>(GetController());
+	UWorld* CurrentWorld = GetWorld();
+	TActorIterator<APlayer_Manager> Player_It(GetWorld());
+	TActorIterator<AZombie_Manager> Zombie_It(GetWorld());
+	Players = (*Player_It)->GetPlayerArray();
+	Zombies = (*Zombie_It)->GetZombieArray();
 
+	Zombie_Index = 0;
+	for (int i = 0; i < MAX_ZOMBIE; ++i)
+	{
+		if (Zombie_info.IsAlive[i])
+		{
+			if ((*Zombies).IsValidIndex(i))
+			{
+				if (this == (*Zombies)[i])
+				{
+					Zombie_Index = i;
+				}
+			}
+		}
+	}
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		if (Player_info.IsUsed[i])

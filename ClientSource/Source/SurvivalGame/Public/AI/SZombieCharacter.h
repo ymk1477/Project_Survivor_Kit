@@ -5,6 +5,7 @@
 #include "SBaseCharacter.h"
 #include "MyGameInstance.h"
 
+
 #include "SZombieCharacter.generated.h"
 
 UCLASS(ABSTRACT)
@@ -12,9 +13,7 @@ class SURVIVALGAME_API ASZombieCharacter : public ASBaseCharacter
 {
 	GENERATED_BODY()
 
-	TArray<ASCharacter*> Players;
-	TArray<ASZombieCharacter*>* Zombies;
-	int Zombie_Index;
+
 
 	/* Last time the player was spotted */
 	float LastSeenTime;

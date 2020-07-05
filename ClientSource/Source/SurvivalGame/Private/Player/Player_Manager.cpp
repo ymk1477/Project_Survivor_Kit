@@ -182,8 +182,13 @@ void APlayer_Manager::Tick(float DeltaTime)
 		
 		for (int i = 0; i < MAX_ZOMBIE; ++i)
 		{
-			if(Zombie_info.IsAlive[i])
-				Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
+			if (Zombie_info.IsAlive[i])
+			{
+				if (ZombieArray->IsValidIndex(i))
+				{
+					Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();		
+				}
+			}
 		}
 
 		S_Zombies s_zombie_packet;
@@ -201,28 +206,34 @@ void APlayer_Manager::Tick(float DeltaTime)
 		{
 			if (Zombie_info.IsAlive[i])
 			{
-				if (Zombie_info.HP[i] > (*ZombieArray)[i]->GetHealth())
+				if (ZombieArray->IsValidIndex(i))
 				{
-					Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
-				}
-				else if (Zombie_info.HP[i] < (*ZombieArray)[i]->GetHealth())
-				{
-					(*ZombieArray)[i]->SetHP(Zombie_info.HP[i]);
-				}
-
-				ASZombieAIController* ZombieController = Cast<ASZombieAIController>((*ZombieArray)[i]->GetController());
-				if(ZombieController -> GetTargetEnemy())
-				{
-					if (ZombieController->GetTargetEnemy() != players[Zombie_info.Target[i]])
+					if (Zombie_info.HP[i] > (*ZombieArray)[i]->GetHealth())
 					{
-						ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
+						Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
 					}
-				}
-				else
-				{
-					if (Zombie_info.Target[i] != -1)
+					else if (Zombie_info.HP[i] < (*ZombieArray)[i]->GetHealth())
 					{
-						ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
+						(*ZombieArray)[i]->SetHP(Zombie_info.HP[i]);
+					}
+
+					ASZombieAIController* ZombieController = Cast<ASZombieAIController>((*ZombieArray)[i]->GetController());
+					if (ZombieController->GetTargetEnemy())
+					{
+						if (Zombie_info.Target[i] != -1)
+						{
+							if (ZombieController->GetTargetEnemy() != players[Zombie_info.Target[i]])
+							{
+								ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
+							}
+						}
+					}
+					else
+					{
+						if (Zombie_info.Target[i] != -1)
+						{
+							ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
+						}
 					}
 				}
 			}
