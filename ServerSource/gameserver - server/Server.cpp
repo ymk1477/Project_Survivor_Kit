@@ -510,6 +510,105 @@ void Recv_Packet(int clientId, char* buf) {
 			}
 		}
 		break;
+		case PACKET_CS_COMBINE:
+		{
+			R_Combine* packet = reinterpret_cast<R_Combine*>(buf);
+			Player_Info.HP[clientId] = packet->player.HP;
+			Player_Info.Loc[clientId] = packet->player.Loc;
+			Player_Info.Rot[clientId] = packet->player.Rot;
+			Player_Info.Vel[clientId] = packet->player.Vel;
+			Player_Info.Aim[clientId] = packet->player.Aim;
+			Player_Info.IsJump[clientId] = packet->player.IsJump;
+			Player_Info.isTargeting[clientId] = packet->player.isTargeting;
+			Player_Info.IsSprinting[clientId] = packet->player.IsSprinting;
+			Player_Info.onCrouchToggle[clientId] = packet->player.onCrouchToggle;
+			Player_Info.WeaponState[clientId] = packet->player.WeaponState;
+			Player_Info.View[clientId] = packet->player.View;
+
+			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			{
+				Zombie_Info.IsAlive[i] = packet->zombie.IsAlive[i];
+				Zombie_Info.Target[i] = packet->zombie.Target[i];
+				Zombie_Info.HP[i] = packet->zombie.HP[i];
+				//Zombie_Info.Hit[i] = packet->Hit[i];
+			}
+
+			if (packet->time.PlayerNum == Player_Info.Host)
+			{
+				Elapsed_Time = packet->time.ElapsedTime;
+				//cout << "Elapsed Time : " << Elapsed_Time << endl;
+			}
+
+			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
+			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
+
+			memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
+			g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
+
+			S_Players S_Player_Packet;
+			for (int i = 0; i < MAX_USER; ++i) {
+				S_Player_Packet.Host = Player_Info.Host;
+				S_Player_Packet.IsUsed[i] = Player_Info.IsUsed[i];
+				S_Player_Packet.HP[i] = Player_Info.HP[i];
+				S_Player_Packet.Loc[i] = Player_Info.Loc[i];
+				S_Player_Packet.Rot[i] = Player_Info.Rot[i];
+				S_Player_Packet.Vel[i] = Player_Info.Vel[i];
+				S_Player_Packet.Aim[i] = Player_Info.Aim[i];
+				S_Player_Packet.IsJump[i] = Player_Info.IsJump[i];
+				S_Player_Packet.isTargeting[i] = Player_Info.isTargeting[i];
+				S_Player_Packet.IsSprinting[i] = Player_Info.IsSprinting[i];
+				S_Player_Packet.onCrouchToggle[i] = Player_Info.onCrouchToggle[i];
+				S_Player_Packet.WeaponState[i] = Player_Info.WeaponState[i];
+				S_Player_Packet.View[i] = Player_Info.View[i];
+			}
+
+			S_Zombies S_Zombie_Packet;
+			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			{
+				S_Zombie_Packet.IsAlive[i] = Zombie_Info.IsAlive[i];
+				S_Zombie_Packet.HP[i] = Zombie_Info.HP[i];
+				S_Zombie_Packet.Target[i] = Zombie_Info.Target[i];
+				//s_packet.Hit[i] = Zombie_Info.Hit[i];
+			}
+
+			S_Time S_Time_Packet;
+			S_Time_Packet.ElapsedTime = Elapsed_Time;
+
+			S_Combine S_Combine_Packet;
+			S_Combine_Packet.player = S_Player_Packet;
+			S_Combine_Packet.zombie = S_Zombie_Packet;
+			S_Combine_Packet.time = S_Time_Packet;
+
+			for (int i = 0; i < MAX_USER; ++i) {
+				if (Player_Info.IsUsed[i]) {
+
+					OVER_EX* SendingOverlapped = new OVER_EX;
+
+					SendingOverlapped->dataBuffer.len = sizeof(S_Combine_Packet);
+					memset(&(SendingOverlapped->overlapped), 0x00, sizeof(WSAOVERLAPPED));
+					SendingOverlapped->overlapped.hEvent = (HANDLE)i;
+
+					SendingOverlapped->dataBuffer.buf = reinterpret_cast<char*>(&S_Combine_Packet);
+
+					retval = WSASend(g_clients[i].socket, &(SendingOverlapped->dataBuffer), 1, NULL, 0,	 // ¼öÁ¤
+						&(SendingOverlapped->overlapped), send_callback);
+
+					if (retval == SOCKET_ERROR)
+					{
+						if (WSAGetLastError() != WSA_IO_PENDING)
+						{
+							printf("Error - %d CLINET Fail WSASend(error_code : %d)\n", i, WSAGetLastError());
+						}
+						else
+						{
+							delete SendingOverlapped;
+						}
+					}
+				}
+			}
+
+		}
+		break;
 		}
 	}
 	recving[clientId] = false;

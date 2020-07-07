@@ -88,109 +88,32 @@ void APlayer_Manager::Tick(float DeltaTime)
 		Player_info.WeaponState[PlayerId] = MyPawn->GetOtherWeaponState();
 
 
-		S_Players S_Packet;
-		S_Packet.HP = Player_info.HP[PlayerId];
-		S_Packet.Loc = Player_info.Loc[PlayerId];
-		S_Packet.Rot = Player_info.Rot[PlayerId];
-		S_Packet.Vel = Player_info.Vel[PlayerId];
-		S_Packet.Aim = Player_info.Aim[PlayerId];
-		S_Packet.IsJump = Player_info.IsJump[PlayerId];
-		S_Packet.IsTargeting = Player_info.IsTargeting[PlayerId];
-		S_Packet.IsSprinting = Player_info.IsSprinting[PlayerId];
-		S_Packet.onCrouchToggle = Player_info.onCrouchToggle[PlayerId];
-		S_Packet.WeaponState = Player_info.WeaponState[PlayerId];
-		S_Packet.View = Player_info.View[PlayerId];
-		MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Packet);
+		S_Players S_Player_Packet;
+		S_Player_Packet.HP = Player_info.HP[PlayerId];
+		S_Player_Packet.Loc = Player_info.Loc[PlayerId];
+		S_Player_Packet.Rot = Player_info.Rot[PlayerId];
+		S_Player_Packet.Vel = Player_info.Vel[PlayerId];
+		S_Player_Packet.Aim = Player_info.Aim[PlayerId];
+		S_Player_Packet.IsJump = Player_info.IsJump[PlayerId];
+		S_Player_Packet.IsTargeting = Player_info.IsTargeting[PlayerId];
+		S_Player_Packet.IsSprinting = Player_info.IsSprinting[PlayerId];
+		S_Player_Packet.onCrouchToggle = Player_info.onCrouchToggle[PlayerId];
+		S_Player_Packet.WeaponState = Player_info.WeaponState[PlayerId];
+		S_Player_Packet.View = Player_info.View[PlayerId];
+		//MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Packet);
 		Player_info.onCrouchToggle[PlayerId] = false;
 
-		MySocket::RecvPacket();
-
-		for (int i = 0; i < MAX_USER; ++i)
-		{
-
-			if ((i != PlayerId) && Player_info.IsUsed[i])
-			{
-				FVector NewLocation;
-				NewLocation.X = Player_info.Loc[i].x;
-				NewLocation.Y = Player_info.Loc[i].y;
-				NewLocation.Z = Player_info.Loc[i].z;
-
-				FRotator NewRotation;
-				NewRotation.Pitch = Player_info.Rot[i].pitch;
-				NewRotation.Yaw = Player_info.Rot[i].yaw;
-				NewRotation.Roll = Player_info.Rot[i].roll;
-				FVector NewVelocity;
-				NewVelocity.X = Player_info.Vel[i].x;
-				NewVelocity.Y = Player_info.Vel[i].y;
-				NewVelocity.Z = Player_info.Vel[i].z;
-				FRotator NewAim;
-				NewAim.Pitch = Player_info.Aim[i].pitch;
-				NewAim.Yaw = Player_info.Aim[i].yaw;
-				NewAim.Roll = Player_info.Aim[i].roll;
-
-				players[i]->SetOtherHealth(Player_info.HP[i]);
-				
-				/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player View Rot : Pitch - %f , Roll - %f , Yaw - %f"),
-					Player_info.View[i].Rot.pitch, Player_info.View[i].Rot.roll, Player_info.View[i].Rot.yaw));*/
-
-				players[i]->SetActorRelativeRotation(NewRotation);
-				players[i]->SetAimOffset(NewAim);
-				players[i]->GetMovementComponent()->Velocity = NewVelocity;
-				players[i]->AddMovementInput(NewVelocity);
-
-				const FVector NewLoc = NewLocation;
-				
-				/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player GetLoc = X : %f, Y : %f, Z : %f"), i + 1,
-					players[i]->GetActorLocation().X, players[i]->GetActorLocation().Y, players[i]->GetActorLocation().Z));
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player NewLoc = X: %f, Y : %f, Z : %f"), i + 1,
-					NewLoc.X, NewLoc.Y, NewLoc.Z));*/
-				
-				if ((FVector::Dist(players[i]->GetActorLocation(), NewLoc)) > 3.0f)
-				{
-					//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player Distance > 10.0f"), i + 1));
-					const FVector InterpVec = FMath::VInterpTo(players[i]->GetActorLocation(), NewLoc, DeltaTime, NewVelocity.Size());
-					players[i]->SetActorLocation(InterpVec, true, nullptr, ETeleportType::None);
-					
-				}
-				else
-				{
-					//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player Distance < 10.0f"), i + 1));
-				}
-
-				players[i]->SetIsJumping(Player_info.IsJump[i]);
-				players[i]->SetIsTargeting(Player_info.IsTargeting[i]);
-				players[i]->SetSprinting(Player_info.IsSprinting[i]);
-				if (Player_info.onCrouchToggle[i])
-					players[i]->OnCrouchToggle();
-				if (Player_info.WeaponState[i] == WEAPON_FIRING)
-				{
-					players[i]->StartFiringOther();
-				}
-				else if (Player_info.WeaponState[i] == WEAPON_RELOADING)
-				{
-
-					players[i]->ReloadingOther();
-				}
-				else
-					players[i]->StopFiringOther();
-			}
-
-		}
-
-		// 좀비 샌드리시브
 		auto ZombieArray = zombie_manager->GetZombieArray();
-		
 		for (int i = 0; i < MAX_ZOMBIE; ++i)
 		{
 			if (Zombie_info.IsAlive[i])
 			{
 				if (ZombieArray->IsValidIndex(i))
 				{
-					Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();		
+					Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
 				}
 			}
 		}
-
 		S_Zombies s_zombie_packet;
 		for (int i = 0; i < MAX_ZOMBIE; ++i)
 		{
@@ -199,64 +122,180 @@ void APlayer_Manager::Tick(float DeltaTime)
 			s_zombie_packet.HP[i] = Zombie_info.HP[i];
 			//s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
 		}
-		MySocket::sendBuffer(PACKET_CS_ZOMBIE, &S_Packet);
-		
-		MySocket::RecvPacket();
-		for (int i = 0; i < MAX_ZOMBIE; ++i)
+
+		ASGameState* MyGameState = Cast<ASGameState>(GetWorld()->GetAuthGameMode()->GameState);
+		S_Time S_Time_packet;
+		S_Time_packet.PlayerNum = PlayerId;
+		if (PlayerId == HostPlayer)
 		{
-			if (Zombie_info.IsAlive[i])
+
+			S_Time_packet.ElapsedTime = MyGameState->ElapsedGameMinutes;
+		}
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Elapsed Time : %d"),
+			MyGameState->ElapsedGameMinutes));*/
+		
+		S_Combine S_Combine_Packet;
+		S_Combine_Packet.player = S_Player_Packet;
+		S_Combine_Packet.zombie = s_zombie_packet;
+		S_Combine_Packet.time = S_Time_packet;
+
+		MySocket::sendBuffer(PACKET_CS_COMBINE, &S_Combine_Packet);
+		MySocket::RecvPacket();
+
+		if (Playing > 1)
+		{
+			for (int i = 0; i < MAX_USER; ++i)
 			{
-				if (ZombieArray->IsValidIndex(i))
+
+				if ((i != PlayerId) && Player_info.IsUsed[i])
 				{
-					if (Zombie_info.HP[i] > (*ZombieArray)[i]->GetHealth())
+					FVector NewLocation;
+					NewLocation.X = Player_info.Loc[i].x;
+					NewLocation.Y = Player_info.Loc[i].y;
+					NewLocation.Z = Player_info.Loc[i].z;
+
+					FRotator NewRotation;
+					NewRotation.Pitch = Player_info.Rot[i].pitch;
+					NewRotation.Yaw = Player_info.Rot[i].yaw;
+					NewRotation.Roll = Player_info.Rot[i].roll;
+					FVector NewVelocity;
+					NewVelocity.X = Player_info.Vel[i].x;
+					NewVelocity.Y = Player_info.Vel[i].y;
+					NewVelocity.Z = Player_info.Vel[i].z;
+					FRotator NewAim;
+					NewAim.Pitch = Player_info.Aim[i].pitch;
+					NewAim.Yaw = Player_info.Aim[i].yaw;
+					NewAim.Roll = Player_info.Aim[i].roll;
+
+					players[i]->SetOtherHealth(Player_info.HP[i]);
+
+					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player View Rot : Pitch - %f , Roll - %f , Yaw - %f"),
+						Player_info.View[i].Rot.pitch, Player_info.View[i].Rot.roll, Player_info.View[i].Rot.yaw));*/
+
+					players[i]->SetActorRelativeRotation(NewRotation);
+					players[i]->SetAimOffset(NewAim);
+					players[i]->GetMovementComponent()->Velocity = NewVelocity;
+					players[i]->AddMovementInput(NewVelocity);
+
+					const FVector NewLoc = NewLocation;
+
+					/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player GetLoc = X : %f, Y : %f, Z : %f"), i + 1,
+						players[i]->GetActorLocation().X, players[i]->GetActorLocation().Y, players[i]->GetActorLocation().Z));
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player NewLoc = X: %f, Y : %f, Z : %f"), i + 1,
+						NewLoc.X, NewLoc.Y, NewLoc.Z));*/
+
+					if ((FVector::Dist(players[i]->GetActorLocation(), NewLoc)) > 3.0f)
 					{
-						Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
+						//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player Distance > 10.0f"), i + 1));
+						const FVector InterpVec = FMath::VInterpTo(players[i]->GetActorLocation(), NewLoc, DeltaTime, NewVelocity.Size());
+						players[i]->SetActorLocation(InterpVec, true, nullptr, ETeleportType::None);
+
 					}
-					else if (Zombie_info.HP[i] < (*ZombieArray)[i]->GetHealth())
+					else
 					{
-						(*ZombieArray)[i]->SetHP(Zombie_info.HP[i]);
+						//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player Distance < 10.0f"), i + 1));
 					}
 
-					ASZombieAIController* ZombieController = Cast<ASZombieAIController>((*ZombieArray)[i]->GetController());
-					if (ZombieController->GetTargetEnemy())
+					players[i]->SetIsJumping(Player_info.IsJump[i]);
+					players[i]->SetIsTargeting(Player_info.IsTargeting[i]);
+					players[i]->SetSprinting(Player_info.IsSprinting[i]);
+					if (Player_info.onCrouchToggle[i])
+						players[i]->OnCrouchToggle();
+					if (Player_info.WeaponState[i] == WEAPON_FIRING)
 					{
-						if (Zombie_info.Target[i] != -1)
+						players[i]->StartFiringOther();
+					}
+					else if (Player_info.WeaponState[i] == WEAPON_RELOADING)
+					{
+
+						players[i]->ReloadingOther();
+					}
+					else
+						players[i]->StopFiringOther();
+				}
+
+			}
+
+			// 좀비 샌드리시브
+			//auto ZombieArray = zombie_manager->GetZombieArray();
+
+			//for (int i = 0; i < MAX_ZOMBIE; ++i)
+			//{
+			//	if (Zombie_info.IsAlive[i])
+			//	{
+			//		if (ZombieArray->IsValidIndex(i))
+			//		{
+			//			Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
+			//		}
+			//	}
+			//}
+
+			//S_Zombies s_zombie_packet;
+			//for (int i = 0; i < MAX_ZOMBIE; ++i)
+			//{
+			//	s_zombie_packet.IsAlive[i] = Zombie_info.IsAlive[i];
+			//	s_zombie_packet.Target[i] = Zombie_info.Target[i];
+			//	s_zombie_packet.HP[i] = Zombie_info.HP[i];
+			//	//s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
+			//}
+			//MySocket::sendBuffer(PACKET_CS_ZOMBIE, &S_Packet);
+
+			//MySocket::RecvPacket();
+			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			{
+				if (Zombie_info.IsAlive[i])
+				{
+					if (ZombieArray->IsValidIndex(i))
+					{
+						if (Zombie_info.HP[i] > (*ZombieArray)[i]->GetHealth())
 						{
-							if (ZombieController->GetTargetEnemy() != players[Zombie_info.Target[i]])
+							Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
+						}
+						else if (Zombie_info.HP[i] < (*ZombieArray)[i]->GetHealth())
+						{
+							(*ZombieArray)[i]->SetHP(Zombie_info.HP[i]);
+						}
+
+						ASZombieAIController* ZombieController = Cast<ASZombieAIController>((*ZombieArray)[i]->GetController());
+						if (ZombieController->GetTargetEnemy())
+						{
+							if (Zombie_info.Target[i] != -1)
+							{
+								if (ZombieController->GetTargetEnemy() != players[Zombie_info.Target[i]])
+								{
+									ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
+								}
+							}
+						}
+						else
+						{
+							if (Zombie_info.Target[i] != -1)
 							{
 								ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
 							}
 						}
 					}
-					else
-					{
-						if (Zombie_info.Target[i] != -1)
-						{
-							ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
-						}
-					}
 				}
 			}
-		}
-	
 
-		// 시간 샌드리시브
-		//ASGameState* MyGameState = Cast<ASGameState>(GetWorld()->GetAuthGameMode()->GameState);
-		//S_Time Timepacket;
-		//Timepacket.PlayerNum = PlayerId;
-		//if (PlayerId == HostPlayer)
-		//{
-		//	
-		//	Timepacket.ElapsedTime = MyGameState->ElapsedGameMinutes;
-		//}
-		///*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Elapsed Time : %d"), 
-		//	MyGameState->ElapsedGameMinutes));*/
-		//MySocket::sendBuffer(PACKET_CS_TIME, &Timepacket);
-		//MySocket::RecvPacket();
-		//UMyGameInstance* MyInstance = Cast<UMyGameInstance>(GetWorld()->GetGameInstance());
-		//if(!(MyInstance->IsHost()))
-		//	MyGameState->ElapsedGameMinutes = Elapsed_Time;
-		
+
+			// 시간 샌드리시브
+			//ASGameState* MyGameState = Cast<ASGameState>(GetWorld()->GetAuthGameMode()->GameState);
+			//S_Time Timepacket;
+			//Timepacket.PlayerNum = PlayerId;
+			//if (PlayerId == HostPlayer)
+			//{
+			//	
+			//	Timepacket.ElapsedTime = MyGameState->ElapsedGameMinutes;
+			//}
+			///*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Elapsed Time : %d"), 
+			//	MyGameState->ElapsedGameMinutes));*/
+			//MySocket::sendBuffer(PACKET_CS_TIME, &Timepacket);
+			//MySocket::RecvPacket();
+			UMyGameInstance* MyInstance = Cast<UMyGameInstance>(GetWorld()->GetGameInstance());
+			if(!(MyInstance->IsHost()))
+				MyGameState->ElapsedGameMinutes = Elapsed_Time;
+		}
 	}
 }
 

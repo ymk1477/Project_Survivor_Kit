@@ -37,6 +37,9 @@ using namespace std;
 #define PACKET_SC_TIME 600
 #define PACKET_CS_TIME 601
 
+#define PACKET_SC_COMBINE 700
+#define PACKET_CS_COMBINE 701
+
 typedef struct LOCATION {
 	float x;
 	float y;
@@ -138,7 +141,7 @@ typedef struct Recv_Packet_GAME_START {
 }R_Start;
 
 typedef struct Send_Packet_Players {
-	int packet_type = PACKET_SC_PLAYERS;
+	//int packet_type = PACKET_SC_PLAYERS;
 	int Host;
 	bool IsUsed[MAX_USER];
 	float HP[MAX_USER];
@@ -155,7 +158,7 @@ typedef struct Send_Packet_Players {
 }S_Players;
 
 typedef struct Recv_Packet_Players {
-	int packet_type = PACKET_CS_PLAYERS;
+	//int packet_type = PACKET_CS_PLAYERS;
 	float HP;
 	Location Loc;
 	Rotation Rot;
@@ -181,34 +184,52 @@ typedef struct Send_Packet_Level_Change {
 
 typedef struct Recv_Packet_Zombie
 {
-	int packet_type = PACKET_CS_ZOMBIE;
+	//int packet_type = PACKET_CS_ZOMBIE;
 	bool IsAlive[MAX_ZOMBIE];
 	int Target[MAX_ZOMBIE] = { -1, };
 	float HP[MAX_ZOMBIE];
+	Location Loc[MAX_ZOMBIE];
 	//bool Hit[MAX_ZOMBIE];
 }R_Zombies;
 
 typedef struct Send_Packet_Zombie
 {
-	int packet_type = PACKET_SC_ZOMBIE;
+	//int packet_type = PACKET_SC_ZOMBIE;
 	bool IsAlive[MAX_ZOMBIE];
 	int Target[MAX_ZOMBIE] = { -1, };
 	float HP[MAX_ZOMBIE];
+	Location Loc[MAX_ZOMBIE];
 	//bool Hit[MAX_ZOMBIE];
 }S_Zombies;
 
 typedef struct Recv_Packet_Time
 {
-	int packet_type = PACKET_CS_TIME;
+	//int packet_type = PACKET_CS_TIME;
 	int PlayerNum;
 	int ElapsedTime;
 }R_Time;
 
 typedef struct Send_Packet_Time
 {
-	int packet_type = PACKET_SC_TIME;
+	//int packet_type = PACKET_SC_TIME;
 	int ElapsedTime;
 }S_Time;
+
+typedef struct Send_Packet_Combine
+{
+	int packet_type = PACKET_SC_COMBINE;
+	S_Players player;
+	S_Zombies zombie;
+	S_Time time;
+}S_Combine;
+
+typedef struct Recv_Packet_Combine
+{
+	int packet_type = PACKET_CS_COMBINE;
+	R_Players player;
+	R_Zombies zombie;
+	R_Time time;
+}R_Combine;
 
 void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overlapped, DWORD lnFlags);
 void CALLBACK send_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overlapped, DWORD lnFlags);

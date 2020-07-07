@@ -48,14 +48,14 @@ void MySocket::sendBuffer(int PacketType, void* BUF) {
 	switch (PacketType) {
 	case PACKET_CS_LOGIN:
 	{
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("S_Login Packet Process Begin!!")));
+		//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("S_Login Packet Process Begin!!")));
 		S_Login* packet = reinterpret_cast<S_Login*>(BUF);
 		Success = inst->Send((uint8*)packet, (int32)sizeof(*packet), zero);
-	/*	if (Success) {
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("S_Login Send! SIZE : %d"), (int32)sizeof(*packet)));
-		}
-		else
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("S_Login Packet Process Fail!!")));*/
+		/*	if (Success) {
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("S_Login Send! SIZE : %d"), (int32)sizeof(*packet)));
+			}
+			else
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("S_Login Packet Process Fail!!")));*/
 	}
 	break;
 	case PACKET_CS_GAME_START:
@@ -63,7 +63,7 @@ void MySocket::sendBuffer(int PacketType, void* BUF) {
 		S_Start* packet = reinterpret_cast<S_Start*>(BUF);
 		Success = inst->Send((uint8*)packet, (int32)sizeof(*packet), zero);
 		if (Success) {
-		//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("S_Start Send! SIZE : %d"), (int32)sizeof(*packet)));
+			//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("S_Start Send! SIZE : %d"), (int32)sizeof(*packet)));
 		}
 	}
 	break;
@@ -89,7 +89,7 @@ void MySocket::sendBuffer(int PacketType, void* BUF) {
 	{
 		S_Players* packet = reinterpret_cast<S_Players*>(BUF);
 		Success = inst->Send((uint8*)packet, (int32)sizeof(*packet), zero);
-		
+
 		/*if(Success)
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Complete to Send Player_Info !!")));
 		else
@@ -111,6 +111,12 @@ void MySocket::sendBuffer(int PacketType, void* BUF) {
 	case PACKET_CS_TIME:
 	{
 		S_Time* packet = reinterpret_cast<S_Time*>(BUF);
+		Success = inst->Send((uint8*)packet, (int32)sizeof(*packet), zero);
+	}
+	break;
+	case PACKET_CS_COMBINE:
+	{
+		S_Combine* packet = reinterpret_cast<S_Combine*>(BUF);
 		Success = inst->Send((uint8*)packet, (int32)sizeof(*packet), zero);
 	}
 	break;
@@ -175,8 +181,8 @@ void MySocket::RecvPacket() {
 				Player_info.IsUsed[i] = packet->Player[i];
 				if (Player_info.IsUsed[i])
 					Playing++;
-			/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Login : %d "),
-					i + 1, packet->Player[i]));*/
+				/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%d Player Login : %d "),
+						i + 1, packet->Player[i]));*/
 			}
 
 		}
@@ -197,7 +203,7 @@ void MySocket::RecvPacket() {
 			{
 				Player_info.Host = packet->Host;
 				Player_info.IsUsed[i] = packet->IsUsed[i];
-				if ( (i != PlayerId) && Player_info.IsUsed[i])
+				if ((i != PlayerId) && Player_info.IsUsed[i])
 				{
 					Player_info.HP[i] = packet->HP[i];
 					Player_info.Loc[i] = packet->Loc[i];
@@ -210,24 +216,24 @@ void MySocket::RecvPacket() {
 					Player_info.onCrouchToggle[i] = packet->onCrouchToggle[i];
 					Player_info.WeaponState[i] = packet->WeaponState[i];
 					Player_info.View[i] = packet->View[i];
-				}	 
-								
+				}
+
 				if (Player_info.IsUsed[i])
 				{
-						
+
 				}
-				
+
 			}
 
-		/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("X : %f, Y : %f, Z: %f "),
-				Player_info.Loc[PlayerId].x, Player_info.Loc[PlayerId].y, Player_info.Loc[PlayerId].z));*/
+			/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("X : %f, Y : %f, Z: %f "),
+					Player_info.Loc[PlayerId].x, Player_info.Loc[PlayerId].y, Player_info.Loc[PlayerId].z));*/
 		}
 		break;
 		case PACKET_SC_LEVEL_CHANGE:
 		{
 			R_LevelChange* packet = reinterpret_cast<R_LevelChange*>(RECV_BUF);
 			All_level_Changed = packet->changed;
-			if(All_level_Changed)
+			if (All_level_Changed)
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("All Level Changed!! ")));
 		}
 		break;
@@ -252,8 +258,43 @@ void MySocket::RecvPacket() {
 			Elapsed_Time = packet->ElapsedTime;
 		}
 		break;
+		case PACKET_SC_COMBINE:
+		{
+			R_Combine* packet = reinterpret_cast<R_Combine*>(RECV_BUF);
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Players RECV! ")));
+			for (int i = 0; i < MAX_USER; ++i)
+			{
+				Player_info.Host = packet->player.Host;
+				Player_info.IsUsed[i] = packet->player.IsUsed[i];
+				if ((i != PlayerId) && Player_info.IsUsed[i])
+				{
+					Player_info.HP[i] = packet->player.HP[i];
+					Player_info.Loc[i] = packet->player.Loc[i];
+					Player_info.Rot[i] = packet->player.Rot[i];
+					Player_info.Vel[i] = packet->player.Vel[i];
+					Player_info.Aim[i] = packet->player.Aim[i];
+					Player_info.IsJump[i] = packet->player.IsJump[i];
+					Player_info.IsTargeting[i] = packet->player.IsTargeting[i];
+					Player_info.IsSprinting[i] = packet->player.IsSprinting[i];
+					Player_info.onCrouchToggle[i] = packet->player.onCrouchToggle[i];
+					Player_info.WeaponState[i] = packet->player.WeaponState[i];
+					Player_info.View[i] = packet->player.View[i];
+				}
+			}
+			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			{
+				Zombie_info.IsAlive[i] = packet->zombie.IsAlive[i];
+				if (packet->zombie.IsAlive[i])
+				{
+					Zombie_info.Target[i] = packet->zombie.Target[i];
+					//Zombie_info.Hit[i] = packet->Hit[i];
+					Zombie_info.HP[i] = packet->zombie.HP[i];
+				}
+			}
+			Elapsed_Time = packet->time.ElapsedTime;
 		}
-			   
+		break;
+		}
 	}
 
 	delete[] RECV_BUF;
