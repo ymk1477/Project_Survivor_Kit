@@ -101,6 +101,7 @@ typedef struct Info_Zombie {
 	float HP[MAX_ZOMBIE];
 	bool IsAlive[MAX_ZOMBIE] = { false };
 	int Target[MAX_ZOMBIE] = { -1, };
+	Location Loc[MAX_ZOMBIE];
 	//bool Hit[MAX_ZOMBIE] = { false };
 }Zombie;
 

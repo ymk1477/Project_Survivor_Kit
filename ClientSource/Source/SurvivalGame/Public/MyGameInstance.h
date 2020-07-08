@@ -15,7 +15,7 @@
 #define MAX_USER 4
 #define MAX_ZOMBIE 30
 #define SERVERPORT 9000
-#define MAX_BUFFER 1024
+#define MAX_BUFFER 2048
 
 #define WEAPON_IDLE 10
 #define WEAPON_FIRING 11
@@ -99,6 +99,7 @@ typedef struct Info_Zombie {
 	float HP[MAX_ZOMBIE];
 	bool IsAlive[MAX_ZOMBIE] = { false };
 	int Target[MAX_ZOMBIE] = { -1, };
+	Location Loc[MAX_ZOMBIE];
 	//bool Hit[MAX_ZOMBIE] = { false };
 
 }Zombie;

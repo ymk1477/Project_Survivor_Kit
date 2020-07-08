@@ -32,7 +32,8 @@ class SURVIVALGAME_API APlayer_Manager : public AActor
 
 	AZombie_Manager* zombie_manager;
 	bool test = false;
-
+	UMyGameInstance* MyInstance;
+	ASGameState* MyGameState;
 
 public:
 	// Sets default values for this actor's properties

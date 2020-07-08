@@ -289,6 +289,7 @@ void MySocket::RecvPacket() {
 					Zombie_info.Target[i] = packet->zombie.Target[i];
 					//Zombie_info.Hit[i] = packet->Hit[i];
 					Zombie_info.HP[i] = packet->zombie.HP[i];
+					Zombie_info.Loc[i] = packet->zombie.Loc[i];
 				}
 			}
 			Elapsed_Time = packet->time.ElapsedTime;

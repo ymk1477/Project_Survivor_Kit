@@ -12,6 +12,7 @@ Player Player_Info;
 R_Players recvplayer;
 S_Players sendplayer;
 Zombie Zombie_Info;
+R_Combine R_COMBINE;
 
 bool IsStarted = false;
 bool recving[MAX_USER] = { false };
@@ -179,7 +180,7 @@ void Recv_Packet(int clientId, char* buf) {
 			Player_Info.Host = clientId;
 
 		g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
-		g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
+		g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&R_COMBINE);
 
 		memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
 		g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
@@ -235,7 +236,7 @@ void Recv_Packet(int clientId, char* buf) {
 			cout << "호스트가 게임 시작함" << endl;
 
 			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
-			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
+			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&R_COMBINE);
 
 			memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
 			g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
@@ -300,7 +301,7 @@ void Recv_Packet(int clientId, char* buf) {
 				//cout << "VELOCITY - x : " << Player_Info.Vel[clientId].x << " y : " << Player_Info.Vel[clientId].y << " z : " << Player_Info.Vel[clientId].z << endl;
 			/*cout << clientId + 1 << "번 플레이어 View : Pitch - " << Player_Info.View[clientId].Rot.pitch
 				<< " Roll - " << Player_Info.View[clientId].Rot.roll << " Yaw - " << Player_Info.View[clientId].Rot.yaw << endl;*/
-			
+
 			S_Players s_packet;
 			for (int i = 0; i < MAX_USER; ++i) {
 				s_packet.Host = Player_Info.Host;
@@ -512,6 +513,7 @@ void Recv_Packet(int clientId, char* buf) {
 		break;
 		case PACKET_CS_COMBINE:
 		{
+			
 			R_Combine* packet = reinterpret_cast<R_Combine*>(buf);
 			Player_Info.HP[clientId] = packet->player.HP;
 			Player_Info.Loc[clientId] = packet->player.Loc;
@@ -525,14 +527,17 @@ void Recv_Packet(int clientId, char* buf) {
 			Player_Info.WeaponState[clientId] = packet->player.WeaponState;
 			Player_Info.View[clientId] = packet->player.View;
 
-			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			if (clientId == Player_Info.Host)
 			{
-				Zombie_Info.IsAlive[i] = packet->zombie.IsAlive[i];
-				Zombie_Info.Target[i] = packet->zombie.Target[i];
-				Zombie_Info.HP[i] = packet->zombie.HP[i];
-				//Zombie_Info.Hit[i] = packet->Hit[i];
+				for (int i = 0; i < MAX_ZOMBIE; ++i)
+				{
+					Zombie_Info.IsAlive[i] = packet->zombie.IsAlive[i];
+					Zombie_Info.Target[i] = packet->zombie.Target[i];
+					Zombie_Info.HP[i] = packet->zombie.HP[i];
+					Zombie_Info.Loc[i] = packet->zombie.Loc[i];
+					//Zombie_Info.Hit[i] = packet->Hit[i];
+				}
 			}
-
 			if (packet->time.PlayerNum == Player_Info.Host)
 			{
 				Elapsed_Time = packet->time.ElapsedTime;
@@ -540,7 +545,7 @@ void Recv_Packet(int clientId, char* buf) {
 			}
 
 			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
-			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
+			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&R_COMBINE);
 
 			memset(&(g_clients[clientId].over.overlapped), 0x00, sizeof(WSAOVERLAPPED));
 			g_clients[clientId].over.overlapped.hEvent = (HANDLE)clientId;
@@ -568,6 +573,7 @@ void Recv_Packet(int clientId, char* buf) {
 				S_Zombie_Packet.IsAlive[i] = Zombie_Info.IsAlive[i];
 				S_Zombie_Packet.HP[i] = Zombie_Info.HP[i];
 				S_Zombie_Packet.Target[i] = Zombie_Info.Target[i];
+				S_Zombie_Packet.Loc[i] = Zombie_Info.Loc[i];
 				//s_packet.Hit[i] = Zombie_Info.Hit[i];
 			}
 
@@ -585,9 +591,9 @@ void Recv_Packet(int clientId, char* buf) {
 					OVER_EX* SendingOverlapped = new OVER_EX;
 
 					SendingOverlapped->dataBuffer.len = sizeof(S_Combine_Packet);
-					memset(&(SendingOverlapped->overlapped), 0x00, sizeof(WSAOVERLAPPED));
+					//memset(&(SendingOverlapped->overlapped), 0x00, sizeof(WSAOVERLAPPED));
+					ZeroMemory(&(SendingOverlapped->overlapped), sizeof(WSAOVERLAPPED));
 					SendingOverlapped->overlapped.hEvent = (HANDLE)i;
-
 					SendingOverlapped->dataBuffer.buf = reinterpret_cast<char*>(&S_Combine_Packet);
 
 					retval = WSASend(g_clients[i].socket, &(SendingOverlapped->dataBuffer), 1, NULL, 0,	 // 수정

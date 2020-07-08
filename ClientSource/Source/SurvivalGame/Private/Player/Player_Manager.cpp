@@ -23,14 +23,14 @@ void APlayer_Manager::BeginPlay()
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player_Manager Begin Play!! ")));
 
-	SetActorTickInterval(0.016f);
-
+	SetActorTickInterval(0.033f);
+	MyInstance = Cast<UMyGameInstance>(GetWorld()->GetGameInstance());
+	MyGameState = Cast<ASGameState>(GetWorld()->GetAuthGameMode()->GameState);
 
 	MakeStartLocation();
 	SpawnPlayers();
 
 	TActorIterator<AZombie_Manager> It(GetWorld());
-
 	zombie_manager = *It;
 
 	/*S_LevelChange s_packet;
@@ -111,6 +111,9 @@ void APlayer_Manager::Tick(float DeltaTime)
 				if (ZombieArray->IsValidIndex(i))
 				{
 					Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
+					Zombie_info.Loc[i].x = (*ZombieArray)[i]->GetActorLocation().X;
+					Zombie_info.Loc[i].y = (*ZombieArray)[i]->GetActorLocation().Y;
+					Zombie_info.Loc[i].z = (*ZombieArray)[i]->GetActorLocation().Z;
 				}
 			}
 		}
@@ -120,15 +123,17 @@ void APlayer_Manager::Tick(float DeltaTime)
 			s_zombie_packet.IsAlive[i] = Zombie_info.IsAlive[i];
 			s_zombie_packet.Target[i] = Zombie_info.Target[i];
 			s_zombie_packet.HP[i] = Zombie_info.HP[i];
+			s_zombie_packet.Loc[i].x = Zombie_info.Loc[i].x;
+			s_zombie_packet.Loc[i].y = Zombie_info.Loc[i].y;
+			s_zombie_packet.Loc[i].z = Zombie_info.Loc[i].z;
 			//s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
 		}
 
-		ASGameState* MyGameState = Cast<ASGameState>(GetWorld()->GetAuthGameMode()->GameState);
+		
 		S_Time S_Time_packet;
 		S_Time_packet.PlayerNum = PlayerId;
 		if (PlayerId == HostPlayer)
 		{
-
 			S_Time_packet.ElapsedTime = MyGameState->ElapsedGameMinutes;
 		}
 		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Elapsed Time : %d"),
@@ -241,37 +246,51 @@ void APlayer_Manager::Tick(float DeltaTime)
 			//MySocket::sendBuffer(PACKET_CS_ZOMBIE, &S_Packet);
 
 			//MySocket::RecvPacket();
-			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			if (!(MyInstance->IsHost()))
 			{
-				if (Zombie_info.IsAlive[i])
+				for (int i = 0; i < MAX_ZOMBIE; ++i)
 				{
-					if (ZombieArray->IsValidIndex(i))
+					if (Zombie_info.IsAlive[i])
 					{
-						if (Zombie_info.HP[i] > (*ZombieArray)[i]->GetHealth())
+						if (ZombieArray->IsValidIndex(i))
 						{
-							Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
-						}
-						else if (Zombie_info.HP[i] < (*ZombieArray)[i]->GetHealth())
-						{
-							(*ZombieArray)[i]->SetHP(Zombie_info.HP[i]);
-						}
-
-						ASZombieAIController* ZombieController = Cast<ASZombieAIController>((*ZombieArray)[i]->GetController());
-						if (ZombieController->GetTargetEnemy())
-						{
-							if (Zombie_info.Target[i] != -1)
+							if (Zombie_info.HP[i] > (*ZombieArray)[i]->GetHealth())
 							{
-								if (ZombieController->GetTargetEnemy() != players[Zombie_info.Target[i]])
+								Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
+							}
+							else if (Zombie_info.HP[i] < (*ZombieArray)[i]->GetHealth())
+							{
+								(*ZombieArray)[i]->SetHP(Zombie_info.HP[i]);
+							}
+
+							FVector NewZombieLocation;
+							NewZombieLocation.X = Zombie_info.Loc[i].x;
+							NewZombieLocation.Y = Zombie_info.Loc[i].y;
+							NewZombieLocation.Z = Zombie_info.Loc[i].z;
+							if ((FVector::Dist((*ZombieArray)[i]->GetActorLocation(), NewZombieLocation)) > 3.0f)
+							{
+								//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player Distance > 10.0f"), i + 1));
+								//const FVector InterpVec = FMath::VInterpTo(players[i]->GetActorLocation(), NewLoc, DeltaTime, NewVelocity.Size());
+								(*ZombieArray)[i]->SetActorLocation(NewZombieLocation, true, nullptr, ETeleportType::None);
+							}
+
+							ASZombieAIController* ZombieController = Cast<ASZombieAIController>((*ZombieArray)[i]->GetController());
+							if (ZombieController->GetTargetEnemy())
+							{
+								if (Zombie_info.Target[i] != -1)
+								{
+									if (ZombieController->GetTargetEnemy() != Cast<ASBaseCharacter>(players[Zombie_info.Target[i]]))
+									{
+										ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
+									}
+								}
+							}
+							else
+							{
+								if (Zombie_info.Target[i] != -1)
 								{
 									ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
 								}
-							}
-						}
-						else
-						{
-							if (Zombie_info.Target[i] != -1)
-							{
-								ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
 							}
 						}
 					}
@@ -292,7 +311,8 @@ void APlayer_Manager::Tick(float DeltaTime)
 			//	MyGameState->ElapsedGameMinutes));*/
 			//MySocket::sendBuffer(PACKET_CS_TIME, &Timepacket);
 			//MySocket::RecvPacket();
-			UMyGameInstance* MyInstance = Cast<UMyGameInstance>(GetWorld()->GetGameInstance());
+
+			
 			if(!(MyInstance->IsHost()))
 				MyGameState->ElapsedGameMinutes = Elapsed_Time;
 		}
