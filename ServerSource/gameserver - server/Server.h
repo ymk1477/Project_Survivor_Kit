@@ -142,7 +142,7 @@ typedef struct Recv_Packet_GAME_START {
 }R_Start;
 
 typedef struct Send_Packet_Players {
-	//int packet_type = PACKET_SC_PLAYERS;
+	int packet_type = PACKET_SC_PLAYERS;
 	int Host;
 	bool IsUsed[MAX_USER];
 	float HP[MAX_USER];
@@ -159,7 +159,7 @@ typedef struct Send_Packet_Players {
 }S_Players;
 
 typedef struct Recv_Packet_Players {
-	//int packet_type = PACKET_CS_PLAYERS;
+	int packet_type = PACKET_CS_PLAYERS;
 	float HP;
 	Location Loc;
 	Rotation Rot;
@@ -185,7 +185,7 @@ typedef struct Send_Packet_Level_Change {
 
 typedef struct Recv_Packet_Zombie
 {
-	//int packet_type = PACKET_CS_ZOMBIE;
+	int packet_type = PACKET_CS_ZOMBIE;
 	bool IsAlive[MAX_ZOMBIE];
 	int Target[MAX_ZOMBIE] = { -1, };
 	float HP[MAX_ZOMBIE];
@@ -195,7 +195,7 @@ typedef struct Recv_Packet_Zombie
 
 typedef struct Send_Packet_Zombie
 {
-	//int packet_type = PACKET_SC_ZOMBIE;
+	int packet_type = PACKET_SC_ZOMBIE;
 	bool IsAlive[MAX_ZOMBIE];
 	int Target[MAX_ZOMBIE] = { -1, };
 	float HP[MAX_ZOMBIE];
@@ -205,14 +205,14 @@ typedef struct Send_Packet_Zombie
 
 typedef struct Recv_Packet_Time
 {
-	//int packet_type = PACKET_CS_TIME;
+	int packet_type = PACKET_CS_TIME;
 	int PlayerNum;
 	int ElapsedTime;
 }R_Time;
 
 typedef struct Send_Packet_Time
 {
-	//int packet_type = PACKET_SC_TIME;
+	int packet_type = PACKET_SC_TIME;
 	int ElapsedTime;
 }S_Time;
 

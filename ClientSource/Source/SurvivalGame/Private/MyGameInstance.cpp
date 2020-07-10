@@ -218,11 +218,6 @@ void MySocket::RecvPacket() {
 					Player_info.View[i] = packet->View[i];
 				}
 
-				if (Player_info.IsUsed[i])
-				{
-
-				}
-
 			}
 
 			/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("X : %f, Y : %f, Z: %f "),
@@ -246,8 +241,8 @@ void MySocket::RecvPacket() {
 				if (packet->IsAlive[i])
 				{
 					Zombie_info.Target[i] = packet->Target[i];
-					//Zombie_info.Hit[i] = packet->Hit[i];
 					Zombie_info.HP[i] = packet->HP[i];
+					Zombie_info.Loc[i] = packet->Loc[i];
 				}
 			}
 		}

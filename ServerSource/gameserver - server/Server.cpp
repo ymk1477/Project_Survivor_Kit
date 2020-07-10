@@ -418,7 +418,7 @@ void Recv_Packet(int clientId, char* buf) {
 				Zombie_Info.IsAlive[i] = packet->IsAlive[i];
 				Zombie_Info.Target[i] = packet->Target[i];
 				Zombie_Info.HP[i] = packet->HP[i];
-				//Zombie_Info.Hit[i] = packet->Hit[i];
+				Zombie_Info.Loc[i] = packet->Loc[i];
 			}
 
 			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;

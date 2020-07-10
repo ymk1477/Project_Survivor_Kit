@@ -40,6 +40,9 @@ void ASCoopGameMode::RestartPlayer(class AController* NewPlayer)
 			{
 				Zombie_info.IsAlive[i] = true;
 				Zombie_info.HP[i] = NewZombie->GetHealth();
+				Zombie_info.Loc[i].x = NewZombie->GetActorLocation().X;
+				Zombie_info.Loc[i].y = NewZombie->GetActorLocation().Y;
+				Zombie_info.Loc[i].z = NewZombie->GetActorLocation().Z;
 				break;
 			}
 		}
