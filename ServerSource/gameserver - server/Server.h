@@ -95,6 +95,7 @@ typedef struct Info_Player {
 	bool onCrouchToggle[MAX_USER] = { false };
 	int WeaponState[MAX_USER] = { WEAPON_IDLE };
 	ViewPoint View[MAX_USER];
+	int WeaponNum[MAX_USER] = { 1 };
 }Player;
 
 typedef struct Info_Zombie {
@@ -156,6 +157,7 @@ typedef struct Send_Packet_Players {
 	bool onCrouchToggle[MAX_USER];
 	int WeaponState[MAX_USER];
 	ViewPoint View[MAX_USER];
+	int WeaponNum[MAX_USER];
 }S_Players;
 
 typedef struct Recv_Packet_Players {
@@ -171,6 +173,7 @@ typedef struct Recv_Packet_Players {
 	bool onCrouchToggle;
 	int WeaponState;
 	ViewPoint View;
+	int WeaponNum;
 }R_Players;
 
 typedef struct Recv_Packet_Level_Change {
@@ -200,7 +203,7 @@ typedef struct Send_Packet_Zombie
 	int Target[MAX_ZOMBIE] = { -1, };
 	float HP[MAX_ZOMBIE];
 	Location Loc[MAX_ZOMBIE];
-	//bool Hit[MAX_ZOMBIE];
+	//bool Hit[MAX_ZOMBIE];`
 }S_Zombies;
 
 typedef struct Recv_Packet_Time

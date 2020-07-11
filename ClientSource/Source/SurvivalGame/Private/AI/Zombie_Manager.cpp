@@ -54,6 +54,7 @@ void AZombie_Manager::SpawnZombies()
 		ZombieController->Possess(NewZombie);
 		Zombie_info.HP[ZombieNum] = NewZombie->GetHealth();
 		Zombie_info.IsAlive[ZombieNum] = true;
+		Zombie_info.Target[ZombieNum] = -1;
 		ZombieNum++;
 	}		
 
@@ -105,6 +106,7 @@ void AZombie_Manager::Tick(float DeltaTime)
 			if (Zombies[i]->IsDie())
 			{
 				Zombie_info.IsAlive[i] = false;
+				Zombie_info.Target[i] = -1;
 				indexNum = i;
 				break;
 			}
@@ -125,6 +127,8 @@ void AZombie_Manager::Tick(float DeltaTime)
 		{
 			if (PatrolZombies[i]->IsDie())
 			{
+				Zombie_info.IsAlive[i] = false;
+				Zombie_info.Target[i] = -1;
 				indexNum = i;
 				break;
 			}

@@ -70,6 +70,7 @@ ASCharacter::ASCharacter(const class FObjectInitializer& ObjectInitializer)
 void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	isCrouching = false;
 
 	if (Role == ROLE_Authority)
 	{
@@ -406,32 +407,38 @@ void ASCharacter::OnCrouchToggle()
 	{
 		SetSprinting(false);
 	}
-	if (this->IsControlled())
-	{
-		Player_info.onCrouchToggle[PlayerId] = true;
-	}
-	else
-	{
-		if (this->bIsCrouched)
-			this->bIsCrouched = false;
-		else
-			this->bIsCrouched = true;
 
-	}
+	
 	// If we are crouching then CanCrouch will return false. If we cannot crouch then calling Crouch() wont do anything
 	if (CanCrouch())
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("CAN CROUCH!")));
 		Crouch();
+		if (PlayerNum == PlayerId)
+		{
+			Player_info.onCrouchToggle[PlayerId] = true;
+		}
+	
+		isCrouching = GetCharacterMovement()->bWantsToCrouch;
 	}
 	else
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("CAN'T CROUCH!")));
 		UnCrouch();
+		if (PlayerNum == PlayerId)
+		{
+			Player_info.onCrouchToggle[PlayerId] = false;
+		}
+		
 	}
-	
-	
+	isCrouching = GetCharacterMovement()->bWantsToCrouch;
 	
 }
 
+bool ASCharacter::GetCrouched()
+{
+	return isCrouching;
+}
 
 float ASCharacter::GetHunger() const
 {
@@ -932,6 +939,8 @@ void ASCharacter::OnEquipPrimaryWeapon()
 			}
 		}
 	}
+	if (PlayerNum == PlayerId)
+		Player_info.WeaponNum[PlayerId] = 1;
 }
 
 
@@ -955,6 +964,8 @@ void ASCharacter::OnEquipSecondaryWeapon()
 			}
 		}
 	}
+	if (PlayerNum == PlayerId)
+		Player_info.WeaponNum[PlayerId] = 2;
 }
 
 bool ASCharacter::WeaponSlotAvailable(EInventorySlot CheckSlot)
@@ -1070,4 +1081,16 @@ void ASCharacter::SetSprinting(bool NewSprinting)
 void ASCharacter::SetOtherHealth(float hp)
 {
 	Health = hp;
+}
+
+void ASCharacter::OtherChangeWeapon(int WeaponNum)
+{
+	if (WeaponNum == 1)
+	{
+		OnEquipPrimaryWeapon();
+	}
+	else if (WeaponNum == 2)
+	{
+		OnEquipSecondaryWeapon;
+	}
 }

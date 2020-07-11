@@ -154,6 +154,7 @@ void ASZombieCharacter::OnSeePlayer(APawn* Pawn)
 				if (this == (*Zombies)[i])
 				{
 					Zombie_Index = i;
+					break;
 				}
 			}
 		}
@@ -170,6 +171,7 @@ void ASZombieCharacter::OnSeePlayer(APawn* Pawn)
 				{
 					AIController->SetTargetEnemy(SensedPawn);
 					Zombie_info.Target[Zombie_Index] = i;
+					break;
 				}
 			}
 		}
@@ -212,20 +214,24 @@ void ASZombieCharacter::OnHearNoise(APawn* PawnInstigator, const FVector& Locati
 				if (this == (*Zombies)[i])
 				{
 					Zombie_Index = i;
+					break;
 				}
 			}
 		}
 	}
+
+	ASBaseCharacter* TargetPawn = Cast<ASBaseCharacter>(PawnInstigator);
 	for (int i = 0; i < MAX_USER; ++i)
 	{
 		if (Player_info.IsUsed[i])
 		{
-			if (PawnInstigator == Cast<APawn>(Players[i]))
+			if (TargetPawn == Players[i])
 			{
 				if (AIController)
 				{
 					AIController->SetTargetEnemy(PawnInstigator);
 					Zombie_info.Target[Zombie_Index] = i;
+					break;
 				}
 			}
 		}

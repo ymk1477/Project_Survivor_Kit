@@ -23,7 +23,7 @@ void APlayer_Manager::BeginPlay()
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player_Manager Begin Play!! ")));
 
-	SetActorTickInterval(0.033f);
+	SetActorTickInterval(0.016f);
 	MyInstance = Cast<UMyGameInstance>(GetWorld()->GetGameInstance());
 	MyGameState = Cast<ASGameState>(GetWorld()->GetAuthGameMode()->GameState);
 
@@ -32,6 +32,11 @@ void APlayer_Manager::BeginPlay()
 
 	TActorIterator<AZombie_Manager> It(GetWorld());
 	zombie_manager = *It;
+
+	for (int i = 0; i < MAX_ZOMBIE; ++i)
+	{
+		Zombie_info.Target[i] = -1;
+	}
 
 	/*S_LevelChange s_packet;
 	s_packet.changed = true;
@@ -100,8 +105,9 @@ void APlayer_Manager::Tick(float DeltaTime)
 		S_Player_Packet.onCrouchToggle = Player_info.onCrouchToggle[PlayerId];
 		S_Player_Packet.WeaponState = Player_info.WeaponState[PlayerId];
 		S_Player_Packet.View = Player_info.View[PlayerId];
+		S_Player_Packet.WeaponNum = Player_info.WeaponNum[PlayerId];
 		//MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Packet);
-		Player_info.onCrouchToggle[PlayerId] = false;
+		//Player_info.onCrouchToggle[PlayerId] = false;
 
 		//auto ZombieArray = zombie_manager->GetZombieArray();
 		//for (int i = 0; i < MAX_ZOMBIE; ++i)
@@ -151,6 +157,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 		//MySocket::RecvPacket();
 		
 		MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Player_Packet);
+		
 		MySocket::RecvPacket();
 		if (Playing > 1)
 		{
@@ -209,8 +216,14 @@ void APlayer_Manager::Tick(float DeltaTime)
 					players[i]->SetIsJumping(Player_info.IsJump[i]);
 					players[i]->SetIsTargeting(Player_info.IsTargeting[i]);
 					players[i]->SetSprinting(Player_info.IsSprinting[i]);
-					if (Player_info.onCrouchToggle[i])
+
+					if (Player_info.onCrouchToggle[i] != players[i]->GetCrouched())
 						players[i]->OnCrouchToggle();
+				/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player Crouched : %d, %d"), 
+						i, Player_info.onCrouchToggle[i], players[i]->GetCrouched()));*/
+
+					players[i]->OtherChangeWeapon(Player_info.WeaponNum[i]);
+					
 					if (Player_info.WeaponState[i] == WEAPON_FIRING)
 					{
 						players[i]->StartFiringOther();
@@ -228,6 +241,12 @@ void APlayer_Manager::Tick(float DeltaTime)
 
 			// 좀비 샌드리시브
 			auto ZombieArray = zombie_manager->GetZombieArray();
+
+			/*for (int i = 0; i < ZombieArray->Num(); ++i)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d ZOMBIE HP : %f"), 
+					i, (*ZombieArray)[i]->GetHealth()));
+			}*/
 
 			for (int i = 0; i < MAX_ZOMBIE; ++i)
 			{
@@ -257,6 +276,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 			}
 			MySocket::sendBuffer(PACKET_CS_ZOMBIE, &s_zombie_packet);
 			MySocket::RecvPacket();
+
 			if (!(MyInstance->IsHost()))
 			{
 				for (int i = 0; i < MAX_ZOMBIE; ++i)
@@ -285,7 +305,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 								(*ZombieArray)[i]->SetActorLocation(NewZombieLocation, true, nullptr, ETeleportType::None);
 							}
 
-							/*ASZombieAIController* ZombieController = Cast<ASZombieAIController>((*ZombieArray)[i]->GetController());
+							ASZombieAIController* ZombieController = Cast<ASZombieAIController>((*ZombieArray)[i]->GetController());
 							if (ZombieController->GetTargetEnemy())
 							{
 								if (Zombie_info.Target[i] != -1)
@@ -302,29 +322,34 @@ void APlayer_Manager::Tick(float DeltaTime)
 								{
 									ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
 								}
-							}*/
+							}
 						}
 					}
 				}
 			}
 
+		/*	for (int i = 0; i < MAX_ZOMBIE; ++i)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d ZOMBIE TARGET : %d"), i, Zombie_info.Target[i]));
+			
+			}*/
 
 			// 시간 샌드리시브
 			
-			S_Time Timepacket;
-			Timepacket.PlayerNum = PlayerId;
-			if (PlayerId == HostPlayer)
-			{
-				Timepacket.ElapsedTime = MyGameState->ElapsedGameMinutes;
-			}
-			/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Elapsed Time : %d"), 
-				MyGameState->ElapsedGameMinutes));*/
-			MySocket::sendBuffer(PACKET_CS_TIME, &Timepacket);
-			MySocket::RecvPacket();
+			//S_Time Timepacket;
+			//Timepacket.PlayerNum = PlayerId;
+			//if (PlayerId == HostPlayer)
+			//{
+			//	Timepacket.ElapsedTime = MyGameState->ElapsedGameMinutes;
+			//}
+			///*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Elapsed Time : %d"), 
+			//	MyGameState->ElapsedGameMinutes));*/
+			//MySocket::sendBuffer(PACKET_CS_TIME, &Timepacket);
+			//MySocket::RecvPacket();
 
-			
-			if(!(MyInstance->IsHost()))
-				MyGameState->ElapsedGameMinutes = Elapsed_Time;
+			//
+			//if(!(MyInstance->IsHost()))
+			//	MyGameState->ElapsedGameMinutes = Elapsed_Time;
 		}
 	}
 }

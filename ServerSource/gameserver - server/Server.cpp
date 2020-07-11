@@ -287,6 +287,9 @@ void Recv_Packet(int clientId, char* buf) {
 			Player_Info.onCrouchToggle[clientId] = packet->onCrouchToggle;
 			Player_Info.WeaponState[clientId] = packet->WeaponState;
 			Player_Info.View[clientId] = packet->View;
+			Player_Info.WeaponNum[clientId] = packet->WeaponNum;
+
+			//cout << clientId << " Crouched : " << Player_Info.onCrouchToggle[clientId] << endl;
 
 			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
 			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
@@ -317,6 +320,7 @@ void Recv_Packet(int clientId, char* buf) {
 				s_packet.onCrouchToggle[i] = Player_Info.onCrouchToggle[i];
 				s_packet.WeaponState[i] = Player_Info.WeaponState[i];
 				s_packet.View[i] = Player_Info.View[i];
+				s_packet.WeaponNum[i] = Player_Info.WeaponNum[i];
 			}
 
 			for (int i = 0; i < MAX_USER; ++i) {

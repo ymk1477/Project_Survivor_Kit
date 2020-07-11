@@ -216,6 +216,7 @@ void MySocket::RecvPacket() {
 					Player_info.onCrouchToggle[i] = packet->onCrouchToggle[i];
 					Player_info.WeaponState[i] = packet->WeaponState[i];
 					Player_info.View[i] = packet->View[i];
+					Player_info.WeaponNum[i] = packet->WeaponNum[i];
 				}
 
 			}

@@ -93,12 +93,13 @@ typedef struct Info_Player {
 	//bool UseWeapon[MAX_USER] = { false };
 	int WeaponState[MAX_USER] = { WEAPON_IDLE };
 	ViewPoint View[MAX_USER];
+	int WeaponNum[MAX_USER] = { 1 };
 }Player;
 
 typedef struct Info_Zombie {
 	float HP[MAX_ZOMBIE];
 	bool IsAlive[MAX_ZOMBIE] = { false };
-	int Target[MAX_ZOMBIE] = { -1, };
+	int Target[MAX_ZOMBIE] = { -1 };
 	Location Loc[MAX_ZOMBIE];
 	//bool Hit[MAX_ZOMBIE] = { false };
 
@@ -153,6 +154,7 @@ typedef struct Send_Packet_Players {
 	//bool UseWeapon;
 	int WeaponState;
 	ViewPoint View;
+	int WeaponNum;
 }S_Players;
 
 typedef struct Recv_Packet_Players {
@@ -171,6 +173,7 @@ typedef struct Recv_Packet_Players {
 	//bool UseWeapon[MAX_USER];
 	int WeaponState[MAX_USER];
 	ViewPoint View[MAX_USER];
+	int WeaponNum[MAX_USER] = { 1 };
 }R_Players;
 
 typedef struct Send_Packet_Level_Change {
@@ -188,7 +191,7 @@ typedef struct Recv_Packet_Zombie
 {
 	int packet_type = PACKET_SC_ZOMBIE;
 	bool IsAlive[MAX_ZOMBIE];
-	int Target[MAX_ZOMBIE] = { -1, };
+	int Target[MAX_ZOMBIE];
 	float HP[MAX_ZOMBIE];
 	Location Loc[MAX_ZOMBIE];
 	//bool Hit[MAX_ZOMBIE];
@@ -198,7 +201,7 @@ typedef struct Send_Packet_Zombie
 {
 	int packet_type = PACKET_CS_ZOMBIE;
 	bool IsAlive[MAX_ZOMBIE]; 
-	int Target[MAX_ZOMBIE] = { -1, };
+	int Target[MAX_ZOMBIE];
 	float HP[MAX_ZOMBIE];
 	Location Loc[MAX_ZOMBIE];
 	//bool Hit[MAX_ZOMBIE];
