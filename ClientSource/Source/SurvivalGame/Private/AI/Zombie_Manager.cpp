@@ -87,6 +87,8 @@ void AZombie_Manager::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("ZOMBIE MANAGER BEGIN PLAY!!!")));
+
 	PatrolZombieNumber = 0;
 	FindSpawnPoints();
 	FindWayPoints();

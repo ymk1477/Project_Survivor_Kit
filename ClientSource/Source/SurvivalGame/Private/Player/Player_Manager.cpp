@@ -21,7 +21,7 @@ void APlayer_Manager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player_Manager Begin Play!! ")));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player_Manager Begin Play!! ")));
 
 	SetActorTickInterval(0.016f);
 	MyInstance = Cast<UMyGameInstance>(GetWorld()->GetGameInstance());
@@ -106,6 +106,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 		S_Player_Packet.WeaponState = Player_info.WeaponState[PlayerId];
 		S_Player_Packet.View = Player_info.View[PlayerId];
 		S_Player_Packet.WeaponNum = Player_info.WeaponNum[PlayerId];
+		S_Player_Packet.Kit = Player_info.Kit[PlayerId];
 		//MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Packet);
 		//Player_info.onCrouchToggle[PlayerId] = false;
 
@@ -235,6 +236,8 @@ void APlayer_Manager::Tick(float DeltaTime)
 					}
 					else
 						players[i]->StopFiringOther();
+
+					players[i]->SetKit(Player_info.Kit[i]);
 				}
 
 			}

@@ -64,6 +64,8 @@ ASCharacter::ASCharacter(const class FObjectInitializer& ObjectInitializer)
 	WeaponAttachPoint = TEXT("WeaponSocket");
 	PelvisAttachPoint = TEXT("PelvisSocket");
 	SpineAttachPoint = TEXT("SpineSocket");
+	
+	Kit = 0;
 }
 
 
@@ -1091,6 +1093,21 @@ void ASCharacter::OtherChangeWeapon(int WeaponNum)
 	}
 	else if (WeaponNum == 2)
 	{
-		OnEquipSecondaryWeapon;
+		OnEquipSecondaryWeapon();
 	}
+}
+
+void ASCharacter::PlusKit()
+{
+	Kit++;
+}
+
+int ASCharacter::GetKits()
+{
+	return Kit;
+}
+
+void ASCharacter::SetKit(int i)
+{
+	Kit = i;
 }

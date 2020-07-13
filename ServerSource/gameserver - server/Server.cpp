@@ -288,6 +288,7 @@ void Recv_Packet(int clientId, char* buf) {
 			Player_Info.WeaponState[clientId] = packet->WeaponState;
 			Player_Info.View[clientId] = packet->View;
 			Player_Info.WeaponNum[clientId] = packet->WeaponNum;
+			Player_Info.Kit[clientId] = packet->Kit;
 
 			//cout << clientId << " Crouched : " << Player_Info.onCrouchToggle[clientId] << endl;
 
@@ -321,6 +322,7 @@ void Recv_Packet(int clientId, char* buf) {
 				s_packet.WeaponState[i] = Player_Info.WeaponState[i];
 				s_packet.View[i] = Player_Info.View[i];
 				s_packet.WeaponNum[i] = Player_Info.WeaponNum[i];
+				s_packet.Kit[i] = Player_Info.Kit[i];
 			}
 
 			for (int i = 0; i < MAX_USER; ++i) {

@@ -32,6 +32,8 @@ class SURVIVALGAME_API ASCharacter : public ASBaseCharacter
 
 	float LastMakeNoiseTime;
 
+
+
 private:
 
 	/* Boom to handle distance to player mesh. */
@@ -203,6 +205,14 @@ public:
 	/* Weapons & Inventory                                                  */
 	/************************************************************************/
 
+	UFUNCTION(BlueprintCallable, Category = "Kits")
+	void PlusKit();
+
+	UFUNCTION(BlueprintCallable, Category = "Kits")
+	int GetKits();
+
+	void SetKit(int i);
+
 private:
 
 	/* Attachpoint for active weapon/item in hands */
@@ -222,6 +232,8 @@ private:
 	/* Distance away from character when dropping inventory items. */
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
 	float DropWeaponMaxDistance;
+	
+	int Kit;
 
 	void OnReload();
 
