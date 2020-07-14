@@ -107,56 +107,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 		S_Player_Packet.View = Player_info.View[PlayerId];
 		S_Player_Packet.WeaponNum = Player_info.WeaponNum[PlayerId];
 		S_Player_Packet.Kit = Player_info.Kit[PlayerId];
-		//MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Packet);
-		//Player_info.onCrouchToggle[PlayerId] = false;
-
-		//auto ZombieArray = zombie_manager->GetZombieArray();
-		//for (int i = 0; i < MAX_ZOMBIE; ++i)
-		//{
-		//	if (Zombie_info.IsAlive[i])
-		//	{
-		//		if (ZombieArray->IsValidIndex(i))
-		//		{
-		//			Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
-		//			Zombie_info.Loc[i].x = (*ZombieArray)[i]->GetActorLocation().X;
-		//			Zombie_info.Loc[i].y = (*ZombieArray)[i]->GetActorLocation().Y;
-		//			Zombie_info.Loc[i].z = (*ZombieArray)[i]->GetActorLocation().Z;
-		//		}
-		//	}
-		//}
-	
-		//S_Zombies s_zombie_packet;
-		//if (MyInstance->IsHost())
-		//{
-		//	for (int i = 0; i < MAX_ZOMBIE; ++i)
-		//	{
-		//		s_zombie_packet.IsAlive[i] = Zombie_info.IsAlive[i];
-		//		s_zombie_packet.Target[i] = Zombie_info.Target[i];
-		//		s_zombie_packet.HP[i] = Zombie_info.HP[i];
-		//		s_zombie_packet.Loc[i].x = Zombie_info.Loc[i].x;
-		//		s_zombie_packet.Loc[i].y = Zombie_info.Loc[i].y;
-		//		s_zombie_packet.Loc[i].z = Zombie_info.Loc[i].z;
-		//		//s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
-		//	}
-		//}
-		//
-		//S_Time S_Time_packet;
-		//S_Time_packet.PlayerNum = PlayerId;
-		//if (PlayerId == HostPlayer)
-		//{
-		//	S_Time_packet.ElapsedTime = MyGameState->ElapsedGameMinutes;
-		//}
-		///*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Elapsed Time : %d"),
-		//	MyGameState->ElapsedGameMinutes));*/
-		//
-		//S_Combine S_Combine_Packet;
-		//S_Combine_Packet.player = S_Player_Packet;
-		//S_Combine_Packet.zombie = s_zombie_packet;
-		//S_Combine_Packet.time = S_Time_packet;
-
-		//MySocket::sendBuffer(PACKET_CS_COMBINE, &S_Combine_Packet);
-		//MySocket::RecvPacket();
-		
+				
 		MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Player_Packet);
 		
 		MySocket::RecvPacket();

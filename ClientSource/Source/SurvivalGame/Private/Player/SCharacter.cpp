@@ -1076,7 +1076,7 @@ void ASCharacter::SetSprinting(bool NewSprinting)
 	}
 
 	Super::SetSprinting(NewSprinting);
-	if (this->IsControlled())
+	if (this->IsPlayerControlled())
 		Player_info.IsSprinting[PlayerId] = NewSprinting;
 }
 
