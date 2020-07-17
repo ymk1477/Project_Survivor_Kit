@@ -372,7 +372,7 @@ void ASCharacter::OnStartSprinting()
 	{
 		CarriedObjectComp->Drop();
 	}
-
+	
 	SetSprinting(true);
 	
 }
@@ -380,6 +380,7 @@ void ASCharacter::OnStartSprinting()
 
 void ASCharacter::OnStopSprinting()
 {
+	
 	SetSprinting(false);
 	
 }
@@ -432,8 +433,8 @@ void ASCharacter::OnCrouchToggle()
 			Player_info.onCrouchToggle[PlayerId] = false;
 		}
 		
+		isCrouching = GetCharacterMovement()->bWantsToCrouch;
 	}
-	isCrouching = GetCharacterMovement()->bWantsToCrouch;
 	
 }
 
@@ -1074,10 +1075,8 @@ void ASCharacter::SetSprinting(bool NewSprinting)
 	{
 		StopWeaponFire();
 	}
-
 	Super::SetSprinting(NewSprinting);
-	if (this->IsPlayerControlled())
-		Player_info.IsSprinting[PlayerId] = NewSprinting;
+	
 }
 
 void ASCharacter::SetOtherHealth(float hp)
@@ -1110,4 +1109,11 @@ int ASCharacter::GetKits()
 void ASCharacter::SetKit(int i)
 {
 	Kit = i;
+}
+
+void ASCharacter::HealHealth()
+{
+	Health += 25.0f;
+	if (Health > 100.0f)
+		Health = 100.0f;
 }

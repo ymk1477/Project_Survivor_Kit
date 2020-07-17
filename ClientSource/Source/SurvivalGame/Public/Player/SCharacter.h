@@ -90,7 +90,7 @@ public:
 	void OnStopSprinting();
 
 	virtual void SetSprinting(bool NewSprinting) override;
-
+	
 	/* Is character currently performing a jump action. Resets on landed.  */
 	UPROPERTY(Transient, Replicated)
 	bool bIsJumping;
@@ -332,4 +332,7 @@ public:
 	void SwapToNewWeaponMesh();
 
 	void OtherChangeWeapon(int WeaponNum);
+
+	UFUNCTION(BlueprintCallable, Category = "HealHealth")
+	void HealHealth();
 };

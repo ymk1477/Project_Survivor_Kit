@@ -19,13 +19,13 @@ int Zombie_Index;
 
 // Sets default values
 ASZombieCharacter::ASZombieCharacter(const class FObjectInitializer& ObjectInitializer)
-: Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-	/* Note: We assign the Controller class in the Blueprint extension of this class 
+	/* Note: We assign the Controller class in the Blueprint extension of this class
 		Because the zombie AIController is a blueprint in content and it's better to avoid content references in code.  */
-	/*AIControllerClass = ASZombieAIController::StaticClass();*/
+		/*AIControllerClass = ASZombieAIController::StaticClass();*/
 
-	/* Our sensing component to detect players by visibility and noise checks. */
+		/* Our sensing component to detect players by visibility and noise checks. */
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComp"));
 	PawnSensingComp->SetPeripheralVisionAngle(60.0f);
 	PawnSensingComp->SightRadius = 2000;
@@ -71,7 +71,7 @@ void ASZombieCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+
 
 	/* This is the earliest moment we can bind our delegates to the component */
 	if (PawnSensingComp)
@@ -102,7 +102,7 @@ void ASZombieCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	/* Check if the last time we sensed a player is beyond the time out value to prevent bot from endlessly following a player. */
-	if (bSensedTarget && (GetWorld()->TimeSeconds - LastSeenTime) > SenseTimeOut 
+	if (bSensedTarget && (GetWorld()->TimeSeconds - LastSeenTime) > SenseTimeOut
 		&& (GetWorld()->TimeSeconds - LastHeardTime) > SenseTimeOut)
 	{
 		ASZombieAIController* AIController = Cast<ASZombieAIController>(GetController());
@@ -122,18 +122,18 @@ void ASZombieCharacter::Tick(float DeltaSeconds)
 
 void ASZombieCharacter::OnSeePlayer(APawn* Pawn)
 {
-	if (!IsAlive())
+	if (PlayerId == HostPlayer)
 	{
-		return;
-	}
+		if (!IsAlive())
+		{
+			return;
+		}
 
-	if (!bSensedTarget)
-	{
-		BroadcastUpdateAudioLoop(true);
-	}
+		if (!bSensedTarget)
+		{
+			BroadcastUpdateAudioLoop(true);
+		}
 
-	if(PlayerId == HostPlayer)
-	{
 		/* Keep track of the time the player was last sensed in order to clear the target */
 		LastSeenTime = GetWorld()->GetTimeSeconds();
 		bSensedTarget = true;
@@ -179,38 +179,43 @@ void ASZombieCharacter::OnSeePlayer(APawn* Pawn)
 				{
 					if (AIController && SensedPawn->IsAlive())
 					{
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("TargetPawn : %d"), &(*SensedPawn)));
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Players : %d"), &(*(TestPawn))));
 						AIController->SetTargetEnemy(SensedPawn);
 						Zombie_info.Target[Zombie_Index] = i;
 						break;
 					}
 				}
 			}
+
 		}
 	}
+
+
 	//if (AIController)
 	//{
 	//	AIController->SetTargetEnemy(SensedPawn);
 
 	//	
 	//}
-	
+
 }
 
 
 void ASZombieCharacter::OnHearNoise(APawn* PawnInstigator, const FVector& Location, float Volume)
 {
-	if (!IsAlive())
-	{
-		return;
-	}
-
-	if (!bSensedTarget)
-	{
-		BroadcastUpdateAudioLoop(true);
-	}
-
 	if (PlayerId == HostPlayer)
 	{
+		if (!IsAlive())
+		{
+			return;
+		}
+
+		if (!bSensedTarget)
+		{
+			BroadcastUpdateAudioLoop(true);
+		}
+
 		bSensedTarget = true;
 		LastHeardTime = GetWorld()->GetTimeSeconds();
 
@@ -244,6 +249,8 @@ void ASZombieCharacter::OnHearNoise(APawn* PawnInstigator, const FVector& Locati
 			{
 				if (&(*TargetPawn) == &(*(Players[i])))
 				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("TargetPawn : %d"), &(*TargetPawn)));
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Players : %d"), &(*(Players[i]))));
 					if (AIController)
 					{
 						AIController->SetTargetEnemy(PawnInstigator);
@@ -254,10 +261,11 @@ void ASZombieCharacter::OnHearNoise(APawn* PawnInstigator, const FVector& Locati
 			}
 		}
 	}
+
 	/*if (AIController)
 	{
 		AIController->SetTargetEnemy(PawnInstigator);
-	
+
 	}*/
 
 }
@@ -312,7 +320,7 @@ void ASZombieCharacter::PerformMeleeStrike(AActor* HitActor)
 void ASZombieCharacter::SetBotType(EBotBehaviorType NewType)
 {
 	BotType = NewType;
-	
+
 	ASZombieAIController* AIController = Cast<ASZombieAIController>(GetController());
 	if (AIController)
 	{
@@ -359,7 +367,7 @@ void ASZombieCharacter::OnMeleeCompBeginOverlap(class UPrimitiveComponent* Overl
 	TimerHandle_MeleeAttack.Invalidate();
 
 	PerformMeleeStrike(OtherActor);
-	
+
 	/* Set re-trigger timer to re-check overlapping pawns at melee attack rate interval */
 	GetWorldTimerManager().SetTimer(TimerHandle_MeleeAttack, this, &ASZombieCharacter::OnRetriggerMeleeStrike, MeleeStrikeCooldown, true);
 }

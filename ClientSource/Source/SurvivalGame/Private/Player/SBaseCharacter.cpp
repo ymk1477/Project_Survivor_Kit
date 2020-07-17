@@ -305,10 +305,15 @@ void ASBaseCharacter::SetSprinting(bool NewSprinting)
 		UnCrouch();
 	}
 
-	if (Role < ROLE_Authority)
+	if (PlayerNum == PlayerId)
+	{
+		Player_info.IsSprinting[PlayerId] = NewSprinting;
+	}
+
+	/*if (Role < ROLE_Authority)
 	{
 		ServerSetSprinting(NewSprinting);
-	}
+	}*/
 }
 
 

@@ -23,7 +23,7 @@ void APlayer_Manager::BeginPlay()
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player_Manager Begin Play!! ")));
 
-	SetActorTickInterval(0.016f);
+	SetActorTickInterval(0.033f);
 	MyInstance = Cast<UMyGameInstance>(GetWorld()->GetGameInstance());
 	MyGameState = Cast<ASGameState>(GetWorld()->GetAuthGameMode()->GameState);
 
@@ -115,7 +115,8 @@ void APlayer_Manager::Tick(float DeltaTime)
 		{
 			for (int i = 0; i < MAX_USER; ++i)
 			{
-
+				/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player Sprint : %d"), 
+					i, Player_info.IsSprinting[i]));*/
 				if ((i != PlayerId) && Player_info.IsUsed[i])
 				{
 					FVector NewLocation;
@@ -171,7 +172,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 
 					if (Player_info.onCrouchToggle[i] != players[i]->GetCrouched())
 						players[i]->OnCrouchToggle();
-				/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player Crouched : %d, %d"), 
+					/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player Crouched : %d, %d"), 
 						i, Player_info.onCrouchToggle[i], players[i]->GetCrouched()));*/
 
 					players[i]->OtherChangeWeapon(Player_info.WeaponNum[i]);
@@ -193,7 +194,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 
 			}
 
-			// 좀비 샌드리시브
+			//좀비 샌드리시브
 			auto ZombieArray = zombie_manager->GetZombieArray();
 
 			/*for (int i = 0; i < ZombieArray->Num(); ++i)
@@ -258,8 +259,9 @@ void APlayer_Manager::Tick(float DeltaTime)
 								//const FVector InterpVec = FMath::VInterpTo(players[i]->GetActorLocation(), NewLoc, DeltaTime, NewVelocity.Size());
 								(*ZombieArray)[i]->SetActorLocation(NewZombieLocation, true, nullptr, ETeleportType::None);
 							}
-
 							ASZombieAIController* ZombieController = Cast<ASZombieAIController>((*ZombieArray)[i]->GetController());
+							
+							/*ASZombieAIController* ZombieController = Cast<ASZombieAIController>((*ZombieArray)[i]->GetController());
 							if (ZombieController->GetTargetEnemy())
 							{
 								if (Zombie_info.Target[i] != -1)
@@ -276,17 +278,18 @@ void APlayer_Manager::Tick(float DeltaTime)
 								{
 									ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
 								}
-							}
+							}*/
 						}
 					}
 				}
 			}
 
-		/*	for (int i = 0; i < MAX_ZOMBIE; ++i)
+			for (int i = 0; i < MAX_ZOMBIE; ++i)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d ZOMBIE TARGET : %d"), i, Zombie_info.Target[i]));
+				if(Zombie_info.IsAlive[i])
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d ZOMBIE TARGET : %d"), i, Zombie_info.Target[i]));
 			
-			}*/
+			}
 
 			// 시간 샌드리시브
 			

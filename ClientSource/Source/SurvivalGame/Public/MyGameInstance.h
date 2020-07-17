@@ -223,6 +223,16 @@ typedef struct Recv_Packet_Time
 	int ElapsedTime;
 }R_Time;
 
+typedef struct Send_Packet_Game_State
+{
+
+}S_GState;
+
+typedef struct Recv_Packet_Game_State
+{
+
+}R_GState;
+
 typedef struct Send_Packet_Combine
 {
 	int packet_type = PACKET_CS_COMBINE;

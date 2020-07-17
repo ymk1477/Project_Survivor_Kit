@@ -11,6 +11,8 @@ SockInf g_clients[MAX_USER];
 Player Player_Info;
 R_Players recvplayer;
 S_Players sendplayer;
+R_Zombies RecvZombie;
+R_Time RecvTime;
 Zombie Zombie_Info;
 R_Combine R_COMBINE;
 
@@ -290,7 +292,7 @@ void Recv_Packet(int clientId, char* buf) {
 			Player_Info.WeaponNum[clientId] = packet->WeaponNum;
 			Player_Info.Kit[clientId] = packet->Kit;
 
-			//cout << clientId << " Crouched : " << Player_Info.onCrouchToggle[clientId] << endl;
+			//cout << clientId << " SPRINTING : " << Player_Info.IsSprinting[clientId] << endl;
 
 			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
 			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
