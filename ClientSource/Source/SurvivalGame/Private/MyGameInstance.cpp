@@ -298,6 +298,11 @@ void MySocket::RecvPacket() {
 	delete[] RECV_BUF;
 }
 
+void MySocket::CloseSocket()
+{
+	inst->Close();
+}
+
 UMyGameInstance::UMyGameInstance()
 {
 	PlayerId = -1;
@@ -362,9 +367,19 @@ bool UMyGameInstance::IsAllLevelChange()
 {
 	return All_level_Changed;
 }
+void UMyGameInstance::FinishGame()
+{
+	MySocket::CloseSocket();
+	PlayerId = -1;
+	HostPlayer = -1;
+	Connected = false;
+	GameStart = false;
+	PlayerLogin = false;
+}
 
 UMyGameInstance::~UMyGameInstance()
 {
 	if (Connected)
 		inst->Close();
 }
+

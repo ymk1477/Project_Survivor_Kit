@@ -258,7 +258,7 @@ public:
 	static void initializeServer();
 	static void sendBuffer(int PacketType, void* BUF);
 	static void RecvPacket();
-	
+	static void CloseSocket();
 };
 
 static Player Player_info;
@@ -310,6 +310,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "TimeOfDay")
 		bool IsAllLevelChange();
+
+	UFUNCTION(BlueprintCallable, Category = "My_Server")
+		void FinishGame();
 
 	~UMyGameInstance();
 };
