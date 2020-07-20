@@ -218,6 +218,7 @@ void MySocket::RecvPacket() {
 					Player_info.View[i] = packet->View[i];
 					Player_info.WeaponNum[i] = packet->WeaponNum[i];
 					Player_info.Kit[i] = packet->Kit[i];
+					Player_info.SirenButton = packet->SirenButton;
 				}
 
 			}
@@ -311,6 +312,7 @@ UMyGameInstance::UMyGameInstance()
 	GameStart = false;
 	PlayerLogin = false;
 	All_level_Changed = false;
+	SirenPushed = false;
 }
 
 
@@ -375,6 +377,18 @@ void UMyGameInstance::FinishGame()
 	Connected = false;
 	GameStart = false;
 	PlayerLogin = false;
+	SirenPushed = false;
+}
+
+void UMyGameInstance::SirenPush()
+{
+	Player_info.SirenButton = true;
+	SirenPushed = true;
+}
+
+bool UMyGameInstance::IsSirenPushed()
+{
+	return SirenPushed;
 }
 
 UMyGameInstance::~UMyGameInstance()

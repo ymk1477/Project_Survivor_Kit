@@ -95,6 +95,7 @@ typedef struct Info_Player {
 	ViewPoint View[MAX_USER];
 	int WeaponNum[MAX_USER] = { 1 };
 	int Kit[MAX_USER] = { 0 };
+	bool SirenButton = false;
 }Player;
 
 typedef struct Info_Zombie {
@@ -157,6 +158,7 @@ typedef struct Send_Packet_Players {
 	ViewPoint View;
 	int WeaponNum;
 	int Kit;
+	bool SirenButton;
 }S_Players;
 
 typedef struct Recv_Packet_Players {
@@ -177,6 +179,7 @@ typedef struct Recv_Packet_Players {
 	ViewPoint View[MAX_USER];
 	int WeaponNum[MAX_USER] = { 1 };
 	int Kit[MAX_USER];
+	bool SirenButton;
 }R_Players;
 
 typedef struct Send_Packet_Level_Change {
@@ -272,6 +275,7 @@ static bool GameStart;
 static bool PlayerLogin;
 static bool All_level_Changed;
 static int Elapsed_Time;
+static bool SirenPushed;
 /**
  *
  */
@@ -314,5 +318,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "My_Server")
 		void FinishGame();
 
+	UFUNCTION(BlueprintCallable, Category = "My_Server")
+		void SirenPush();
+
+	UFUNCTION(BlueprintCallable, Category = "My_Server")
+		bool IsSirenPushed();
+	
 	~UMyGameInstance();
 };

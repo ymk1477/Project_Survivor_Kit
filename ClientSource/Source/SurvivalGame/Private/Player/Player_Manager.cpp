@@ -107,7 +107,8 @@ void APlayer_Manager::Tick(float DeltaTime)
 		S_Player_Packet.View = Player_info.View[PlayerId];
 		S_Player_Packet.WeaponNum = Player_info.WeaponNum[PlayerId];
 		S_Player_Packet.Kit = Player_info.Kit[PlayerId];
-				
+		S_Player_Packet.SirenButton = Player_info.SirenButton;
+
 		MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Player_Packet);
 		
 		MySocket::RecvPacket();
@@ -193,6 +194,9 @@ void APlayer_Manager::Tick(float DeltaTime)
 				}
 
 			}
+
+			if (Player_info.SirenButton)
+				SirenPushed = true;
 
 			//좀비 샌드리시브
 			auto ZombieArray = zombie_manager->GetZombieArray();

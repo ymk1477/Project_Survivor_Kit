@@ -292,6 +292,9 @@ void Recv_Packet(int clientId, char* buf) {
 			Player_Info.WeaponNum[clientId] = packet->WeaponNum;
 			Player_Info.Kit[clientId] = packet->Kit;
 
+			if(!(Player_Info.SirenButton) && packet->SirenButton)
+			Player_Info.SirenButton = packet->SirenButton;
+
 			//cout << clientId << " SPRINTING : " << Player_Info.IsSprinting[clientId] << endl;
 
 			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
@@ -325,6 +328,7 @@ void Recv_Packet(int clientId, char* buf) {
 				s_packet.View[i] = Player_Info.View[i];
 				s_packet.WeaponNum[i] = Player_Info.WeaponNum[i];
 				s_packet.Kit[i] = Player_Info.Kit[i];
+				s_packet.SirenButton = Player_Info.SirenButton;
 			}
 
 			for (int i = 0; i < MAX_USER; ++i) {

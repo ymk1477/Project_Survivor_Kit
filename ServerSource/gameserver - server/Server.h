@@ -97,6 +97,7 @@ typedef struct Info_Player {
 	ViewPoint View[MAX_USER];
 	int WeaponNum[MAX_USER] = { 1 };
 	int Kit[MAX_USER] = { 0 };
+	bool SirenButton;
 }Player;
 
 typedef struct Info_Zombie {
@@ -160,6 +161,7 @@ typedef struct Send_Packet_Players {
 	ViewPoint View[MAX_USER];
 	int WeaponNum[MAX_USER];
 	int Kit[MAX_USER];
+	bool SirenButton;
 }S_Players;
 
 typedef struct Recv_Packet_Players {
@@ -177,6 +179,7 @@ typedef struct Recv_Packet_Players {
 	ViewPoint View;
 	int WeaponNum;
 	int Kit;
+	bool SirenButton;
 }R_Players;
 
 typedef struct Recv_Packet_Level_Change {
