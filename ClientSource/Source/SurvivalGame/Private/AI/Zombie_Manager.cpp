@@ -8,7 +8,7 @@
 // Sets default values
 AZombie_Manager::AZombie_Manager()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
@@ -28,6 +28,23 @@ void AZombie_Manager::FindSpawnPoints()
 		PatrolZombieSpawnPoints.Emplace(NewPoint);
 	}
 
+	for (TActorIterator< AFastZombieSpawnPoint> It(CurrentWorld); It; ++It)
+	{
+		AFastZombieSpawnPoint* NewPoint = *It;
+		FastZombieSpawnPoints.Emplace(NewPoint);
+	}
+
+	for (TActorIterator< ACoronaZombieSpawnPoint> It(CurrentWorld); It; ++It)
+	{
+		ACoronaZombieSpawnPoint* NewPoint = *It;
+		CoronaZombieSpawnPoints.Emplace(NewPoint);
+	}
+
+	for (TActorIterator< AZombieAttackPoint> It(CurrentWorld); It; ++It)
+	{
+		AZombieAttackPoint* NewPoint = *It;
+		ZombieAttackPoints.Emplace(NewPoint);
+	}
 
 }
 
@@ -56,18 +73,51 @@ void AZombie_Manager::SpawnZombies()
 		Zombie_info.IsAlive[ZombieNum] = true;
 		Zombie_info.Target[ZombieNum] = -1;
 		ZombieNum++;
-	}		
+	}
 
-	UObject* SpawnActor2 = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/zombie/ZombiePatrol1")));
+	UObject* SpawnActor2 = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/zombie/ZombiePatrol1.ZombiePatrol1")));
 	UBlueprint* GenerateBp2 = Cast<UBlueprint>(SpawnActor2);
 
 	for (auto i = PatrolZombieSpawnPoints.begin(); i != PatrolZombieSpawnPoints.end(); ++i)
 	{
-		//NewRotator.Yaw = FMath::RandRange(0.0f, 360.0f);
 		ASZombieCharacter* NewPatrolZombie = CurrentWorld->SpawnActor<ASZombieCharacter>(GenerateBp2->GeneratedClass, (*i)->GetActorLocation(), FRotator::ZeroRotator, Spawnparams);
-		//ASZombieAIController* ZombieController = Cast<ASZombieAIController>(NewPatrolZombie->GetController());
-		PatrolZombies.Emplace(NewPatrolZombie);
-		//ZombieController->Possess(NewPatrolZombie);
+		ASZombieAIController* ZombieController = Cast<ASZombieAIController>(NewPatrolZombie->GetController());
+		Zombies.Emplace(NewPatrolZombie);
+		ZombieController->Possess(NewPatrolZombie);
+		Zombie_info.HP[ZombieNum] = NewPatrolZombie->GetHealth();
+		Zombie_info.IsAlive[ZombieNum] = true;
+		Zombie_info.Target[ZombieNum] = -1;
+		ZombieNum++;
+	}
+
+	UObject* SpawnActor3 = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/FreeModels/Zombie_3/Zombie_Fast")));
+	UBlueprint* GenerateBp3 = Cast<UBlueprint>(SpawnActor3);
+
+	for (auto i = FastZombieSpawnPoints.begin(); i != FastZombieSpawnPoints.end(); ++i)
+	{
+		ASZombieCharacter* NewFastZombie = CurrentWorld->SpawnActor<ASZombieCharacter>(GenerateBp3->GeneratedClass, (*i)->GetActorLocation(), FRotator::ZeroRotator, Spawnparams);
+		ASZombieAIController* ZombieController = Cast<ASZombieAIController>(NewFastZombie->GetController());
+		Zombies.Emplace(NewFastZombie);
+		ZombieController->Possess(NewFastZombie);
+		Zombie_info.HP[ZombieNum] = NewFastZombie->GetHealth();
+		Zombie_info.IsAlive[ZombieNum] = true;
+		Zombie_info.Target[ZombieNum] = -1;
+		ZombieNum++;;
+	}
+
+	UObject* SpawnActor4 = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/FreeModels/Zombie_4/CoronaZombie.CoronaZombie")));
+	UBlueprint* GenerateBp4 = Cast<UBlueprint>(SpawnActor4);
+
+	for (auto i = CoronaZombieSpawnPoints.begin(); i != CoronaZombieSpawnPoints.end(); ++i)
+	{
+		ASZombieCharacter* NewCoronaZombie = CurrentWorld->SpawnActor<ASZombieCharacter>(GenerateBp4->GeneratedClass, (*i)->GetActorLocation(), FRotator::ZeroRotator, Spawnparams);
+		ASZombieAIController* ZombieController = Cast<ASZombieAIController>(NewCoronaZombie->GetController());
+		Zombies.Emplace(NewCoronaZombie);
+		ZombieController->Possess(NewCoronaZombie);
+		Zombie_info.HP[ZombieNum] = NewCoronaZombie->GetHealth();
+		Zombie_info.IsAlive[ZombieNum] = true;
+		Zombie_info.Target[ZombieNum] = -1;
+		ZombieNum++;
 	}
 
 }
@@ -86,8 +136,6 @@ void AZombie_Manager::FindWayPoints()
 void AZombie_Manager::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("ZOMBIE MANAGER BEGIN PLAY!!!")));
 
 	PatrolZombieNumber = 0;
 	FindSpawnPoints();
@@ -99,7 +147,7 @@ void AZombie_Manager::BeginPlay()
 void AZombie_Manager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	int32 indexNum = -1;
 	if (Zombies.Num() > 0)
 	{
@@ -108,7 +156,6 @@ void AZombie_Manager::Tick(float DeltaTime)
 			if (Zombies[i]->IsDie())
 			{
 				Zombie_info.IsAlive[i] = false;
-				Zombie_info.Target[i] = -1;
 				indexNum = i;
 				break;
 			}
@@ -122,15 +169,13 @@ void AZombie_Manager::Tick(float DeltaTime)
 	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Zobies : %d "),
 		Zombies.Num()));*/
 
-	indexNum = -1;
+	/*indexNum = -1;
 	if (PatrolZombies.Num() > 0)
 	{
 		for (int32 i = 0; i < PatrolZombies.Num(); ++i)
 		{
 			if (PatrolZombies[i]->IsDie())
 			{
-				Zombie_info.IsAlive[i] = false;
-				Zombie_info.Target[i] = -1;
 				indexNum = i;
 				break;
 			}
@@ -139,12 +184,19 @@ void AZombie_Manager::Tick(float DeltaTime)
 		{
 			PatrolZombies.RemoveAt(indexNum);
 		}
-	}
+	}*/
 	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("ZombieSpawnPoints : %d , PatrolZombiesSpawnPoints : %d "),
 		ZombieSpawnPoints.Num(), PatrolZombieSpawnPoints.Num()));
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Zombies : %d , PatrolZombies : %d "),
 		Zombies.Num(),PatrolZombies.Num()));*/
 
+
+
+		/*for (int32 i = 0; i < Zombies.Num(); ++i)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Zombie HP : %d "),
+				i, Zombies[i]->GetHealth()));
+		}*/
 }
 
 TArray<ASZombieCharacter*>* AZombie_Manager::GetZombieArray()
@@ -166,4 +218,25 @@ int32 AZombie_Manager::GetPatrolNumber()
 {
 	PatrolZombieNumber++;
 	return PatrolZombieNumber;
+}
+
+void AZombie_Manager::ZombieAttackSpawn()
+{
+	for (int i = 0; i < Zombies.Num(); ++i)
+	{
+		Zombies[i]->Destroy();
+	}
+	Zombies.Empty();
+	SpawnZombies();
+	/*auto AttackPoints = ZombieAttackPoints.begin();
+	for (auto p = Zombies.begin(); p != Zombies.end(); ++p)
+	{
+		(*p)->SetActorLocation((*AttackPoints)->GetActorLocation(), true, nullptr, ETeleportType::None);
+		AttackPoints++;
+	}*/
+
+	for (int i = 0; i < Zombies.Num(); ++i)
+	{
+		Zombies[i]->SetActorLocation(ZombieAttackPoints[i]->GetActorLocation());
+	}
 }

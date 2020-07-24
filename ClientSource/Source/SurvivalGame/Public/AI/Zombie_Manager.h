@@ -7,6 +7,9 @@
 #include "GameFramework/Actor.h"
 #include "ZombieSpawnPoint.h"
 #include "PatrolZombieSpawnPoint.h"
+#include "FastZombieSpawnPoint.h"
+#include "CoronaZombieSpawnPoint.h"
+#include "ZombieAttackPoint.h"
 #include "SZombieCharacter.h"
 #include "SZombieAIController.h"
 #include "SBotWayPoint.h"
@@ -22,6 +25,10 @@ class SURVIVALGAME_API AZombie_Manager : public AActor
 	TArray< ASZombieCharacter*> Zombies;
 	TArray< APatrolZombieSpawnPoint*> PatrolZombieSpawnPoints;
 	TArray< ASZombieCharacter*> PatrolZombies;
+	TArray< AFastZombieSpawnPoint*> FastZombieSpawnPoints;
+	TArray< ACoronaZombieSpawnPoint*> CoronaZombieSpawnPoints;
+	TArray< AZombieAttackPoint*> ZombieAttackPoints;
+
 	TArray< ASBotWaypoint*> Waypoints;
 
 	int32 PatrolZombieNumber;
@@ -52,4 +59,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Patrol Zombie")
 	int32 GetPatrolNumber();
+
+	UFUNCTION(BlueprintCallable, Category = "Zombie Attack")
+	void ZombieAttackSpawn();
 };

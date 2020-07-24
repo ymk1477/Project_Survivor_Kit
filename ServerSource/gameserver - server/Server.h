@@ -9,7 +9,7 @@ using namespace std;
 #define MAX_BUFFER 2048
 #define SERVER_PORT 9000
 #define MAX_USER 4
-#define MAX_ZOMBIE 30
+#define MAX_ZOMBIE 35
 
 #define WEAPON_IDLE 10
 #define WEAPON_FIRING 11
@@ -97,13 +97,13 @@ typedef struct Info_Player {
 	ViewPoint View[MAX_USER];
 	int WeaponNum[MAX_USER] = { 1 };
 	int Kit[MAX_USER] = { 0 };
-	bool SirenButton;
+	bool SirenButton = false;
 }Player;
 
 typedef struct Info_Zombie {
 	float HP[MAX_ZOMBIE];
 	bool IsAlive[MAX_ZOMBIE] = { false };
-	int Target[MAX_ZOMBIE] = { -1, };
+	int Target[MAX_ZOMBIE] = { -1 };
 	Location Loc[MAX_ZOMBIE];
 	//bool Hit[MAX_ZOMBIE] = { false };
 }Zombie;

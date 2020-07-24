@@ -292,10 +292,10 @@ void Recv_Packet(int clientId, char* buf) {
 			Player_Info.WeaponNum[clientId] = packet->WeaponNum;
 			Player_Info.Kit[clientId] = packet->Kit;
 
-			if(!(Player_Info.SirenButton) && packet->SirenButton)
-			Player_Info.SirenButton = packet->SirenButton;
+			if (!(Player_Info.SirenButton) && packet->SirenButton)
+				Player_Info.SirenButton = packet->SirenButton;
 
-			//cout << clientId << " SPRINTING : " << Player_Info.IsSprinting[clientId] << endl;
+			//cout << clientId << " SirenPushed : " << Player_Info.SirenButton << endl;
 
 			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
 			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&recvplayer);
@@ -427,10 +427,13 @@ void Recv_Packet(int clientId, char* buf) {
 			R_Zombies* packet = reinterpret_cast<R_Zombies*>(buf);
 			for (int i = 0; i < MAX_ZOMBIE; ++i)
 			{
-				Zombie_Info.IsAlive[i] = packet->IsAlive[i];
-				Zombie_Info.Target[i] = packet->Target[i];
-				Zombie_Info.HP[i] = packet->HP[i];
-				Zombie_Info.Loc[i] = packet->Loc[i];
+				if (clientId == Player_Info.Host)
+				{
+					Zombie_Info.IsAlive[i] = packet->IsAlive[i];
+					Zombie_Info.Target[i] = packet->Target[i];
+					Zombie_Info.HP[i] = packet->HP[i];
+					Zombie_Info.Loc[i] = packet->Loc[i];
+				}
 			}
 
 			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
@@ -525,7 +528,7 @@ void Recv_Packet(int clientId, char* buf) {
 		break;
 		case PACKET_CS_COMBINE:
 		{
-			
+
 			R_Combine* packet = reinterpret_cast<R_Combine*>(buf);
 			Player_Info.HP[clientId] = packet->player.HP;
 			Player_Info.Loc[clientId] = packet->player.Loc;
