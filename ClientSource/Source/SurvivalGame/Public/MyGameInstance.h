@@ -13,7 +13,7 @@
 #include "MyGameInstance.generated.h"
 
 #define MAX_USER 4
-#define MAX_ZOMBIE 35
+#define MAX_ZOMBIE 30
 #define SERVERPORT 9000
 #define MAX_BUFFER 2048
 

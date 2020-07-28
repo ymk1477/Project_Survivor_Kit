@@ -9,7 +9,7 @@ using namespace std;
 #define MAX_BUFFER 2048
 #define SERVER_PORT 9000
 #define MAX_USER 4
-#define MAX_ZOMBIE 35
+#define MAX_ZOMBIE 30
 
 #define WEAPON_IDLE 10
 #define WEAPON_FIRING 11
@@ -110,7 +110,7 @@ typedef struct Info_Zombie {
 
 typedef struct Test_Packet {
 	int packet_type;
-	int i;
+	int i[256];
 }R_Test;
 
 
@@ -196,7 +196,7 @@ typedef struct Recv_Packet_Zombie
 {
 	int packet_type = PACKET_CS_ZOMBIE;
 	bool IsAlive[MAX_ZOMBIE];
-	int Target[MAX_ZOMBIE] = { -1, };
+	int Target[MAX_ZOMBIE] = { -1 };
 	float HP[MAX_ZOMBIE];
 	Location Loc[MAX_ZOMBIE];
 	//bool Hit[MAX_ZOMBIE];
@@ -206,7 +206,7 @@ typedef struct Send_Packet_Zombie
 {
 	int packet_type = PACKET_SC_ZOMBIE;
 	bool IsAlive[MAX_ZOMBIE];
-	int Target[MAX_ZOMBIE] = { -1, };
+	int Target[MAX_ZOMBIE] = { -1 };
 	float HP[MAX_ZOMBIE];
 	Location Loc[MAX_ZOMBIE];
 	//bool Hit[MAX_ZOMBIE];`

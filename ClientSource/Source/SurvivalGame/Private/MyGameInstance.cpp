@@ -239,14 +239,20 @@ void MySocket::RecvPacket() {
 		case PACKET_SC_ZOMBIE:
 		{
 			R_Zombies* packet = reinterpret_cast<R_Zombies*>(RECV_BUF);
-			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			if (PlayerId != HostPlayer)
 			{
-				Zombie_info.IsAlive[i] = packet->IsAlive[i];
-				if (packet->IsAlive[i])
+				for (int i = 0; i < MAX_ZOMBIE; ++i)
 				{
-					Zombie_info.Target[i] = packet->Target[i];
-					Zombie_info.HP[i] = packet->HP[i];
-					Zombie_info.Loc[i] = packet->Loc[i];
+					Zombie_info.IsAlive[i] = packet->IsAlive[i];
+					if (packet->IsAlive[i])
+					{
+						if (packet->Target[i] < -1 || packet->Target[i] > (Playing - 1))
+							Zombie_info.Target[i] = -1;
+						else
+							Zombie_info.Target[i] = packet->Target[i];
+						Zombie_info.HP[i] = packet->HP[i];
+						Zombie_info.Loc[i] = packet->Loc[i];
+					}
 				}
 			}
 		}

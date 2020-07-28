@@ -211,44 +211,41 @@ void APlayer_Manager::Tick(float DeltaTime)
 
 			}
 
-			/*if (Player_info.SirenButton)
-				SirenPushed = true;*/
 
 				//좀비 샌드리시브
 			auto ZombieArray = zombie_manager->GetZombieArray();
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("ZOMBIE : %d"),
-				ZombieArray->Num()));
-			/*for (int i = 0; i < ZombieArray->Num(); ++i)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d ZOMBIE HP : %f"),
-					i, (*ZombieArray)[i]->GetHealth()));
-			}*/
+		
 
-			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			if (MyInstance->IsHost())
 			{
-				if (Zombie_info.IsAlive[i])
+				for (int i = 0; i < MAX_ZOMBIE; ++i)
 				{
-					if (ZombieArray->IsValidIndex(i))
+					if (Zombie_info.IsAlive[i])
 					{
-						Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
-						Zombie_info.Loc[i].x = (*ZombieArray)[i]->GetActorLocation().X;
-						Zombie_info.Loc[i].y = (*ZombieArray)[i]->GetActorLocation().Y;
-						Zombie_info.Loc[i].z = (*ZombieArray)[i]->GetActorLocation().Z;
+						if (ZombieArray->IsValidIndex(i))
+						{
+							Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
+							Zombie_info.Loc[i].x = (*ZombieArray)[i]->GetActorLocation().X;
+							Zombie_info.Loc[i].y = (*ZombieArray)[i]->GetActorLocation().Y;
+							Zombie_info.Loc[i].z = (*ZombieArray)[i]->GetActorLocation().Z;
+						}
 					}
 				}
 			}
-
 			S_Zombies s_zombie_packet;
-			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			if (MyInstance->IsHost())
 			{
-				s_zombie_packet.IsAlive[i] = Zombie_info.IsAlive[i];
-				s_zombie_packet.Target[i] = Zombie_info.Target[i];
-				s_zombie_packet.HP[i] = Zombie_info.HP[i];
-				s_zombie_packet.Loc[i].x = Zombie_info.Loc[i].x;
-				s_zombie_packet.Loc[i].y = Zombie_info.Loc[i].y;
-				s_zombie_packet.Loc[i].z = Zombie_info.Loc[i].z;
-				//s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
-				//s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
+				for (int i = 0; i < MAX_ZOMBIE; ++i)
+				{
+					s_zombie_packet.IsAlive[i] = Zombie_info.IsAlive[i];
+					s_zombie_packet.Target[i] = Zombie_info.Target[i];
+					s_zombie_packet.HP[i] = Zombie_info.HP[i];
+					s_zombie_packet.Loc[i].x = Zombie_info.Loc[i].x;
+					s_zombie_packet.Loc[i].y = Zombie_info.Loc[i].y;
+					s_zombie_packet.Loc[i].z = Zombie_info.Loc[i].z;
+					//s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
+					//s_zombie_packet.Hit[i] = Zombie_info.Hit[i];
+				}
 			}
 			MySocket::sendBuffer(PACKET_CS_ZOMBIE, &s_zombie_packet);
 			MySocket::RecvPacket();
@@ -281,31 +278,18 @@ void APlayer_Manager::Tick(float DeltaTime)
 								(*ZombieArray)[i]->SetActorLocation(NewZombieLocation, true, nullptr, ETeleportType::None);
 							}
 							ASZombieAIController* ZombieController = Cast<ASZombieAIController>((*ZombieArray)[i]->GetController());
-
-							/*if (ZombieController->GetTargetEnemy())
-							{
-								if (Zombie_info.Target[i] != -1)
-								{
-									if (ZombieController->GetTargetEnemy() != Cast<ASBaseCharacter>(players[Zombie_info.Target[i]]))
-									{
-										ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
-									}
-								}
-							}
-							else
-							{
-								if (Zombie_info.Target[i] != -1)
-								{
-									ZombieController->SetTargetEnemy(players[Zombie_info.Target[i]]);
-								}
-							}*/
-
+			
 							if (Zombie_info.Target[i] != -1)
-							{
+							{	
 								if (ZombieController->GetTargetEnemy() == nullptr)
 								{
 									ZombieController->SetTargetEnemy(Cast<APawn>(players[Zombie_info.Target[i]]));
 								}
+							
+							}
+							else
+							{
+								ZombieController->SetTargetEnemy(nullptr);
 							}
 
 						}
@@ -313,12 +297,12 @@ void APlayer_Manager::Tick(float DeltaTime)
 				}
 			}
 
-			/*for (int i = 0; i < MAX_ZOMBIE; ++i)
+			for (int i = 0; i < MAX_ZOMBIE; ++i)
 			{
 				if(Zombie_info.IsAlive[i])
 					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d ZOMBIE TARGET : %d"), i, Zombie_info.Target[i]));
 
-			}*/
+			}
 
 			// 시간 샌드리시브
 

@@ -132,4 +132,6 @@ public:
 	void SetBotType(EBotBehaviorType NewType);
 
 	void SetHP(float hp);
+
+	int Zombie_Index;
 };

@@ -15,7 +15,7 @@
 
 TArray<ASCharacter*> Players;
 TArray<ASZombieCharacter*>* Zombies;
-int Zombie_Index;
+
 
 // Sets default values
 ASZombieCharacter::ASZombieCharacter(const class FObjectInitializer& ObjectInitializer)
@@ -154,7 +154,7 @@ void ASZombieCharacter::OnSeePlayer(APawn* Pawn)
 		Players = (*Player_It)->GetPlayerArray();
 		Zombies = (*Zombie_It)->GetZombieArray();
 
-		Zombie_Index = 0;
+		/*Zombie_Index = 0;
 		for (int i = 0; i < MAX_ZOMBIE; ++i)
 		{
 			if (Zombie_info.IsAlive[i])
@@ -168,7 +168,7 @@ void ASZombieCharacter::OnSeePlayer(APawn* Pawn)
 					}
 				}
 			}
-		}
+		}*/
 
 		for (int i = 0; i < MAX_USER; ++i)
 		{
@@ -226,7 +226,7 @@ void ASZombieCharacter::OnHearNoise(APawn* PawnInstigator, const FVector& Locati
 		Players = (*Player_It)->GetPlayerArray();
 		Zombies = (*Zombie_It)->GetZombieArray();
 
-		Zombie_Index = 0;
+		/*Zombie_Index = 0;
 		for (int i = 0; i < MAX_ZOMBIE; ++i)
 		{
 			if (Zombie_info.IsAlive[i])
@@ -240,7 +240,7 @@ void ASZombieCharacter::OnHearNoise(APawn* PawnInstigator, const FVector& Locati
 					}
 				}
 			}
-		}
+		}*/
 
 		ASBaseCharacter* TargetPawn = Cast<ASBaseCharacter>(PawnInstigator);
 		for (int i = 0; i < MAX_USER; ++i)

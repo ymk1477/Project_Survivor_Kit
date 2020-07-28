@@ -72,7 +72,11 @@ void AZombie_Manager::SpawnZombies()
 		Zombie_info.HP[ZombieNum] = NewZombie->GetHealth();
 		Zombie_info.IsAlive[ZombieNum] = true;
 		Zombie_info.Target[ZombieNum] = -1;
-		ZombieNum++;
+		Zombie_info.Loc[ZombieNum].x = NewZombie->GetActorLocation().X;
+		Zombie_info.Loc[ZombieNum].y = NewZombie->GetActorLocation().Y;
+		Zombie_info.Loc[ZombieNum].z = NewZombie->GetActorLocation().Z;
+		NewZombie->Zombie_Index = ZombieNum;
+		++ZombieNum;
 	}
 
 	UObject* SpawnActor2 = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/zombie/ZombiePatrol1.ZombiePatrol1")));
@@ -87,7 +91,11 @@ void AZombie_Manager::SpawnZombies()
 		Zombie_info.HP[ZombieNum] = NewPatrolZombie->GetHealth();
 		Zombie_info.IsAlive[ZombieNum] = true;
 		Zombie_info.Target[ZombieNum] = -1;
-		ZombieNum++;
+		Zombie_info.Loc[ZombieNum].x = NewPatrolZombie->GetActorLocation().X;
+		Zombie_info.Loc[ZombieNum].y = NewPatrolZombie->GetActorLocation().Y;
+		Zombie_info.Loc[ZombieNum].z = NewPatrolZombie->GetActorLocation().Z;
+		NewPatrolZombie->Zombie_Index = ZombieNum;
+		++ZombieNum;
 	}
 
 	UObject* SpawnActor3 = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/FreeModels/Zombie_3/Zombie_Fast")));
@@ -102,7 +110,11 @@ void AZombie_Manager::SpawnZombies()
 		Zombie_info.HP[ZombieNum] = NewFastZombie->GetHealth();
 		Zombie_info.IsAlive[ZombieNum] = true;
 		Zombie_info.Target[ZombieNum] = -1;
-		ZombieNum++;;
+		Zombie_info.Loc[ZombieNum].x = NewFastZombie->GetActorLocation().X;
+		Zombie_info.Loc[ZombieNum].y = NewFastZombie->GetActorLocation().Y;
+		Zombie_info.Loc[ZombieNum].z = NewFastZombie->GetActorLocation().Z;
+		NewFastZombie->Zombie_Index = ZombieNum;
+		++ZombieNum;;
 	}
 
 	UObject* SpawnActor4 = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/FreeModels/Zombie_4/CoronaZombie.CoronaZombie")));
@@ -117,7 +129,11 @@ void AZombie_Manager::SpawnZombies()
 		Zombie_info.HP[ZombieNum] = NewCoronaZombie->GetHealth();
 		Zombie_info.IsAlive[ZombieNum] = true;
 		Zombie_info.Target[ZombieNum] = -1;
-		ZombieNum++;
+		Zombie_info.Loc[ZombieNum].x = NewCoronaZombie->GetActorLocation().X;
+		Zombie_info.Loc[ZombieNum].y = NewCoronaZombie->GetActorLocation().Y;
+		Zombie_info.Loc[ZombieNum].z = NewCoronaZombie->GetActorLocation().Z;
+		NewCoronaZombie->Zombie_Index = ZombieNum;
+		++ZombieNum;
 	}
 
 }
