@@ -98,6 +98,7 @@ typedef struct Info_Player {
 	int WeaponNum[MAX_USER] = { 1 };
 	int Kit[MAX_USER] = { 0 };
 	bool SirenButton = false;
+	int ElapsedTime = 0;
 }Player;
 
 typedef struct Info_Zombie {
@@ -162,6 +163,9 @@ typedef struct Send_Packet_Players {
 	int WeaponNum[MAX_USER];
 	int Kit[MAX_USER];
 	bool SirenButton;
+	int ElapsedTime;
+	bool ZombieIsAlive[MAX_ZOMBIE];
+	int ZombieTarget[MAX_ZOMBIE];
 }S_Players;
 
 typedef struct Recv_Packet_Players {
@@ -180,6 +184,9 @@ typedef struct Recv_Packet_Players {
 	int WeaponNum;
 	int Kit;
 	bool SirenButton;
+	int ElapsedTime;
+	bool ZombieIsAlive[MAX_ZOMBIE];
+	int ZombieTarget[MAX_ZOMBIE];
 }R_Players;
 
 typedef struct Recv_Packet_Level_Change {

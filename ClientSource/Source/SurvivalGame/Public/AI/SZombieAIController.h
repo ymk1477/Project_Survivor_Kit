@@ -56,4 +56,6 @@ public:
 	FORCEINLINE UBehaviorTreeComponent* GetBehaviorComp() const { return BehaviorComp; }
 
 	FORCEINLINE UBlackboardComponent* GetBlackboardComp() const { return BlackboardComp; }
+
+
 };

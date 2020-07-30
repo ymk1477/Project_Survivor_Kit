@@ -32,6 +32,7 @@ class SURVIVALGAME_API AZombie_Manager : public AActor
 	TArray< ASBotWaypoint*> Waypoints;
 
 	int32 PatrolZombieNumber;
+	int AllZombies;
 public:	
 	// Sets default values for this actor's properties
 	AZombie_Manager();

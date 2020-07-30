@@ -136,6 +136,7 @@ void AZombie_Manager::SpawnZombies()
 		++ZombieNum;
 	}
 
+	AllZombies = ZombieNum;
 }
 
 void AZombie_Manager::FindWayPoints()
@@ -153,6 +154,7 @@ void AZombie_Manager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	AllZombies = 0;
 	PatrolZombieNumber = 0;
 	FindSpawnPoints();
 	FindWayPoints();
@@ -172,13 +174,24 @@ void AZombie_Manager::Tick(float DeltaTime)
 			if (Zombies[i]->IsDie())
 			{
 				Zombie_info.IsAlive[i] = false;
+				Zombie_info.Target[i] = -1;
 				indexNum = i;
-				break;
+
+				for (int32 j = indexNum; j < AllZombies - 1 ; ++j)
+				{
+					Zombie_info.IsAlive[j] = Zombie_info.IsAlive[j + 1];
+					Zombie_info.Target[j] = Zombie_info.Target[j + 1];
+					Zombie_info.Loc[j] = Zombie_info.Loc[j + 1];
+					Zombie_info.HP[j] = Zombie_info.HP[j + 1];
+				}
+
+				Zombie_info.IsAlive[AllZombies] = false;
+				AllZombies -= 1;
+				if (Zombies.IsValidIndex(indexNum))
+				{
+					Zombies.RemoveAt(indexNum);
+				}				
 			}
-		}
-		if (Zombies.IsValidIndex(indexNum))
-		{
-			Zombies.RemoveAt(indexNum);
 		}
 	}
 

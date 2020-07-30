@@ -173,8 +173,16 @@ void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 
 			if (!(Player_Info.SirenButton) && packet->SirenButton)
 				Player_Info.SirenButton = packet->SirenButton;
-
-			//cout << clientId << " SirenPushed : " << Player_Info.SirenButton << endl;
+			if (clientId == Player_Info.Host)
+			{
+				Player_Info.ElapsedTime = packet->ElapsedTime;
+				for (int i = 0; i < MAX_ZOMBIE; ++i)
+				{
+					Zombie_Info.IsAlive[i] = packet->ZombieIsAlive[i];
+					Zombie_Info.Target[i] = packet->ZombieTarget[i];
+				}
+			}
+			//cout << clientId << " ElapsedTime : " << Player_Info.ElapsedTime << endl;
 
 			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
 			g_clients[clientId].over.dataBuffer.buf = reinterpret_cast<char*>(&Testing);
@@ -208,6 +216,12 @@ void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 				s_packet.WeaponNum[i] = Player_Info.WeaponNum[i];
 				s_packet.Kit[i] = Player_Info.Kit[i];
 				s_packet.SirenButton = Player_Info.SirenButton;
+				s_packet.ElapsedTime = Player_Info.ElapsedTime;
+			}
+			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			{
+				s_packet.ZombieIsAlive[i] = Zombie_Info.IsAlive[i];
+				s_packet.ZombieTarget[i] = Zombie_Info.Target[i];
 			}
 
 			for (int i = 0; i < MAX_USER; ++i) {
@@ -330,6 +344,8 @@ void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 			for (int i = 0; i < MAX_ZOMBIE; ++i)
 			{
 				s_packet.IsAlive[i] = Zombie_Info.IsAlive[i];
+				if(Zombie_Info.Target[i] != -1)
+					cout << i << " Zombie Target : " << Zombie_Info.Target[i] << endl;
 				s_packet.Target[i] = Zombie_Info.Target[i];
 				s_packet.HP[i] = Zombie_Info.HP[i];
 				s_packet.Loc[i] = Zombie_Info.Loc[i];

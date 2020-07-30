@@ -71,6 +71,7 @@ void ASZombieAIController::SetTargetEnemy(APawn* NewTarget)
 	{
 		BlackboardComp->SetValueAsObject(TargetEnemyKeyName, NewTarget);
 	}
+	
 }
 
 
@@ -103,3 +104,4 @@ void ASZombieAIController::SetBlackboardBotType(EBotBehaviorType NewType)
 		BlackboardComp->SetValueAsEnum(BotTypeKeyName, (uint8)NewType);
 	}
 }
+

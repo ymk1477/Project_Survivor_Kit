@@ -101,20 +101,41 @@ void ASZombieCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	/* Check if the last time we sensed a player is beyond the time out value to prevent bot from endlessly following a player. */
-	if (bSensedTarget && (GetWorld()->TimeSeconds - LastSeenTime) > SenseTimeOut
-		&& (GetWorld()->TimeSeconds - LastHeardTime) > SenseTimeOut)
+	if (PlayerId == HostPlayer)
 	{
-		ASZombieAIController* AIController = Cast<ASZombieAIController>(GetController());
-		if (AIController)
+		/* Check if the last time we sensed a player is beyond the time out value to prevent bot from endlessly following a player. */
+		if (bSensedTarget && (GetWorld()->TimeSeconds - LastSeenTime) > SenseTimeOut
+			&& (GetWorld()->TimeSeconds - LastHeardTime) > SenseTimeOut)
 		{
-			bSensedTarget = false;
-			/* Reset */
-			AIController->SetTargetEnemy(nullptr);
-			Zombie_info.Target[Zombie_Index] = -1;
+			ASZombieAIController* AIController = Cast<ASZombieAIController>(GetController());
+			if (AIController)
+			{
+				bSensedTarget = false;
+				/* Reset */
+				AIController->SetTargetEnemy(nullptr);
+				Zombie_info.Target[Zombie_Index] = -1;
 
-			/* Stop playing the hunting sound */
-			BroadcastUpdateAudioLoop(false);
+				/* Stop playing the hunting sound */
+				BroadcastUpdateAudioLoop(false);
+			}
+		}
+	}
+	else
+	{
+		if (bSensedTarget && (GetWorld()->TimeSeconds - LastSeenTime) > SenseTimeOut
+			&& (GetWorld()->TimeSeconds - LastHeardTime) > SenseTimeOut)
+		{
+			ASZombieAIController* AIController = Cast<ASZombieAIController>(GetController());
+			if (AIController)
+			{
+				bSensedTarget = false;
+				/* Reset */
+				AIController->SetTargetEnemy(nullptr);
+				//Zombie_info.Target[Zombie_Index] = -1;
+
+				/* Stop playing the hunting sound */
+				BroadcastUpdateAudioLoop(false);
+			}
 		}
 	}
 }
@@ -122,18 +143,18 @@ void ASZombieCharacter::Tick(float DeltaSeconds)
 
 void ASZombieCharacter::OnSeePlayer(APawn* Pawn)
 {
+	if (!IsAlive())
+	{
+		return;
+	}
+
+	if (!bSensedTarget)
+	{
+		BroadcastUpdateAudioLoop(true);
+	}
+
 	if (PlayerId == HostPlayer)
 	{
-		if (!IsAlive())
-		{
-			return;
-		}
-
-		if (!bSensedTarget)
-		{
-			BroadcastUpdateAudioLoop(true);
-		}
-
 		/* Keep track of the time the player was last sensed in order to clear the target */
 		LastSeenTime = GetWorld()->GetTimeSeconds();
 		bSensedTarget = true;
@@ -153,22 +174,6 @@ void ASZombieCharacter::OnSeePlayer(APawn* Pawn)
 		}
 		Players = (*Player_It)->GetPlayerArray();
 		Zombies = (*Zombie_It)->GetZombieArray();
-
-		/*Zombie_Index = 0;
-		for (int i = 0; i < MAX_ZOMBIE; ++i)
-		{
-			if (Zombie_info.IsAlive[i])
-			{
-				if ((*Zombies).IsValidIndex(i))
-				{
-					if (this == (*Zombies)[i])
-					{
-						Zombie_Index = i;
-						break;
-					}
-				}
-			}
-		}*/
 
 		for (int i = 0; i < MAX_USER; ++i)
 		{
@@ -191,21 +196,27 @@ void ASZombieCharacter::OnSeePlayer(APawn* Pawn)
 		}
 	}
 
+	else
+	{
+	
+		/* Keep track of the time the player was last sensed in order to clear the target */
+		LastSeenTime = GetWorld()->GetTimeSeconds();
+		bSensedTarget = true;
 
-	//if (AIController)
-	//{
-	//	AIController->SetTargetEnemy(SensedPawn);
-
-	//	
-	//}
+		ASZombieAIController* AIController = Cast<ASZombieAIController>(GetController());
+		ASBaseCharacter* SensedPawn = Cast<ASBaseCharacter>(Pawn);
+		if (AIController && SensedPawn->IsAlive())
+		{
+			AIController->SetTargetEnemy(SensedPawn);
+		}
+	}
 
 }
 
 
 void ASZombieCharacter::OnHearNoise(APawn* PawnInstigator, const FVector& Location, float Volume)
 {
-	if (PlayerId == HostPlayer)
-	{
+	
 		if (!IsAlive())
 		{
 			return;
@@ -216,58 +227,48 @@ void ASZombieCharacter::OnHearNoise(APawn* PawnInstigator, const FVector& Locati
 			BroadcastUpdateAudioLoop(true);
 		}
 
-		bSensedTarget = true;
-		LastHeardTime = GetWorld()->GetTimeSeconds();
-
-		ASZombieAIController* AIController = Cast<ASZombieAIController>(GetController());
-		UWorld* CurrentWorld = GetWorld();
-		TActorIterator<APlayer_Manager> Player_It(GetWorld());
-		TActorIterator<AZombie_Manager> Zombie_It(GetWorld());
-		Players = (*Player_It)->GetPlayerArray();
-		Zombies = (*Zombie_It)->GetZombieArray();
-
-		/*Zombie_Index = 0;
-		for (int i = 0; i < MAX_ZOMBIE; ++i)
+		if (PlayerId == HostPlayer)
 		{
-			if (Zombie_info.IsAlive[i])
-			{
-				if ((*Zombies).IsValidIndex(i))
-				{
-					if (this == (*Zombies)[i])
-					{
-						Zombie_Index = i;
-						break;
-					}
-				}
-			}
-		}*/
+			bSensedTarget = true;
+			LastHeardTime = GetWorld()->GetTimeSeconds();
 
-		ASBaseCharacter* TargetPawn = Cast<ASBaseCharacter>(PawnInstigator);
-		for (int i = 0; i < MAX_USER; ++i)
-		{
-			if (Player_info.IsUsed[i])
+			ASZombieAIController* AIController = Cast<ASZombieAIController>(GetController());
+			UWorld* CurrentWorld = GetWorld();
+			TActorIterator<APlayer_Manager> Player_It(GetWorld());
+			TActorIterator<AZombie_Manager> Zombie_It(GetWorld());
+			Players = (*Player_It)->GetPlayerArray();
+			Zombies = (*Zombie_It)->GetZombieArray();
+
+			ASBaseCharacter* TargetPawn = Cast<ASBaseCharacter>(PawnInstigator);
+			for (int i = 0; i < MAX_USER; ++i)
 			{
-				if (&(*TargetPawn) == &(*(Players[i])))
+				if (Player_info.IsUsed[i])
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("TargetPawn : %d"), &(*TargetPawn)));
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Players : %d"), &(*(Players[i]))));
-					if (AIController)
+					if (&(*TargetPawn) == &(*(Players[i])))
 					{
-						AIController->SetTargetEnemy(PawnInstigator);
-						Zombie_info.Target[Zombie_Index] = i;
-						break;
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("TargetPawn : %d"), &(*TargetPawn)));
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Players : %d"), &(*(Players[i]))));
+						if (AIController)
+						{
+							AIController->SetTargetEnemy(PawnInstigator);
+							Zombie_info.Target[Zombie_Index] = i;
+							break;
+						}
 					}
 				}
 			}
 		}
-	}
+		else
+		{
+			bSensedTarget = true;
+			LastHeardTime = GetWorld()->GetTimeSeconds();
 
-	/*if (AIController)
-	{
-		AIController->SetTargetEnemy(PawnInstigator);
-
-	}*/
-
+			ASZombieAIController* AIController = Cast<ASZombieAIController>(GetController());
+			if (AIController)
+			{
+				AIController->SetTargetEnemy(PawnInstigator);
+			}
+		}
 }
 
 

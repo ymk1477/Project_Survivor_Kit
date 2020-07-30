@@ -218,10 +218,19 @@ void MySocket::RecvPacket() {
 					Player_info.View[i] = packet->View[i];
 					Player_info.WeaponNum[i] = packet->WeaponNum[i];
 					Player_info.Kit[i] = packet->Kit[i];
-					if(!Player_info.SirenButton && packet->SirenButton)
-						Player_info.SirenButton = packet->SirenButton;
 				}
 
+			}
+			if(!Player_info.SirenButton && packet->SirenButton)
+				Player_info.SirenButton = packet->SirenButton;
+			if (Player_info.Host != PlayerId) 
+			{
+				Player_info.ElapsedTime = packet->ElapsedTime;
+				for (int i = 0; i < MAX_ZOMBIE; ++i)
+				{
+					Zombie_info.IsAlive[i] = packet->ZombieIsAlive[i];
+					Zombie_info.Target[i] = packet->ZombieTarget[i];
+				}
 			}
 
 			/*	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("X : %f, Y : %f, Z: %f "),
