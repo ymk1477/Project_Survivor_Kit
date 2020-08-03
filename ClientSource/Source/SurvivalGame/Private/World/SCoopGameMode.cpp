@@ -31,7 +31,7 @@ void ASCoopGameMode::RestartPlayer(class AController* NewPlayer)
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Restart Player() ")));
 		Super::RestartPlayer(NewPlayer);
 
-		TActorIterator<AZombie_Manager> It(GetWorld());
+		/*TActorIterator<AZombie_Manager> It(GetWorld());
 		ASZombieCharacter* NewZombie = Cast<ASZombieCharacter>(NewPlayer->GetPawn());
 		(*It)->GetZombieArray()->Emplace(NewZombie);
 		for (int i = 0; i < MAX_ZOMBIE; ++i)
@@ -45,7 +45,7 @@ void ASCoopGameMode::RestartPlayer(class AController* NewPlayer)
 				Zombie_info.Loc[i].z = NewZombie->GetActorLocation().Z;
 				break;
 			}
-		}
+		}*/
 		return;
 	}
 

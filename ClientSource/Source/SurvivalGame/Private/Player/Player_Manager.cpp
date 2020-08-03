@@ -52,12 +52,12 @@ void APlayer_Manager::Tick(float DeltaTime)
 	{
 		/*if (All_level_Changed)
 		{*/
-		ASCharacter* MyPawn = players[PlayerId];
-		Player_info.HP[PlayerId] = MyPawn->GetHealth();
-		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player HP : %f"),
-				Player_info.HP[PlayerId]));*/
-		if (Player_info.HP[PlayerId] > 0.0f)
+		if (!(players[PlayerId]->IsDie()))
 		{
+			ASCharacter* MyPawn = players[PlayerId];
+			Player_info.HP[PlayerId] = MyPawn->GetHealth();
+			/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Player HP : %f"),
+					Player_info.HP[PlayerId]));*/
 			FVector MyLocation = MyPawn->GetActorLocation();
 			Player_info.Loc[PlayerId].x = MyLocation.X;
 			Player_info.Loc[PlayerId].y = MyLocation.Y;
@@ -101,7 +101,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 			Player_info.ElapsedTime = MyGameState->ElapsedGameMinutes;
 
 			auto ZombieArray = zombie_manager->GetZombieArray();
-			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			/*for (int i = 0; i < MAX_ZOMBIE; ++i)
 			{
 				if (Zombie_info.IsAlive[i])
 				{
@@ -113,7 +113,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 						Zombie_info.Loc[i].z = (*ZombieArray)[i]->GetActorLocation().Z;
 					}
 				}
-			}
+			}*/
 		}
 
 		S_Players S_Player_Packet;
@@ -197,7 +197,7 @@ void APlayer_Manager::Tick(float DeltaTime)
 							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player NewLoc = X: %f, Y : %f, Z : %f"), i + 1,
 								NewLoc.X, NewLoc.Y, NewLoc.Z));*/
 
-							if ((FVector::Dist(players[i]->GetActorLocation(), NewLoc)) > 3.0f)
+							if ((FVector::Dist(players[i]->GetActorLocation(), NewLoc)) > 10.0f)
 							{
 								//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player Distance > 10.0f"), i + 1));
 								const FVector InterpVec = FMath::VInterpTo(players[i]->GetActorLocation(), NewLoc, DeltaTime, NewVelocity.Size());
@@ -245,16 +245,31 @@ void APlayer_Manager::Tick(float DeltaTime)
 				{
 					if (Zombie_info.IsAlive[i])
 					{
-						if (ZombieArray->IsValidIndex(i))
+						if ((*ZombieArray)[i] != nullptr)
 						{
 							ASZombieAIController* ZombieController = Cast<ASZombieAIController>((*ZombieArray)[i]->GetController());
 
 							if (Zombie_info.Target[i] != -1)
 							{
+								if (Zombie_info.Target[i] > (Playing - 1)) 
+								{
+									GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("i Zombie Target : %d "),
+										Zombie_info.Target[i]));
+								}
+
 								ZombieController->SetTargetEnemy(Cast<APawn>(players[Zombie_info.Target[i]]));
+							}
+							else
+							{
+								ZombieController->SetTargetEnemy(nullptr);
 							}
 
 						}
+					}
+					else
+					{
+						(*ZombieArray)[i]->Destroy();
+						//(*ZombieArray)[i] = nullptr;
 					}
 				}
 

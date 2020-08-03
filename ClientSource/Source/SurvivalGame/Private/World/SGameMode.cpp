@@ -368,7 +368,7 @@ void ASGameMode::SpawnBotHandler()
 			/* Check number of available pawns (players included) */
 			if (GetWorld()->GetNumPawns() < MaxPawns)
 			{
-				SpawnNewBot();
+				//SpawnNewBot();
 			}
 		}
 	}

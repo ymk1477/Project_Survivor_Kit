@@ -171,13 +171,14 @@ void AZombie_Manager::Tick(float DeltaTime)
 	{
 		for (int32 i = 0; i < Zombies.Num(); ++i)
 		{
-			if (Zombies[i]->IsDie())
+			if (Zombies[i] != nullptr && Zombies[i]->IsDie())
 			{
 				Zombie_info.IsAlive[i] = false;
 				Zombie_info.Target[i] = -1;
 				indexNum = i;
+				Zombies[i] = nullptr;
 
-				for (int32 j = indexNum; j < AllZombies - 1 ; ++j)
+				/*for (int32 j = indexNum; j < AllZombies - 1 ; ++j)
 				{
 					Zombie_info.IsAlive[j] = Zombie_info.IsAlive[j + 1];
 					Zombie_info.Target[j] = Zombie_info.Target[j + 1];
@@ -190,13 +191,21 @@ void AZombie_Manager::Tick(float DeltaTime)
 				if (Zombies.IsValidIndex(indexNum))
 				{
 					Zombies.RemoveAt(indexNum);
-				}				
+				}*/				
 			}
 		}
 	}
 
-	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Zobies : %d "),
-		Zombies.Num()));*/
+	for (int32 i = 0; i < Zombies.Num(); ++i)
+	{
+		if (Zombies[i] == nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Zombie %d : NULL "),i));
+		}
+	}
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Zobies : %d "),
+	//	Zombies.Num()));
 
 	/*indexNum = -1;
 	if (PatrolZombies.Num() > 0)
@@ -253,7 +262,8 @@ void AZombie_Manager::ZombieAttackSpawn()
 {
 	for (int i = 0; i < Zombies.Num(); ++i)
 	{
-		Zombies[i]->Destroy();
+		if(Zombie_info.IsAlive[i])
+			Zombies[i]->Destroy();
 	}
 	Zombies.Empty();
 	SpawnZombies();
