@@ -231,7 +231,7 @@ void MySocket::RecvPacket() {
 					Zombie_info.IsAlive[i] = packet->ZombieIsAlive[i];
 					Zombie_info.Target[i] = packet->ZombieTarget[i];
 					//Zombie_info.Loc[i] = packet->ZombieLoc[i];
-					Zombie_info.HP[i] = packet->ZombieHP[i];
+					//Zombie_info.HP[i] = packet->ZombieHP[i];
 				}
 			}
 

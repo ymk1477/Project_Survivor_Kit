@@ -103,7 +103,7 @@ typedef struct Info_Player {
 
 typedef struct Info_Zombie {
 	float HP[MAX_ZOMBIE];
-	bool IsAlive[MAX_ZOMBIE] = { false };
+	bool IsAlive[MAX_ZOMBIE] = { true };
 	int Target[MAX_ZOMBIE] = { -1 };
 	Location Loc[MAX_ZOMBIE];
 	//bool Hit[MAX_ZOMBIE] = { false };
@@ -167,7 +167,7 @@ typedef struct Send_Packet_Players {
 	bool ZombieIsAlive[MAX_ZOMBIE];
 	int ZombieTarget[MAX_ZOMBIE];
 	//Location ZombieLoc[MAX_ZOMBIE];
-	int ZombieHP[MAX_ZOMBIE];
+	//int ZombieHP[MAX_ZOMBIE];
 }S_Players;
 
 typedef struct Recv_Packet_Players {
@@ -190,7 +190,7 @@ typedef struct Recv_Packet_Players {
 	bool ZombieIsAlive[MAX_ZOMBIE];
 	int ZombieTarget[MAX_ZOMBIE];
 	//Location ZombieLoc[MAX_ZOMBIE];
-	int ZombieHP[MAX_ZOMBIE];
+	//int ZombieHP[MAX_ZOMBIE];
 }R_Players;
 
 typedef struct Recv_Packet_Level_Change {

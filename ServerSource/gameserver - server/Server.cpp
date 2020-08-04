@@ -14,6 +14,7 @@ S_Players sendplayer;
 R_Zombies RecvZombie;
 R_Time RecvTime;
 Zombie Zombie_Info;
+Zombie Client_Zombie[MAX_USER];
 R_Combine R_COMBINE;
 R_Test Testing;
 
@@ -173,17 +174,47 @@ void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 
 			if (!(Player_Info.SirenButton) && packet->SirenButton)
 				Player_Info.SirenButton = packet->SirenButton;
+			if(clientId == Player_Info.Host)
+				Player_Info.ElapsedTime = packet->ElapsedTime;
+			
+			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			{
+				Client_Zombie[clientId].IsAlive[i] = packet->ZombieIsAlive[i];
+				//Client_Zombie[clientId].Target[i] = packet->ZombieTarget[i];
+			}
+
+			for (int i = 0; i < MAX_ZOMBIE; ++i)
+			{
+				bool CalcAlive = false;
+				for (int j = 0; j < Players - 1 ; ++j)
+				{
+					if (j == 0)
+						CalcAlive = Client_Zombie[j].IsAlive[i];
+					else
+						CalcAlive = CalcAlive && Client_Zombie[j].IsAlive[i];
+				}
+
+				Zombie_Info.IsAlive[i] = CalcAlive;
+
+			}
+			
 			if (clientId == Player_Info.Host)
 			{
-				Player_Info.ElapsedTime = packet->ElapsedTime;
-				for (int i = 0; i < MAX_ZOMBIE; ++i)
-				{
-					Zombie_Info.IsAlive[i] = packet->ZombieIsAlive[i];
+				for(int i = 0 ; i < MAX_ZOMBIE; ++i)
 					Zombie_Info.Target[i] = packet->ZombieTarget[i];
-					//Zombie_Info.Loc[i] = packet->ZombieLoc[i];
-					Zombie_Info.HP[i] = packet->ZombieHP[i];
-				}
 			}
+
+			//if (clientId == Player_Info.Host)
+			//{
+			//	Player_Info.ElapsedTime = packet->ElapsedTime;
+			//	for (int i = 0; i < MAX_ZOMBIE; ++i)
+			//	{
+			//		Zombie_Info.IsAlive[i] = packet->ZombieIsAlive[i];
+			//		Zombie_Info.Target[i] = packet->ZombieTarget[i];
+			//		//Zombie_Info.Loc[i] = packet->ZombieLoc[i];
+			//		//Zombie_Info.HP[i] = packet->ZombieHP[i];
+			//	}
+			//}
 			//cout << clientId << " ElapsedTime : " << Player_Info.ElapsedTime << endl;
 
 			g_clients[clientId].over.dataBuffer.len = MAX_BUFFER;
@@ -225,7 +256,7 @@ void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 				s_packet.ZombieIsAlive[i] = Zombie_Info.IsAlive[i];
 				s_packet.ZombieTarget[i] = Zombie_Info.Target[i];
 				//s_packet.ZombieLoc[i] = Zombie_Info.Loc[i];
-				s_packet.ZombieHP[i] = Zombie_Info.HP[i];
+				//s_packet.ZombieHP[i] = Zombie_Info.HP[i];
 			}
 
 			for (int i = 0; i < MAX_USER; ++i) {
