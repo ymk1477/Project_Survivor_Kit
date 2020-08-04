@@ -101,19 +101,19 @@ void APlayer_Manager::Tick(float DeltaTime)
 			Player_info.ElapsedTime = MyGameState->ElapsedGameMinutes;
 
 			auto ZombieArray = zombie_manager->GetZombieArray();
-			/*for (int i = 0; i < MAX_ZOMBIE; ++i)
+			for (int i = 0; i < MAX_ZOMBIE; ++i)
 			{
 				if (Zombie_info.IsAlive[i])
 				{
-					if (ZombieArray->IsValidIndex(i))
+					if ((*ZombieArray)[i] != nullptr)
 					{
 						Zombie_info.HP[i] = (*ZombieArray)[i]->GetHealth();
-						Zombie_info.Loc[i].x = (*ZombieArray)[i]->GetActorLocation().X;
+					/*	Zombie_info.Loc[i].x = (*ZombieArray)[i]->GetActorLocation().X;
 						Zombie_info.Loc[i].y = (*ZombieArray)[i]->GetActorLocation().Y;
-						Zombie_info.Loc[i].z = (*ZombieArray)[i]->GetActorLocation().Z;
+						Zombie_info.Loc[i].z = (*ZombieArray)[i]->GetActorLocation().Z;*/
 					}
 				}
-			}*/
+			}
 		}
 
 		S_Players S_Player_Packet;
@@ -139,6 +139,8 @@ void APlayer_Manager::Tick(float DeltaTime)
 		{
 			S_Player_Packet.ZombieIsAlive[i] = Zombie_info.IsAlive[i];
 			S_Player_Packet.ZombieTarget[i] = Zombie_info.Target[i];
+			//S_Player_Packet.ZombieLoc[i] = Zombie_info.Loc[i];
+			S_Player_Packet.ZombieHP[i] = Zombie_info.HP[i];
 		}
 
 		MySocket::sendBuffer(PACKET_CS_PLAYERS, &S_Player_Packet);
@@ -197,11 +199,11 @@ void APlayer_Manager::Tick(float DeltaTime)
 							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player NewLoc = X: %f, Y : %f, Z : %f"), i + 1,
 								NewLoc.X, NewLoc.Y, NewLoc.Z));*/
 
-							if ((FVector::Dist(players[i]->GetActorLocation(), NewLoc)) > 10.0f)
+							if ((FVector::Dist(players[i]->GetActorLocation(), NewLoc)) > 30.0f)
 							{
-								//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%d Player Distance > 10.0f"), i + 1));
-								const FVector InterpVec = FMath::VInterpTo(players[i]->GetActorLocation(), NewLoc, DeltaTime, NewVelocity.Size());
-								players[i]->SetActorLocation(InterpVec, true, nullptr, ETeleportType::None);
+								//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("%d Player Distance > 30.0f"), i + 1));
+								//const FVector InterpVec = FMath::VInterpTo(players[i]->GetActorLocation(), NewLoc, DeltaTime, NewVelocity.Size());
+								players[i]->SetActorLocation(NewLoc, false, nullptr, ETeleportType::TeleportPhysics);
 
 							}
 							else
@@ -246,12 +248,23 @@ void APlayer_Manager::Tick(float DeltaTime)
 					if (Zombie_info.IsAlive[i])
 					{
 						if ((*ZombieArray)[i] != nullptr)
-						{
+						{	
+							/*FVector NewLocation;
+							NewLocation.X = Zombie_info.Loc[i].x;
+							NewLocation.Y = Zombie_info.Loc[i].y;
+							NewLocation.Z = Zombie_info.Loc[i].z;
+							const FVector CalcLoc = NewLocation;
+							if((FVector::Dist((*ZombieArray)[i]->GetActorLocation(), CalcLoc) > 5.0f))
+								(*ZombieArray)[i]->SetActorLocation(CalcLoc, false, nullptr, ETeleportType::TeleportPhysics);*/
+
+							if (Zombie_info.HP[i] != (*ZombieArray)[i]->GetHealth())
+								(*ZombieArray)[i]->SetHP(Zombie_info.HP[i]);
+
 							ASZombieAIController* ZombieController = Cast<ASZombieAIController>((*ZombieArray)[i]->GetController());
 
 							if (Zombie_info.Target[i] != -1)
 							{
-								if (Zombie_info.Target[i] > (Playing - 1)) 
+								if (Zombie_info.Target[i] < Playing ) 
 								{
 									GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("i Zombie Target : %d "),
 										Zombie_info.Target[i]));
@@ -268,8 +281,11 @@ void APlayer_Manager::Tick(float DeltaTime)
 					}
 					else
 					{
-						(*ZombieArray)[i]->Destroy();
-						//(*ZombieArray)[i] = nullptr;
+						if ((*ZombieArray)[i] != nullptr)
+						{
+							(*ZombieArray)[i]->Destroy();
+							(*ZombieArray)[i] = nullptr;
+						}
 					}
 				}
 
@@ -416,7 +432,7 @@ void APlayer_Manager::SpawnPlayers()
 
 	if (Playing > 1)
 	{
-		UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/Player/Main_Player")));
+		UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/Player/Main_Player.Main_Player'")));
 
 		UBlueprint* GenerateBp = Cast<UBlueprint>(SpawnActor);
 

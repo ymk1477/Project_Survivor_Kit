@@ -180,6 +180,8 @@ void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 				{
 					Zombie_Info.IsAlive[i] = packet->ZombieIsAlive[i];
 					Zombie_Info.Target[i] = packet->ZombieTarget[i];
+					//Zombie_Info.Loc[i] = packet->ZombieLoc[i];
+					Zombie_Info.HP[i] = packet->ZombieHP[i];
 				}
 			}
 			//cout << clientId << " ElapsedTime : " << Player_Info.ElapsedTime << endl;
@@ -222,6 +224,8 @@ void CALLBACK recv_callback(DWORD Error, DWORD dataBytes, LPWSAOVERLAPPED overla
 			{
 				s_packet.ZombieIsAlive[i] = Zombie_Info.IsAlive[i];
 				s_packet.ZombieTarget[i] = Zombie_Info.Target[i];
+				//s_packet.ZombieLoc[i] = Zombie_Info.Loc[i];
+				s_packet.ZombieHP[i] = Zombie_Info.HP[i];
 			}
 
 			for (int i = 0; i < MAX_USER; ++i) {

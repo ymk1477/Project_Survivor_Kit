@@ -51,7 +51,7 @@ void AZombie_Manager::FindSpawnPoints()
 void AZombie_Manager::SpawnZombies()
 {
 	UWorld* CurrentWorld = GetWorld();
-	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/zombie/ZombieCharacter")));
+	UObject* SpawnActor = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/zombie/ZombieCharacter.ZombieCharacter'")));
 	UBlueprint* GenerateBp = Cast<UBlueprint>(SpawnActor);
 
 	FActorSpawnParameters Spawnparams;
@@ -79,7 +79,7 @@ void AZombie_Manager::SpawnZombies()
 		++ZombieNum;
 	}
 
-	UObject* SpawnActor2 = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/zombie/ZombiePatrol1.ZombiePatrol1")));
+	UObject* SpawnActor2 = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/zombie/ZombiePatrol1.ZombiePatrol1'")));
 	UBlueprint* GenerateBp2 = Cast<UBlueprint>(SpawnActor2);
 
 	for (auto i = PatrolZombieSpawnPoints.begin(); i != PatrolZombieSpawnPoints.end(); ++i)
@@ -98,7 +98,7 @@ void AZombie_Manager::SpawnZombies()
 		++ZombieNum;
 	}
 
-	UObject* SpawnActor3 = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/FreeModels/Zombie_3/Zombie_Fast")));
+	UObject* SpawnActor3 = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/FreeModels/Zombie_3/Zombie_Fast.Zombie_Fast'")));
 	UBlueprint* GenerateBp3 = Cast<UBlueprint>(SpawnActor3);
 
 	for (auto i = FastZombieSpawnPoints.begin(); i != FastZombieSpawnPoints.end(); ++i)
@@ -117,7 +117,7 @@ void AZombie_Manager::SpawnZombies()
 		++ZombieNum;;
 	}
 
-	UObject* SpawnActor4 = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("/Game/FreeModels/Zombie_4/CoronaZombie.CoronaZombie")));
+	UObject* SpawnActor4 = Cast<UObject>(StaticLoadObject(UObject::StaticClass(), NULL, TEXT("Blueprint'/Game/FreeModels/Zombie_4/CoronaZombie.CoronaZombie'")));
 	UBlueprint* GenerateBp4 = Cast<UBlueprint>(SpawnActor4);
 
 	for (auto i = CoronaZombieSpawnPoints.begin(); i != CoronaZombieSpawnPoints.end(); ++i)
@@ -262,7 +262,7 @@ void AZombie_Manager::ZombieAttackSpawn()
 {
 	for (int i = 0; i < Zombies.Num(); ++i)
 	{
-		if(Zombie_info.IsAlive[i])
+		if(Zombie_info.IsAlive[i] && Zombies[i] != nullptr)
 			Zombies[i]->Destroy();
 	}
 	Zombies.Empty();
